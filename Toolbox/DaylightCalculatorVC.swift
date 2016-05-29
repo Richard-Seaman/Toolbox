@@ -51,7 +51,7 @@ class DaylightCalculatorVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardNotification:", name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DaylightCalculatorVC.keyboardNotification(_:)), name: UIKeyboardWillChangeFrameNotification, object: nil)
         
         // Set up nav bar
         self.navigationItem.titleView = getNavImageView(UIApplication.sharedApplication().statusBarOrientation)
@@ -60,7 +60,7 @@ class DaylightCalculatorVC: UIViewController {
         
         // Make the labels multi-line
         var labels:[UILabel] = [roomLengthLabel, roomDepthLabel, roomHeightLabel, windowLengthLabel, windowHeightLabel]
-        for index=0; index < labels.count; index++ {
+        for index=0; index < labels.count; index += 1 {
             labels[index].numberOfLines = 0
         }
         
@@ -75,7 +75,7 @@ class DaylightCalculatorVC: UIViewController {
         
         // Set up the views
         var views:[UIView] = [topView, roomVariablesView]
-        for index=0; index < views.count; index++ {
+        for index=0; index < views.count ; index += 1 {
             views[index].layer.backgroundColor = UIColor.whiteColor().CGColor
             if (index == 0) {
                 views[index].layer.cornerRadius = 20
@@ -88,22 +88,22 @@ class DaylightCalculatorVC: UIViewController {
         }
         
         // Add data check, tags, keyboard bar and apply button and default values to textfields
-        for index=0; index < textFields.count; index++ {
+        for index=0; index < textFields.count; index += 1 {
             textFields[index].text = String(format: "%.1f", defaults[index])
             textFields[index].tag = index
-            textFields[index].addTarget(self, action: "checkValue:", forControlEvents: UIControlEvents.EditingDidEnd)
+            textFields[index].addTarget(self, action: #selector(DaylightCalculatorVC.checkValue(_:)), forControlEvents: UIControlEvents.EditingDidEnd)
             self.setupTextFieldInputAccessoryView(textFields[index])
         }
         
         // Add update action to segmented control
-        self.schoolSelector.addTarget(self, action: "updateCalculation", forControlEvents: UIControlEvents.ValueChanged)
+        self.schoolSelector.addTarget(self, action: #selector(DaylightCalculatorVC.updateCalculation), forControlEvents: UIControlEvents.ValueChanged)
         self.schoolSelector.tintColor = bdpColour
         
         // Update max window dimensions
         self.setMaxWindowSizes()
         
         // Keep track of current values
-        for index=0; index < currentValues.count; index++ {
+        for index=0; index < currentValues.count; index += 1 {
             self.currentValues[index] = self.defaults[index]
         }
         
@@ -176,7 +176,7 @@ class DaylightCalculatorVC: UIViewController {
     
     @IBAction func backgroundTapped(sender:AnyObject) {
         var index:Int = Int()
-        for index = 0; index < self.textFields.count; index++ {
+        for index = 0; index < self.textFields.count; index += 1 {
             textFields[index].resignFirstResponder()
             self.keyboardHeightLayoutConstraint.constant = 0
             contentView.layoutIfNeeded()
@@ -189,7 +189,7 @@ class DaylightCalculatorVC: UIViewController {
         doneToolbar.barStyle = UIBarStyle.BlackTranslucent
         
         let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: Selector("applyButtonAction"))
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: #selector(DaylightCalculatorVC.applyButtonAction))
         done.tintColor = UIColor.whiteColor()
         
         var items = [UIBarButtonItem]()
@@ -228,11 +228,11 @@ class DaylightCalculatorVC: UIViewController {
         var daylightFactorPositionInRange:Int = 0
         var index:Int = Int()
         
-        for index = 0; index < ranges.count; index++ {
+        for index = 0; index < ranges.count; index += 1 {
             
             // Find where the daylight factor lies within the range
             if (daylightFactor > ranges[index]) {
-                daylightFactorPositionInRange++
+                daylightFactorPositionInRange += 1
             }
         }
         

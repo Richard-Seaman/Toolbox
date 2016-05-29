@@ -33,11 +33,11 @@ class HeatPipeSizerSettingsVC: UIViewController {
         
         loadPipeSizerProperties()
                 
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardNotification:", name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(HeatPipeSizerSettingsVC.keyboardNotification(_:)), name: UIKeyboardWillChangeFrameNotification, object: nil)
         
         self.automaticallyAdjustsScrollViewInsets = false
         
-        self.selector.addTarget(self, action: "selectorDidChange", forControlEvents: UIControlEvents.ValueChanged)
+        self.selector.addTarget(self, action: #selector(HeatPipeSizerSettingsVC.selectorDidChange), forControlEvents: UIControlEvents.ValueChanged)
         self.selector.tintColor = UIColor.darkGrayColor()
         
         self.setUpUI()
@@ -112,7 +112,7 @@ class HeatPipeSizerSettingsVC: UIViewController {
     
     func addBackgroundTap(view:UIControl) {
         
-        view.addTarget(self, action: "backgroundTapped:", forControlEvents: UIControlEvents.TouchUpInside)
+        view.addTarget(self, action: #selector(HeatPipeSizerSettingsVC.backgroundTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         
     }
     
@@ -351,13 +351,13 @@ class HeatPipeSizerSettingsVC: UIViewController {
                 button.tintColor = UIColor.darkGrayColor()
                 
                 if (indexPath.section == 0) {
-                    button.addTarget(self, action: "resetLPHWDefaults", forControlEvents: UIControlEvents.TouchUpInside)
+                    button.addTarget(self, action: #selector(HeatPipeSizerSettingsVC.resetLPHWDefaults), forControlEvents: UIControlEvents.TouchUpInside)
                 }
                 else if (indexPath.section == 1) {
-                    button.addTarget(self, action: "resetCHWDefaults", forControlEvents: UIControlEvents.TouchUpInside)
+                    button.addTarget(self, action: #selector(HeatPipeSizerSettingsVC.resetCHWDefaults), forControlEvents: UIControlEvents.TouchUpInside)
                 }
                 else if (indexPath.section == 2) {
-                    button.addTarget(self, action: "resetMiscDefaults", forControlEvents: UIControlEvents.TouchUpInside)
+                    button.addTarget(self, action: #selector(HeatPipeSizerSettingsVC.resetMiscDefaults), forControlEvents: UIControlEvents.TouchUpInside)
                 }
                 
                 
@@ -403,7 +403,7 @@ class HeatPipeSizerSettingsVC: UIViewController {
                     textField.alpha = 1
                     textField.minimumFontSize = 5
                     textField.adjustsFontSizeToFitWidth = true
-                    textField.addTarget(self, action: "textFieldEditingDidEnd:", forControlEvents: UIControlEvents.EditingDidEnd)
+                    textField.addTarget(self, action: #selector(HeatPipeSizerSettingsVC.textFieldEditingDidEnd(_:)), forControlEvents: UIControlEvents.EditingDidEnd)
                     self.setupTextFieldInputAccessoryView(textField)
                     
                     // Get the property value
@@ -589,7 +589,7 @@ class HeatPipeSizerSettingsVC: UIViewController {
         doneToolbar.barStyle = UIBarStyle.BlackTranslucent
         
         let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: Selector("applyButtonAction"))
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: #selector(HeatPipeSizerSettingsVC.applyButtonAction))
         done.tintColor = UIColor.whiteColor()
         
         var items = [UIBarButtonItem]()

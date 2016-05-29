@@ -21,7 +21,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardNotification:", name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DaylightCalculatorInfoVC.keyboardNotification(_:)), name: UIKeyboardWillChangeFrameNotification, object: nil)
 
         // Set up nav bar
         self.navigationItem.titleView = getNavImageView(UIApplication.sharedApplication().statusBarOrientation)
@@ -86,7 +86,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
         let filePath = dataFilePath()
         
         var stringArray:[String] = [String]()
-        for var index = 0; index < daylightCalculatorDefaults.count; index++ {
+        for var index = 0; index < daylightCalculatorDefaults.count; index += 1 {
             
             stringArray.append(String(format: "%.2f", daylightCalculatorDefaults[index]))
             
@@ -291,7 +291,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 
                 let button:ButtonWithRow = cell!.viewWithTag(1) as! ButtonWithRow
                 button.row = 1  // use row to store section
-                button.addTarget(self, action: "resetButtonTapped:", forControlEvents: UIControlEvents.TouchUpInside)
+                button.addTarget(self, action: #selector(DaylightCalculatorInfoVC.resetButtonTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
                 
                 button.layer.borderColor = UIColor.darkGrayColor().CGColor
                 button.layer.borderWidth = 1.5
@@ -425,7 +425,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 
                 let button:ButtonWithRow = cell!.viewWithTag(1) as! ButtonWithRow
                 button.row = 2  // use row to store section
-                button.addTarget(self, action: "resetButtonTapped:", forControlEvents: UIControlEvents.TouchUpInside)
+                button.addTarget(self, action: #selector(DaylightCalculatorInfoVC.resetButtonTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
                 
                 button.layer.borderColor = UIColor.darkGrayColor().CGColor
                 button.layer.borderWidth = 1.5
@@ -467,7 +467,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
         
         
         let background:UIControl = cell!.viewWithTag(9) as! UIControl
-        background.addTarget(self, action: "backgroundTapped:", forControlEvents: UIControlEvents.TouchUpInside)
+        background.addTarget(self, action: #selector(DaylightCalculatorInfoVC.backgroundTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         
         
         return cell!
@@ -518,7 +518,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
     func backgroundTapped(sender:AnyObject) {
         print("Background Tapped")
         var index:Int = Int()
-        for index = 0; index < self.textFields.count; index++ {
+        for index = 0; index < self.textFields.count; index += 1 {
             textFields[index].resignFirstResponder()
             self.keyboardHeightLayoutConstraint.constant = 0
         }
@@ -530,7 +530,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
         doneToolbar.barStyle = UIBarStyle.BlackTranslucent
         
         let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: Selector("applyButtonAction"))
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: #selector(DaylightCalculatorInfoVC.applyButtonAction))
         done.tintColor = UIColor.whiteColor()
         
         var items = [UIBarButtonItem]()

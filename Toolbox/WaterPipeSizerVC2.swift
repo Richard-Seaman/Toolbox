@@ -55,7 +55,7 @@ class WaterPipeSizerVC2: UIViewController {
         
         loadLoadingUnits()
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardNotification:", name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(WaterPipeSizerVC2.keyboardNotification(_:)), name: UIKeyboardWillChangeFrameNotification, object: nil)
         
         self.automaticallyAdjustsScrollViewInsets = false
         
@@ -67,7 +67,7 @@ class WaterPipeSizerVC2: UIViewController {
         
         // Add tap background
         for view in self.staticBackgroundViews {
-            view.addTarget(self, action: "backgroundTapped", forControlEvents: UIControlEvents.TouchUpInside)
+            view.addTarget(self, action: #selector(WaterPipeSizerVC2.backgroundTapped), forControlEvents: UIControlEvents.TouchUpInside)
         }
         
         // Set up flow views
@@ -110,7 +110,7 @@ class WaterPipeSizerVC2: UIViewController {
         self.tableView.reloadData()
         
         // Set the results labels
-        for var index:Int = 0; index < self.pipeSizeLabels.count; index++ {
+        for index:Int in 0 ..< self.pipeSizeLabels.count {
             
             let sizeLabel:UILabel = self.pipeSizeLabels[index]
             let size:Int? = self.pipeSizes[index]
@@ -218,10 +218,10 @@ class WaterPipeSizerVC2: UIViewController {
         
         var index:Int = Int()
         // Cycle through each outlet type
-        for index = 0; index < numberOfOutlets.count; index++ {
+        for index = 0; index < numberOfOutlets.count; index += 1 {
             
             var pipeTypeIndex:Int = Int()
-            for (pipeTypeIndex = 0; pipeTypeIndex < totalLoadingUnits.count; pipeTypeIndex++) {
+            for (pipeTypeIndex = 0; pipeTypeIndex < totalLoadingUnits.count; pipeTypeIndex += 1) {
                 
                 totalLoadingUnits[pipeTypeIndex] = totalLoadingUnits[pipeTypeIndex] + Float(numberOfOutlets[index]) * loadingUnitsApplied[index][pipeTypeIndex]
                 
@@ -238,9 +238,9 @@ class WaterPipeSizerVC2: UIViewController {
         // Interpolate the flowrate for the calculated Total Demand
         
         var pipeIndex:Int = Int()
-        for (pipeIndex = 0; pipeIndex < self.pipeFlows.count; pipeIndex++) {
+        for (pipeIndex = 0; pipeIndex < self.pipeFlows.count; pipeIndex += 1) {
             
-            for index = 0; index < demandUnits.count; index++ {
+            for index = 0; index < demandUnits.count; index += 1 {
                 
                 if (totalLoadingUnits[pipeIndex] >= demandUnits.last) {
                     // If it's out of range
@@ -268,9 +268,9 @@ class WaterPipeSizerVC2: UIViewController {
         var pipeSizes:[Int] = [12, 15, 22, 28, 35, 42, 54, 67]
         var maxFlowRates:[Float] = [0.091, 0.143, 0.311, 0.527, 0.833, 1.18, 2.41, 4.8]
         
-        for (pipeIndex = 0; pipeIndex < self.pipeFlows.count; pipeIndex++) {
+        for (pipeIndex = 0; pipeIndex < self.pipeFlows.count; pipeIndex += 1) {
             
-            for index = 0; index < pipeSizes.count; index++ {
+            for index = 0; index < pipeSizes.count; index += 1 {
                 
                 if (self.pipeFlows[pipeIndex] < maxFlowRates[index]) {
                     self.pipeSizes[pipeIndex] = pipeSizes[index]
@@ -284,7 +284,7 @@ class WaterPipeSizerVC2: UIViewController {
             }
         }
         
-        for (pipeIndex = 0; pipeIndex < self.pipeFlows.count; pipeIndex++) {
+        for (pipeIndex = 0; pipeIndex < self.pipeFlows.count; pipeIndex += 1) {
             
             // If the pipe size works out as 12, manually set it to 15
             if (self.pipeSizes[pipeIndex] == 12) {
@@ -379,7 +379,7 @@ class WaterPipeSizerVC2: UIViewController {
             // Set Pipe type (will automatically set image)
             changePipeTypeButton.combination = self.pipeTypeArray[indexPath.row]
             changePipeTypeButton.row = indexPath.row
-            changePipeTypeButton.addTarget(self, action: "changePipeTypeTapped:", forControlEvents: UIControlEvents.TouchUpInside)
+            changePipeTypeButton.addTarget(self, action: #selector(WaterPipeSizerVC2.changePipeTypeTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
             self.outletPipeTypeButtons[indexPath.row] = changePipeTypeButton
             
             // Set Outlet image
@@ -405,7 +405,7 @@ class WaterPipeSizerVC2: UIViewController {
             
             // Set up the textfield
             outletTextField.text = String(format: "%i", self.numberOfOutlets[indexPath.row])
-            outletTextField.addTarget(self, action: "outletTextFieldEditDidEnd:", forControlEvents: UIControlEvents.EditingDidEnd)
+            outletTextField.addTarget(self, action: #selector(WaterPipeSizerVC2.outletTextFieldEditDidEnd(_:)), forControlEvents: UIControlEvents.EditingDidEnd)
             outletTextField.row = indexPath.row
             self.setupTextFieldInputAccessoryView(outletTextField)
             self.outletTextFields[indexPath.row] = outletTextField
@@ -415,13 +415,13 @@ class WaterPipeSizerVC2: UIViewController {
             minusButton.row = indexPath.row
             clearButton.row = indexPath.row
             
-            plusButton.addTarget(self, action: "plusButtonTapped:", forControlEvents: UIControlEvents.TouchUpInside)
-            minusButton.addTarget(self, action: "minusButtonTapped:", forControlEvents: UIControlEvents.TouchUpInside)
-            clearButton.addTarget(self, action: "outletClearButtonTapped:", forControlEvents: UIControlEvents.TouchUpInside)
+            plusButton.addTarget(self, action: #selector(WaterPipeSizerVC2.plusButtonTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+            minusButton.addTarget(self, action: #selector(WaterPipeSizerVC2.minusButtonTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+            clearButton.addTarget(self, action: #selector(WaterPipeSizerVC2.outletClearButtonTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
             
             // Assign background taps to views
-            countView.addTarget(self, action: "backgroundTapped", forControlEvents: UIControlEvents.TouchUpInside)
-            imageContainerView.addTarget(self, action: "backgroundTapped", forControlEvents: UIControlEvents.TouchUpInside)
+            countView.addTarget(self, action: #selector(WaterPipeSizerVC2.backgroundTapped), forControlEvents: UIControlEvents.TouchUpInside)
+            imageContainerView.addTarget(self, action: #selector(WaterPipeSizerVC2.backgroundTapped), forControlEvents: UIControlEvents.TouchUpInside)
             
             
         case 1:
@@ -468,8 +468,8 @@ class WaterPipeSizerVC2: UIViewController {
             leftTextField.row = indexPath.row
             rightTextField.row = indexPath.row + 2
             
-            leftTextField.addTarget(self, action: "flowTextFieldEditingDidEnd:", forControlEvents: UIControlEvents.EditingDidEnd)
-            rightTextField.addTarget(self, action: "flowTextFieldEditingDidEnd:", forControlEvents: UIControlEvents.EditingDidEnd)
+            leftTextField.addTarget(self, action: #selector(WaterPipeSizerVC2.flowTextFieldEditingDidEnd(_:)), forControlEvents: UIControlEvents.EditingDidEnd)
+            rightTextField.addTarget(self, action: #selector(WaterPipeSizerVC2.flowTextFieldEditingDidEnd(_:)), forControlEvents: UIControlEvents.EditingDidEnd)
             
             self.setupTextFieldInputAccessoryView(leftTextField)
             self.setupTextFieldInputAccessoryView(rightTextField)
@@ -482,13 +482,13 @@ class WaterPipeSizerVC2: UIViewController {
             leftClearButton.row = indexPath.row
             rightClearButton.row = indexPath.row + 2
             
-            leftClearButton.addTarget(self, action: "flowClearButtonTapped:", forControlEvents: UIControlEvents.TouchUpInside)
-            rightClearButton.addTarget(self, action: "flowClearButtonTapped:", forControlEvents: UIControlEvents.TouchUpInside)
+            leftClearButton.addTarget(self, action: #selector(WaterPipeSizerVC2.flowClearButtonTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+            rightClearButton.addTarget(self, action: #selector(WaterPipeSizerVC2.flowClearButtonTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
             
             
             // Background taps
-            leftView.addTarget(self, action: "backgroundTapped", forControlEvents: UIControlEvents.TouchUpInside)
-            rightView.addTarget(self, action: "backgroundTapped", forControlEvents: UIControlEvents.TouchUpInside)
+            leftView.addTarget(self, action: #selector(WaterPipeSizerVC2.backgroundTapped), forControlEvents: UIControlEvents.TouchUpInside)
+            rightView.addTarget(self, action: #selector(WaterPipeSizerVC2.backgroundTapped), forControlEvents: UIControlEvents.TouchUpInside)
             
             
             
@@ -707,7 +707,7 @@ class WaterPipeSizerVC2: UIViewController {
         doneToolbar.barStyle = UIBarStyle.BlackTranslucent
         
         let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: Selector("backgroundTapped"))
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: #selector(WaterPipeSizerVC2.backgroundTapped))
         done.tintColor = UIColor.whiteColor()
         
         var items = [UIBarButtonItem]()

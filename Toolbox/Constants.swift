@@ -53,7 +53,7 @@ func loadDaylightDefaults() {
     let filePath = dataFilePath()
     if (NSFileManager.defaultManager().fileExistsAtPath(filePath)) {
         let array = NSArray(contentsOfFile: filePath) as! [String]
-        for var i:Int = 0; i < array.count; i++ {
+        for var i:Int = 0; i < array.count; i += 1 {
             daylightCalculatorDefaults[i] = array[i].floatValue
         }
     }
@@ -106,7 +106,7 @@ func loadLoadingUnits() {
     let filePath = loadingUnitsFilePath()
     if (NSFileManager.defaultManager().fileExistsAtPath(filePath)) {
         let array = NSArray(contentsOfFile: filePath) as! [[Float]]
-        for var i:Int = 0; i < array.count; i++ {
+        for var i:Int = 0; i < array.count; i += 1 {
             loadingUnits[i] = array[i]
         }
         print("Loading Units loaded from file")
@@ -147,7 +147,7 @@ func loadDuctSizerProperties() {
     let filePath = ductSizerPropertiesFilePath()
     if (NSFileManager.defaultManager().fileExistsAtPath(filePath)) {
         let array = NSArray(contentsOfFile: filePath) as! [Float]
-        for var i:Int = 0; i < array.count; i++ {
+        for var i:Int = 0; i < array.count; i += 1 {
             ductSizerProperties[i] = array[i]
         }
         print("Duct Sizer Properties loaded from file")
@@ -212,7 +212,7 @@ func loadPipeSizerProperties() {
     let filePath = pipeSizerPropertiesFilePath()
     if (NSFileManager.defaultManager().fileExistsAtPath(filePath)) {
         let array = NSArray(contentsOfFile: filePath) as! [Float]
-        for var i:Int = 0; i < array.count; i++ {
+        for var i:Int = 0; i < array.count; i += 1 {
             pipeSizerProperties[i] = array[i]
         }
         print("Pipe Sizer Properties loaded from file")
@@ -299,7 +299,7 @@ func returnHeader(sender:UIView, colourOption option:Int = 0) -> UITableViewHead
     }
     else {
         // Default Colour
-        header.contentView.backgroundColor = colour
+        header.contentView.backgroundColor = bdpColour
     }
     
     return header

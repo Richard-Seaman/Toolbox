@@ -37,11 +37,11 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardNotification:", name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(WaterPipeSizerSettingsVC.keyboardNotification(_:)), name: UIKeyboardWillChangeFrameNotification, object: nil)
         
         self.automaticallyAdjustsScrollViewInsets = false
         
-        self.selector.addTarget(self, action: "selectorDidChange", forControlEvents: UIControlEvents.ValueChanged)
+        self.selector.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.selectorDidChange), forControlEvents: UIControlEvents.ValueChanged)
         self.selector.tintColor = UIColor.darkGrayColor()
         
         self.setUpUI()
@@ -130,7 +130,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
     
     func addBorderAndBackgroundTap(view:UIControl) {
         
-        view.addTarget(self, action: "backgroundTapped:", forControlEvents: UIControlEvents.TouchUpInside)
+        view.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.backgroundTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         
         view.layer.borderWidth = 0.5
         view.layer.borderColor = UIColor.darkGrayColor().CGColor
@@ -321,12 +321,12 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
             for textField in textFields {
                 textField.minimumFontSize = 5
                 textField.adjustsFontSizeToFitWidth = true
-                textField.addTarget(self, action: "textFieldEditingDidEnd:", forControlEvents: UIControlEvents.EditingDidEnd)
+                textField.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.textFieldEditingDidEnd(_:)), forControlEvents: UIControlEvents.EditingDidEnd)
                 textField.indexPath = indexPath
                 textField.row = indexPath.row
                 textField.column = currentColumn
                 self.setupTextFieldInputAccessoryView(textField)
-                currentColumn++
+                currentColumn += 1
             }
             
             // Hide the non-applicable text fields in each row
@@ -373,7 +373,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
             
             // Set the text field texts
             var index:Int = Int()
-            for index = 0; index < textFields.count; index++ {
+            for index = 0; index < textFields.count; index += 1 {
                 if (loadingUnits[indexPath.row][index] != 0) {
                     textFields[index].text = String(format: "%.1f", loadingUnits[indexPath.row][index])
                 }
@@ -582,7 +582,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
         doneToolbar.barStyle = UIBarStyle.BlackTranslucent
         
         let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: Selector("applyButtonAction"))
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: #selector(WaterPipeSizerSettingsVC.applyButtonAction))
         done.tintColor = UIColor.whiteColor()
         
         var items = [UIBarButtonItem]()

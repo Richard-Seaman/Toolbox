@@ -20,13 +20,13 @@
 		9B4AD64F1BB5DF1400AF9091 /* WaterPipeSizerVC2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4AD64E1BB5DF1400AF9091 /* WaterPipeSizerVC2.swift */; };
 		9B4AD6511BB5E31300AF9091 /* ButtonWithRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4AD6501BB5E31300AF9091 /* ButtonWithRow.swift */; };
 		9B4AD6541BB5E34500AF9091 /* TextFieldWithRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4AD6531BB5E34500AF9091 /* TextFieldWithRow.swift */; };
+		9B7F7CCB1CFB2DF0002D352B /* DuctSizerFormulae.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9B7F7CC91CFB2DF0002D352B /* DuctSizerFormulae.pdf */; };
+		9B7F7CCC1CFB2DF0002D352B /* PipeSizerFormulae.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9B7F7CCA1CFB2DF0002D352B /* PipeSizerFormulae.pdf */; };
 		9BCE1F191C6E7A0500F417FE /* InfoVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BCE1F181C6E7A0500F417FE /* InfoVC.swift */; };
 		9BD1CD5B1B5EF98100EEFB40 /* DemandUnitTF.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD1CD5A1B5EF98100EEFB40 /* DemandUnitTF.swift */; };
 		9BD6C40D1B603892006D2408 /* DuctSizerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD6C40C1B603892006D2408 /* DuctSizerVC.swift */; };
-		9BE0EFF71C12214000E37680 /* DuctSizerFormulae.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9BE0EFF61C12214000E37680 /* DuctSizerFormulae.pdf */; };
 		9BE0EFFA1C149D2400E37680 /* HomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE0EFF91C149D2400E37680 /* HomeVC.swift */; };
 		9BE0EFFC1C149E2700E37680 /* ActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE0EFFB1C149E2700E37680 /* ActionView.swift */; };
-		9BE0EFFE1C161DAB00E37680 /* PipeSizerFormulae.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9BE0EFFD1C161DAB00E37680 /* PipeSizerFormulae.pdf */; };
 		9BF7E3401B64F0DD00FF247E /* DuctSizerSettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF7E33F1B64F0DD00FF247E /* DuctSizerSettingsVC.swift */; };
 		9BF7E3431B655FDF00FF247E /* HeatPipeSizerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF7E3421B655FDF00FF247E /* HeatPipeSizerVC.swift */; };
 		9BF7E3451B656DC400FF247E /* LoadInfoTF.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF7E3441B656DC400FF247E /* LoadInfoTF.swift */; };
@@ -62,13 +62,13 @@
 		9B4AD64E1BB5DF1400AF9091 /* WaterPipeSizerVC2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaterPipeSizerVC2.swift; sourceTree = "<group>"; };
 		9B4AD6501BB5E31300AF9091 /* ButtonWithRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ButtonWithRow.swift; sourceTree = "<group>"; };
 		9B4AD6531BB5E34500AF9091 /* TextFieldWithRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextFieldWithRow.swift; sourceTree = "<group>"; };
+		9B7F7CC91CFB2DF0002D352B /* DuctSizerFormulae.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = DuctSizerFormulae.pdf; sourceTree = "<group>"; };
+		9B7F7CCA1CFB2DF0002D352B /* PipeSizerFormulae.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = PipeSizerFormulae.pdf; sourceTree = "<group>"; };
 		9BCE1F181C6E7A0500F417FE /* InfoVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InfoVC.swift; sourceTree = "<group>"; };
 		9BD1CD5A1B5EF98100EEFB40 /* DemandUnitTF.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemandUnitTF.swift; sourceTree = "<group>"; };
 		9BD6C40C1B603892006D2408 /* DuctSizerVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuctSizerVC.swift; sourceTree = "<group>"; };
-		9BE0EFF61C12214000E37680 /* DuctSizerFormulae.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = DuctSizerFormulae.pdf; path = "../../../Formulae Images/DuctSizerFormulae.pdf"; sourceTree = "<group>"; };
 		9BE0EFF91C149D2400E37680 /* HomeVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeVC.swift; sourceTree = "<group>"; };
 		9BE0EFFB1C149E2700E37680 /* ActionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionView.swift; sourceTree = "<group>"; };
-		9BE0EFFD1C161DAB00E37680 /* PipeSizerFormulae.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = PipeSizerFormulae.pdf; path = "../../../Formulae Images/PipeSizerFormulae.pdf"; sourceTree = "<group>"; };
 		9BF7E33F1B64F0DD00FF247E /* DuctSizerSettingsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuctSizerSettingsVC.swift; sourceTree = "<group>"; };
 		9BF7E3421B655FDF00FF247E /* HeatPipeSizerVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HeatPipeSizerVC.swift; sourceTree = "<group>"; };
 		9BF7E3441B656DC400FF247E /* LoadInfoTF.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadInfoTF.swift; sourceTree = "<group>"; };
@@ -135,8 +135,8 @@
 		9B094B861B599628002AB4A6 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				9BE0EFF61C12214000E37680 /* DuctSizerFormulae.pdf */,
-				9BE0EFFD1C161DAB00E37680 /* PipeSizerFormulae.pdf */,
+				9B7F7CC91CFB2DF0002D352B /* DuctSizerFormulae.pdf */,
+				9B7F7CCA1CFB2DF0002D352B /* PipeSizerFormulae.pdf */,
 				9B094B871B599628002AB4A6 /* Info.plist */,
 			);
 			name = "Supporting Files";
@@ -300,11 +300,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9BE0EFFE1C161DAB00E37680 /* PipeSizerFormulae.pdf in Resources */,
+				9B7F7CCC1CFB2DF0002D352B /* PipeSizerFormulae.pdf in Resources */,
 				9B094B8E1B599628002AB4A6 /* Main.storyboard in Resources */,
+				9B7F7CCB1CFB2DF0002D352B /* DuctSizerFormulae.pdf in Resources */,
 				9B094B931B599628002AB4A6 /* LaunchScreen.xib in Resources */,
 				9B094B901B599628002AB4A6 /* Images.xcassets in Resources */,
-				9BE0EFF71C12214000E37680 /* DuctSizerFormulae.pdf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

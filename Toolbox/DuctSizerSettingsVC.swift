@@ -29,11 +29,11 @@ class DuctSizerSettingsVC: UIViewController {
         super.viewDidLoad()
         
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardNotification:", name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DuctSizerSettingsVC.keyboardNotification(_:)), name: UIKeyboardWillChangeFrameNotification, object: nil)
         
         self.automaticallyAdjustsScrollViewInsets = false
         
-        self.selector.addTarget(self, action: "selectorDidChange", forControlEvents: UIControlEvents.ValueChanged)
+        self.selector.addTarget(self, action: #selector(DuctSizerSettingsVC.selectorDidChange), forControlEvents: UIControlEvents.ValueChanged)
         self.selector.tintColor = UIColor.darkGrayColor()
         
         self.setUpUI()
@@ -111,7 +111,7 @@ class DuctSizerSettingsVC: UIViewController {
     
     func addBackgroundTap(view:UIControl) {
         
-        view.addTarget(self, action: "backgroundTapped:", forControlEvents: UIControlEvents.TouchUpInside)
+        view.addTarget(self, action: #selector(DuctSizerSettingsVC.backgroundTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         
     }
     
@@ -331,7 +331,7 @@ class DuctSizerSettingsVC: UIViewController {
                 button.layer.backgroundColor = UIColor.whiteColor().CGColor
                 button.setTitle("    Reset Defaults    ", forState: UIControlState.Normal)
                 button.tintColor = UIColor.darkGrayColor()
-                button.addTarget(self, action: "resetDefaults", forControlEvents: UIControlEvents.TouchUpInside)
+                button.addTarget(self, action: #selector(DuctSizerSettingsVC.resetDefaults), forControlEvents: UIControlEvents.TouchUpInside)
                 
             }
             else {
@@ -361,7 +361,7 @@ class DuctSizerSettingsVC: UIViewController {
                     textField.alpha = 1
                     textField.minimumFontSize = 5
                     textField.adjustsFontSizeToFitWidth = true
-                    textField.addTarget(self, action: "textFieldEditingDidEnd:", forControlEvents: UIControlEvents.EditingDidEnd)
+                    textField.addTarget(self, action: #selector(DuctSizerSettingsVC.textFieldEditingDidEnd(_:)), forControlEvents: UIControlEvents.EditingDidEnd)
                     self.setupTextFieldInputAccessoryView(textField)
                     
                     // Set the text field texts
@@ -481,7 +481,7 @@ class DuctSizerSettingsVC: UIViewController {
         
         // Make the changes to the Property Record
         var index:Int = 0
-        for index = 0; index < self.textFields.count; index++ {
+        for index = 0; index < self.textFields.count; index += 1 {
             
             // Find the right textField
             if (sender == self.textFields[index]) {
@@ -550,7 +550,7 @@ class DuctSizerSettingsVC: UIViewController {
         doneToolbar.barStyle = UIBarStyle.BlackTranslucent
         
         let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: Selector("applyButtonAction"))
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: #selector(DuctSizerSettingsVC.applyButtonAction))
         done.tintColor = UIColor.whiteColor()
         
         var items = [UIBarButtonItem]()

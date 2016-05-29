@@ -122,7 +122,7 @@ class DuctSizerVC: UIViewController {
         loadDuctSizerProperties()
         
         // Listen for keyboard changes
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardNotification:", name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DuctSizerVC.keyboardNotification(_:)), name: UIKeyboardWillChangeFrameNotification, object: nil)
         
         // Get rid of the back button text (get rid of "Back")
         self.navigationController?.navigationBar.topItem?.title = ""
@@ -152,25 +152,25 @@ class DuctSizerVC: UIViewController {
         // Set up the text fields
         for textField in self.textFields {
             self.setupTextFieldInputAccessoryView(textField)
-            textField.addTarget(self, action: "textFieldEditingDidEnd:", forControlEvents: UIControlEvents.EditingDidEnd)
+            textField.addTarget(self, action: #selector(DuctSizerVC.textFieldEditingDidEnd(_:)), forControlEvents: UIControlEvents.EditingDidEnd)
         }
         
         // Apply the background tap function to the backgrounds
         for view in self.backGroundControlViews {
-            view.addTarget(self, action: "backgroundTapped:", forControlEvents: UIControlEvents.TouchUpInside)
+            view.addTarget(self, action: #selector(DuctSizerVC.backgroundTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         }
         
         // Set up the sliders
         let sliders:[UISlider] = [self.xSlider, self.ySlider]
         for slider in sliders {
-            slider.addTarget(self, action: "sliderDidChange:", forControlEvents: UIControlEvents.ValueChanged)
-            slider.addTarget(self, action: "sliderTouched:", forControlEvents: UIControlEvents.TouchDown)
-            slider.addTarget(self, action: "sliderReleased:", forControlEvents: UIControlEvents.TouchUpInside)
-            slider.addTarget(self, action: "sliderReleased:", forControlEvents: UIControlEvents.TouchUpOutside)
+            slider.addTarget(self, action: #selector(DuctSizerVC.sliderDidChange(_:)), forControlEvents: UIControlEvents.ValueChanged)
+            slider.addTarget(self, action: #selector(DuctSizerVC.sliderTouched(_:)), forControlEvents: UIControlEvents.TouchDown)
+            slider.addTarget(self, action: #selector(DuctSizerVC.sliderReleased(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+            slider.addTarget(self, action: #selector(DuctSizerVC.sliderReleased(_:)), forControlEvents: UIControlEvents.TouchUpOutside)
         }
         
         // Set up the velocity selector
-        self.velocitySelector.addTarget(self, action: "velocitySelectorDidChange:", forControlEvents: UIControlEvents.ValueChanged)
+        self.velocitySelector.addTarget(self, action: #selector(DuctSizerVC.velocitySelectorDidChange(_:)), forControlEvents: UIControlEvents.ValueChanged)
         
         // Set up th highlight views
         let highlightViews:[UIView] = [self.xHighlighterView, self.yHighlighterView]
@@ -239,10 +239,10 @@ class DuctSizerVC: UIViewController {
     func setUpButtons() {
         
         // Add methods
-        self.ductButton.addTarget(self, action: "ductButtonTapped", forControlEvents: UIControlEvents.TouchUpInside)
-        self.autoSizeButton.addTarget(self, action: "autosizeButtonTapped", forControlEvents: UIControlEvents.TouchUpInside)
-        self.xLockButton.addTarget(self, action: "lockTapped:", forControlEvents: UIControlEvents.TouchUpInside)
-        self.yLockButton.addTarget(self, action: "lockTapped:", forControlEvents: UIControlEvents.TouchUpInside)
+        self.ductButton.addTarget(self, action: #selector(DuctSizerVC.ductButtonTapped), forControlEvents: UIControlEvents.TouchUpInside)
+        self.autoSizeButton.addTarget(self, action: #selector(DuctSizerVC.autosizeButtonTapped), forControlEvents: UIControlEvents.TouchUpInside)
+        self.xLockButton.addTarget(self, action: #selector(DuctSizerVC.lockTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+        self.yLockButton.addTarget(self, action: #selector(DuctSizerVC.lockTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         
         // Change autosize appearance
         self.autoSizeButton.setTitle("Autosize", forState: UIControlState.Normal)
@@ -1096,7 +1096,7 @@ class DuctSizerVC: UIViewController {
     func backgroundTapped(sender:AnyObject) {
         print("backgroundTapped")
         var index:Int = Int()
-        for index = 0; index < self.textFields.count; index++ {
+        for index = 0; index < self.textFields.count; index += 1 {
             self.textFields[index].resignFirstResponder()
         }
         self.keyboardHeightLayoutConstraint.constant = 0
@@ -1108,7 +1108,7 @@ class DuctSizerVC: UIViewController {
         doneToolbar.barStyle = UIBarStyle.BlackTranslucent
         
         let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: Selector("applyButtonAction"))
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: #selector(DuctSizerVC.applyButtonAction))
         done.tintColor = UIColor.whiteColor()
         
         var items = [UIBarButtonItem]()

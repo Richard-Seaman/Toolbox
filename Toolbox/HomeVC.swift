@@ -54,7 +54,7 @@ class HomeVC: UIViewController {
         let ductSizer:ActionView = ActionView()
         ductSizer.label.text = "Duct\nSizer"
         ductSizer.button.setImage(UIImage(named: "DuctButton"), forState: UIControlState.Normal)
-        ductSizer.button.addTarget(self, action: "ductButtonTapped", forControlEvents: UIControlEvents.TouchUpInside)
+        ductSizer.button.addTarget(self, action: #selector(HomeVC.ductButtonTapped), forControlEvents: UIControlEvents.TouchUpInside)
         
         generatedActionViews.append(ductSizer)
         
@@ -62,7 +62,7 @@ class HomeVC: UIViewController {
         let pipeSizer:ActionView = ActionView()
         pipeSizer.label.text = "Pipe\nSizer"
         pipeSizer.button.setImage(UIImage(named: "PipeButton"), forState: UIControlState.Normal)
-        pipeSizer.button.addTarget(self, action: "pipeButtonTapped", forControlEvents: UIControlEvents.TouchUpInside)
+        pipeSizer.button.addTarget(self, action: #selector(HomeVC.pipeButtonTapped), forControlEvents: UIControlEvents.TouchUpInside)
         
         generatedActionViews.append(pipeSizer)
         
@@ -70,7 +70,7 @@ class HomeVC: UIViewController {
         let waterDemand:ActionView = ActionView()
         waterDemand.label.text = "Water\nDemand"
         waterDemand.button.setImage(UIImage(named: "TapButton"), forState: UIControlState.Normal)
-        waterDemand.button.addTarget(self, action: "waterButtonTapped", forControlEvents: UIControlEvents.TouchUpInside)
+        waterDemand.button.addTarget(self, action: #selector(HomeVC.waterButtonTapped), forControlEvents: UIControlEvents.TouchUpInside)
         
         generatedActionViews.append(waterDemand)
         
@@ -78,7 +78,7 @@ class HomeVC: UIViewController {
         let daylightCalculator:ActionView = ActionView()
         daylightCalculator.label.text = "Daylight\nCalculator"
         daylightCalculator.button.setImage(UIImage(named: "DaylightButton"), forState: UIControlState.Normal)
-        daylightCalculator.button.addTarget(self, action: "daylightButtonTapped", forControlEvents: UIControlEvents.TouchUpInside)
+        daylightCalculator.button.addTarget(self, action: #selector(HomeVC.daylightButtonTapped), forControlEvents: UIControlEvents.TouchUpInside)
         
         generatedActionViews.append(daylightCalculator)
         
@@ -146,17 +146,17 @@ class HomeVC: UIViewController {
         for index in 0...self.actionViews.count - 1 {
             
             // Increment the column counter
-            columnCount++
+            columnCount += 1
             
             // Increment the row count if it's the first view
             if (index == 0) {
-                rowCount++
+                rowCount += 1
             }
             
             // If the column reaches the max number of columns, reset it and increment the row counter
             if columnCount > maxNumberOfColumns {
                 columnCount = 1
-                rowCount++
+                rowCount += 1
             }
             
         }
@@ -251,12 +251,12 @@ class HomeVC: UIViewController {
             }
             
             // Increment the column counter
-            columnCounter++
+            columnCounter += 1
             
             // If the column reaches the max number of columns, reset it and increment the row counter
             if columnCounter >= maxNumberOfColumns {
                 columnCounter = 0
-                rowCounter++
+                rowCounter += 1
             }
             
         }
