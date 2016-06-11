@@ -425,7 +425,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
                     
                     // Set up the cell components
                     let label:UILabel = cell!.viewWithTag(1) as! UILabel
-                    label.text = "The first step is to determine the number of demand units.\n\nThere are demand units associated with each outlet type and for each associated pipework arrangment. These demand units may be altered by selecting the 'Demand Units' tab at the top of this screen and editing the corresponding text fields.\n\nThe total number of demand units for each pipe is calculated by summing the product of the number of outlets and the corresponding demand units for each pipe type.\n\nOnce the total number of demand units has been determined for each pipe, the flowrate is interpolated from the following table"
+                    label.text = "The first step is to determine the number of demand units.\n\nThere are demand units associated with each outlet type and for each associated pipework arrangement. These demand units may be altered by selecting the 'Demand Units' tab at the top of this screen and editing the corresponding text fields.\n\nThe total number of demand units for each pipe is calculated by summing the product of the number of outlets and the corresponding demand units for each pipe type.\n\nOnce the total number of demand units has been determined for each pipe, the flowrate is interpolated from the following table"
                     
                 case self.unitColumn.count + 1: // Source
                     
