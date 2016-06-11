@@ -130,7 +130,7 @@ class DuctSizerVC: UIViewController {
         // Set up nav bar
         self.navigationItem.titleView = getNavImageView(UIApplication.sharedApplication().statusBarOrientation)
         
-        // Initally set to flowrate view
+        // Initially set to flowrate view
         self.flowrateView.alpha = 1
         self.achView.alpha = 1
         
@@ -144,7 +144,7 @@ class DuctSizerVC: UIViewController {
         self.xLocked = false
         self.yLocked = false
         
-        // Set up duct change buttons & initally set to rect
+        // Set up duct change buttons & initially set to rect
         self.setUpButtons()
         self.ySlider.alpha = 0  // this and next line will force to rect
         self.ductButtonTapped()
