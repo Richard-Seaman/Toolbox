@@ -51,9 +51,9 @@ func resetDaylightWindowProperties() {
 func loadDaylightDefaults() {
     
     let filePath = dataFilePath()
-    if (NSFileManager.defaultManager().fileExistsAtPath(filePath)) {
+    if (FileManager.default.fileExists(atPath: filePath)) {
         let array = NSArray(contentsOfFile: filePath) as! [String]
-        for var i:Int = 0; i < array.count; i += 1 {
+        for i:Int in 0 ..< array.count {
             daylightCalculatorDefaults[i] = array[i].floatValue
         }
     }
@@ -67,10 +67,10 @@ func loadDaylightDefaults() {
 // Get the path to the defaults file
 func dataFilePath() -> String {
     let paths = NSSearchPathForDirectoriesInDomains(
-        NSSearchPathDirectory.DocumentDirectory,
-        NSSearchPathDomainMask.UserDomainMask, true)
+        FileManager.SearchPathDirectory.documentDirectory,
+        FileManager.SearchPathDomainMask.userDomainMask, true)
     let documentsDirectory = paths[0] as NSString
-    return documentsDirectory.stringByAppendingPathComponent("defaults.plist") as String
+    return documentsDirectory.appendingPathComponent("defaults.plist") as String
 }
 
 
@@ -104,9 +104,9 @@ func resetLoadingUnitDefaults() {
 func loadLoadingUnits() {
     
     let filePath = loadingUnitsFilePath()
-    if (NSFileManager.defaultManager().fileExistsAtPath(filePath)) {
+    if (FileManager.default.fileExists(atPath: filePath)) {
         let array = NSArray(contentsOfFile: filePath) as! [[Float]]
-        for var i:Int = 0; i < array.count; i += 1 {
+        for i:Int in 0 ..< array.count {
             loadingUnits[i] = array[i]
         }
         print("Loading Units loaded from file")
@@ -121,10 +121,10 @@ func loadLoadingUnits() {
 // Get the path to the defaults file
 func loadingUnitsFilePath() -> String {
     let paths = NSSearchPathForDirectoriesInDomains(
-        NSSearchPathDirectory.DocumentDirectory,
-        NSSearchPathDomainMask.UserDomainMask, true)
+        FileManager.SearchPathDirectory.documentDirectory,
+        FileManager.SearchPathDomainMask.userDomainMask, true)
     let documentsDirectory = paths[0] as NSString
-    return documentsDirectory.stringByAppendingPathComponent("loadingUnits.plist") as String
+    return documentsDirectory.appendingPathComponent("loadingUnits.plist") as String
 }
 
 
@@ -137,7 +137,9 @@ var ductSizerProperties:[Float] = [Float(),Float(),Float()] // [rho, visco, k]
 // Reset the defaults to the built in defaults
 func resetDuctSizerPropertiesDefaults() {
     
-    ductSizerProperties = [1.2041,1.8178 * pow(10, -5), 0.075]
+    let visco:Float = 1.8178 * pow(10, -5)
+    
+    ductSizerProperties = [1.2041,visco, 0.075]
     
 }
 
@@ -145,9 +147,9 @@ func resetDuctSizerPropertiesDefaults() {
 func loadDuctSizerProperties() {
     
     let filePath = ductSizerPropertiesFilePath()
-    if (NSFileManager.defaultManager().fileExistsAtPath(filePath)) {
+    if (FileManager.default.fileExists(atPath: filePath)) {
         let array = NSArray(contentsOfFile: filePath) as! [Float]
-        for var i:Int = 0; i < array.count; i += 1 {
+        for i:Int in 0 ..< array.count {
             ductSizerProperties[i] = array[i]
         }
         print("Duct Sizer Properties loaded from file")
@@ -162,10 +164,10 @@ func loadDuctSizerProperties() {
 // Get the path to the defaults file
 func ductSizerPropertiesFilePath() -> String {
     let paths = NSSearchPathForDirectoriesInDomains(
-        NSSearchPathDirectory.DocumentDirectory,
-        NSSearchPathDomainMask.UserDomainMask, true)
+        FileManager.SearchPathDirectory.documentDirectory,
+        FileManager.SearchPathDomainMask.userDomainMask, true)
     let documentsDirectory = paths[0] as NSString
-    return documentsDirectory.stringByAppendingPathComponent("ductSizerProperties.plist") as String
+    return documentsDirectory.appendingPathComponent("ductSizerProperties.plist") as String
 }
 
 
@@ -210,9 +212,9 @@ func resetCHWPipeDefaults() {
 func loadPipeSizerProperties() {
     
     let filePath = pipeSizerPropertiesFilePath()
-    if (NSFileManager.defaultManager().fileExistsAtPath(filePath)) {
+    if (FileManager.default.fileExists(atPath: filePath)) {
         let array = NSArray(contentsOfFile: filePath) as! [Float]
-        for var i:Int = 0; i < array.count; i += 1 {
+        for i:Int in 0 ..< array.count {
             pipeSizerProperties[i] = array[i]
         }
         print("Pipe Sizer Properties loaded from file")
@@ -227,10 +229,10 @@ func loadPipeSizerProperties() {
 // Get the path to the defaults file
 func pipeSizerPropertiesFilePath() -> String {
     let paths = NSSearchPathForDirectoriesInDomains(
-        NSSearchPathDirectory.DocumentDirectory,
-        NSSearchPathDomainMask.UserDomainMask, true)
+        FileManager.SearchPathDirectory.documentDirectory,
+        FileManager.SearchPathDomainMask.userDomainMask, true)
     let documentsDirectory = paths[0] as NSString
-    return documentsDirectory.stringByAppendingPathComponent("pipeSizerProperties.plist") as String
+    return documentsDirectory.appendingPathComponent("pipeSizerProperties.plist") as String
 }
 
 
@@ -239,7 +241,7 @@ func pipeSizerPropertiesFilePath() -> String {
 
 // MARK: - Misc.
 
-func getNavImageView(orientationToDisplayImageOn:UIInterfaceOrientation) -> UIImageView {
+func getNavImageView(_ orientationToDisplayImageOn:UIInterfaceOrientation) -> UIImageView {
     
     // The navigation bar is shorter in landscape than portrait.
     // Change the size of the nav bar image so that it stays within the bar.
@@ -247,7 +249,7 @@ func getNavImageView(orientationToDisplayImageOn:UIInterfaceOrientation) -> UIIm
     var imageHeight:CGFloat = CGFloat()
     var imageWidth:CGFloat = CGFloat()
     
-    if (orientationToDisplayImageOn == UIInterfaceOrientation.Portrait) {
+    if (orientationToDisplayImageOn == UIInterfaceOrientation.portrait) {
         imageHeight = 400/12
         imageWidth = 400/12
     }
@@ -257,7 +259,7 @@ func getNavImageView(orientationToDisplayImageOn:UIInterfaceOrientation) -> UIIm
     }
     
     let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: imageHeight, height: imageWidth))
-    imageView.contentMode = .ScaleAspectFit
+    imageView.contentMode = .scaleAspectFit
     let image = UIImage(named: "navIcon")
     imageView.image = image
     
@@ -266,7 +268,7 @@ func getNavImageView(orientationToDisplayImageOn:UIInterfaceOrientation) -> UIIm
 }
 
 func getVersion() -> String {
-    if let version = NSBundle.mainBundle().infoDictionary?["CFBundleShortVersionString"] as? String {
+    if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
         return version
     }
     return "no version info"
@@ -274,11 +276,11 @@ func getVersion() -> String {
 
 
 
-func returnHeader(sender:UIView, colourOption option:Int = 0) -> UITableViewHeaderFooterView {
+func returnHeader(_ sender:UIView, colourOption option:Int = 0) -> UITableViewHeaderFooterView {
     
     let header: UITableViewHeaderFooterView = sender as! UITableViewHeaderFooterView //recast your view as a UITableViewHeaderFooterView
     
-    header.textLabel!.textColor = UIColor.whiteColor() //make the text white
+    header.textLabel!.textColor = UIColor.white //make the text white
     
     header.alpha = 0.8 //make the header transparent
     if (option == 1) {
@@ -291,7 +293,7 @@ func returnHeader(sender:UIView, colourOption option:Int = 0) -> UITableViewHead
     }
     else if (option == 3) {
         // Gray Colour
-        header.contentView.backgroundColor = UIColor.darkGrayColor()
+        header.contentView.backgroundColor = UIColor.darkGray
     }
     else if (option == 4) {
         // Gray Colour

@@ -11,7 +11,7 @@ import UIKit
 class DemandUnitTF: UITextField {
 
     
-    var indexPath:NSIndexPath = NSIndexPath()
+    var indexPath:IndexPath = IndexPath()
     var row:Int = Int()
     var column:Int = Int()
     

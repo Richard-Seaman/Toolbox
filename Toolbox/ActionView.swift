@@ -58,15 +58,15 @@ class ActionView: UIView {
         self.label.numberOfLines = 2
         self.label.minimumScaleFactor = 0.5
         self.label.text = "Action Title"
-        self.label.textAlignment = NSTextAlignment.Center
+        self.label.textAlignment = NSTextAlignment.center
         self.label.font = UIFont(name: self.label.font.fontName, size: 17)
         
         // button defaults
-        self.button.setTitle("", forState: UIControlState.Normal)        
+        self.button.setTitle("", for: UIControlState())        
         self.button.layer.cornerRadius = 8
         self.button.layer.borderWidth = 1.5
-        self.button.layer.borderColor = UIColor.blackColor().CGColor
-        self.button.layer.backgroundColor = UIColor.whiteColor().CGColor
+        self.button.layer.borderColor = UIColor.black.cgColor
+        self.button.layer.backgroundColor = UIColor.white.cgColor
         self.button.clipsToBounds = true
         //self.button.setImage(UIImage(named: "InfoButton"), forState: UIControlState.Normal)
         

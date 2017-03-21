@@ -25,7 +25,7 @@ class HomeVC: UIViewController {
         // Do any additional setup after loading the view.        
         
         // Set up nav bar
-        self.navigationItem.titleView = getNavImageView(UIApplication.sharedApplication().statusBarOrientation)
+        self.navigationItem.titleView = getNavImageView(UIApplication.shared.statusBarOrientation)
         
         // Get the action views
         self.actionViews = self.getActionViews()
@@ -53,32 +53,32 @@ class HomeVC: UIViewController {
         // Duct sizer action view
         let ductSizer:ActionView = ActionView()
         ductSizer.label.text = "Duct\nSizer"
-        ductSizer.button.setImage(UIImage(named: "DuctButton"), forState: UIControlState.Normal)
-        ductSizer.button.addTarget(self, action: #selector(HomeVC.ductButtonTapped), forControlEvents: UIControlEvents.TouchUpInside)
+        ductSizer.button.setImage(UIImage(named: "DuctButton"), for: UIControlState())
+        ductSizer.button.addTarget(self, action: #selector(HomeVC.ductButtonTapped), for: UIControlEvents.touchUpInside)
         
         generatedActionViews.append(ductSizer)
         
         // Pipe sizer action view
         let pipeSizer:ActionView = ActionView()
         pipeSizer.label.text = "Pipe\nSizer"
-        pipeSizer.button.setImage(UIImage(named: "PipeButton"), forState: UIControlState.Normal)
-        pipeSizer.button.addTarget(self, action: #selector(HomeVC.pipeButtonTapped), forControlEvents: UIControlEvents.TouchUpInside)
+        pipeSizer.button.setImage(UIImage(named: "PipeButton"), for: UIControlState())
+        pipeSizer.button.addTarget(self, action: #selector(HomeVC.pipeButtonTapped), for: UIControlEvents.touchUpInside)
         
         generatedActionViews.append(pipeSizer)
         
         // Water demand action view
         let waterDemand:ActionView = ActionView()
         waterDemand.label.text = "Water\nDemand"
-        waterDemand.button.setImage(UIImage(named: "TapButton"), forState: UIControlState.Normal)
-        waterDemand.button.addTarget(self, action: #selector(HomeVC.waterButtonTapped), forControlEvents: UIControlEvents.TouchUpInside)
+        waterDemand.button.setImage(UIImage(named: "TapButton"), for: UIControlState())
+        waterDemand.button.addTarget(self, action: #selector(HomeVC.waterButtonTapped), for: UIControlEvents.touchUpInside)
         
         generatedActionViews.append(waterDemand)
         
         // Daylight action view
         let daylightCalculator:ActionView = ActionView()
         daylightCalculator.label.text = "Daylight\nCalculator"
-        daylightCalculator.button.setImage(UIImage(named: "DaylightButton"), forState: UIControlState.Normal)
-        daylightCalculator.button.addTarget(self, action: #selector(HomeVC.daylightButtonTapped), forControlEvents: UIControlEvents.TouchUpInside)
+        daylightCalculator.button.setImage(UIImage(named: "DaylightButton"), for: UIControlState())
+        daylightCalculator.button.addTarget(self, action: #selector(HomeVC.daylightButtonTapped), for: UIControlEvents.touchUpInside)
         
         generatedActionViews.append(daylightCalculator)
         
@@ -169,11 +169,11 @@ class HomeVC: UIViewController {
         
         // Add height constraint to the content view so that the scrollview knows how much to allow to scroll
         let contentViewHeight:CGFloat = CGFloat(rowCount) * (self.actionViews[0].height + spacer) + spacer
-        let contentViewHeightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: self.contentView, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: contentViewHeight)
+        let contentViewHeightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: self.contentView, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: contentViewHeight)
         
         // Add width constraint so that we can center it
         let contentViewWidth:CGFloat = CGFloat(actualNumberOfColumns) * (self.actionViews[0].width + spacer) + spacer
-        let contentViewWidthConstraint:NSLayoutConstraint = NSLayoutConstraint(item: self.contentView, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: contentViewWidth)
+        let contentViewWidthConstraint:NSLayoutConstraint = NSLayoutConstraint(item: self.contentView, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: contentViewWidth)
         
         print("Content w x h : \(contentViewWidth) x \(contentViewHeight)")
         
@@ -181,11 +181,11 @@ class HomeVC: UIViewController {
         self.contentView.addConstraints([contentViewHeightConstraint, contentViewWidthConstraint])
         
         // Position the content view in the scrollview
-        let contentViewTopConstraint:NSLayoutConstraint = NSLayoutConstraint(item: self.contentView, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: self.scrollView, attribute: NSLayoutAttribute.Top, multiplier: 1, constant: 0)
+        let contentViewTopConstraint:NSLayoutConstraint = NSLayoutConstraint(item: self.contentView, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: self.scrollView, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0)
         
-        let contentViewBottomConstraint:NSLayoutConstraint = NSLayoutConstraint(item: self.contentView, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: self.scrollView, attribute: NSLayoutAttribute.Bottom, multiplier: 1, constant: 0)
+        let contentViewBottomConstraint:NSLayoutConstraint = NSLayoutConstraint(item: self.contentView, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: self.scrollView, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: 0)
         
-        let contentViewHorizontalConstraint:NSLayoutConstraint = NSLayoutConstraint(item: self.contentView, attribute: NSLayoutAttribute.CenterX, relatedBy: NSLayoutRelation.Equal, toItem: self.scrollView, attribute: NSLayoutAttribute.CenterX, multiplier: 1, constant: 0)
+        let contentViewHorizontalConstraint:NSLayoutConstraint = NSLayoutConstraint(item: self.contentView, attribute: NSLayoutAttribute.centerX, relatedBy: NSLayoutRelation.equal, toItem: self.scrollView, attribute: NSLayoutAttribute.centerX, multiplier: 1, constant: 0)
         
         // Add the contentView position constraints to the scrollview
         self.scrollView.addConstraints([contentViewTopConstraint, contentViewBottomConstraint, contentViewHorizontalConstraint])
@@ -204,9 +204,9 @@ class HomeVC: UIViewController {
             self.contentView.addSubview(thisActionView)
             
             // Set the height and width constraints
-            let heightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: thisActionView, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: thisActionView.height)
+            let heightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: thisActionView, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: thisActionView.height)
             
-            let widthConstraint:NSLayoutConstraint = NSLayoutConstraint(item: thisActionView, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: thisActionView.width)
+            let widthConstraint:NSLayoutConstraint = NSLayoutConstraint(item: thisActionView, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: thisActionView.width)
             
             thisActionView.addConstraints([heightConstraint, widthConstraint])
             
@@ -219,14 +219,14 @@ class HomeVC: UIViewController {
                 // View is not in the first column
                 let actionViewOnTheLeft:ActionView = self.actionViews[index - 1]
                 
-                let leftMarginConstraint:NSLayoutConstraint = NSLayoutConstraint(item: thisActionView, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: actionViewOnTheLeft, attribute: NSLayoutAttribute.Right, multiplier: 1, constant: spacer)
+                let leftMarginConstraint:NSLayoutConstraint = NSLayoutConstraint(item: thisActionView, attribute: NSLayoutAttribute.left, relatedBy: NSLayoutRelation.equal, toItem: actionViewOnTheLeft, attribute: NSLayoutAttribute.right, multiplier: 1, constant: spacer)
                 
                 // Add constraint
                 self.contentView.addConstraint(leftMarginConstraint)
             }
             else {
                 // Card is in the first column
-                let leftMarginConstraint:NSLayoutConstraint = NSLayoutConstraint(item: thisActionView, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: self.contentView, attribute: NSLayoutAttribute.Left, multiplier: 1, constant: spacer)
+                let leftMarginConstraint:NSLayoutConstraint = NSLayoutConstraint(item: thisActionView, attribute: NSLayoutAttribute.left, relatedBy: NSLayoutRelation.equal, toItem: self.contentView, attribute: NSLayoutAttribute.left, multiplier: 1, constant: spacer)
                 
                 // Add the constraint
                 self.contentView.addConstraint(leftMarginConstraint)
@@ -237,14 +237,14 @@ class HomeVC: UIViewController {
                 // Card is not in the first row
                 let actionViewOnTop:ActionView = self.actionViews[index - maxNumberOfColumns]
                 
-                let topMarginConstraint:NSLayoutConstraint = NSLayoutConstraint(item: thisActionView, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: actionViewOnTop, attribute: NSLayoutAttribute.Bottom, multiplier: 1, constant: spacer)
+                let topMarginConstraint:NSLayoutConstraint = NSLayoutConstraint(item: thisActionView, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: actionViewOnTop, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: spacer)
                 
                 // Add constraint
                 self.contentView.addConstraint(topMarginConstraint)
             }
             else {
                 // Card is in the first row
-                let topMarginConstraint:NSLayoutConstraint = NSLayoutConstraint(item: thisActionView, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: self.contentView, attribute: NSLayoutAttribute.Top, multiplier: 1, constant: spacer)
+                let topMarginConstraint:NSLayoutConstraint = NSLayoutConstraint(item: thisActionView, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: self.contentView, attribute: NSLayoutAttribute.top, multiplier: 1, constant: spacer)
                 
                 // Add constraint
                 self.contentView.addConstraint(topMarginConstraint)
@@ -264,47 +264,47 @@ class HomeVC: UIViewController {
         
     }
     
-    func applySizeConstraintsToActionView(actionView:ActionView) {
+    func applySizeConstraintsToActionView(_ actionView:ActionView) {
         
         // Set translates autoresizingmask to false
         actionView.button.translatesAutoresizingMaskIntoConstraints = false
         actionView.label.translatesAutoresizingMaskIntoConstraints = false
         
         // set constraints for the button
-        let buttonHeightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.button, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: actionView.width)
+        let buttonHeightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.button, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: actionView.width)
         
-        let buttonWidthConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.button, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: actionView.width)
+        let buttonWidthConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.button, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: actionView.width)
         
         actionView.button.addConstraints([buttonHeightConstraint, buttonWidthConstraint])
         
         
         // set constraints for the button
-        let labelHeightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.label, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: actionView.labelHeight)
+        let labelHeightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.label, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: actionView.labelHeight)
         
-        let labelWidthConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.label, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: nil, attribute: NSLayoutAttribute.NotAnAttribute, multiplier: 1, constant: actionView.width)
+        let labelWidthConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.label, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: actionView.width)
         
         actionView.label.addConstraints([labelHeightConstraint, labelWidthConstraint])
         
     }
     
-    func applyPositioningConstraintsToActionView(actionView:ActionView) {
+    func applyPositioningConstraintsToActionView(_ actionView:ActionView) {
         
         // Set the position of the button to the parent view
-        let buttonTopConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.button, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: actionView, attribute: NSLayoutAttribute.Top, multiplier: 1, constant: 0)
+        let buttonTopConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.button, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: actionView, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0)
         
-        let buttonLeftConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.button, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: actionView, attribute: NSLayoutAttribute.Left, multiplier: 1, constant: 0)
+        let buttonLeftConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.button, attribute: NSLayoutAttribute.left, relatedBy: NSLayoutRelation.equal, toItem: actionView, attribute: NSLayoutAttribute.left, multiplier: 1, constant: 0)
         
-        let buttonRightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.button, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: actionView, attribute: NSLayoutAttribute.Right, multiplier: 1, constant: 0)
+        let buttonRightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.button, attribute: NSLayoutAttribute.right, relatedBy: NSLayoutRelation.equal, toItem: actionView, attribute: NSLayoutAttribute.right, multiplier: 1, constant: 0)
         
         // Set the relative position of the objects
-        let buttonBottomConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.button, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: actionView.label, attribute: NSLayoutAttribute.Top, multiplier: 1, constant: 0)
+        let buttonBottomConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.button, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: actionView.label, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0)
         
         // Set the position of the label to the parent view
-        let labelLeftConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.label, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: actionView, attribute: NSLayoutAttribute.Left, multiplier: 1, constant: 0)
+        let labelLeftConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.label, attribute: NSLayoutAttribute.left, relatedBy: NSLayoutRelation.equal, toItem: actionView, attribute: NSLayoutAttribute.left, multiplier: 1, constant: 0)
         
-        let labelRightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.label, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: actionView, attribute: NSLayoutAttribute.Right, multiplier: 1, constant: 0)
+        let labelRightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.label, attribute: NSLayoutAttribute.right, relatedBy: NSLayoutRelation.equal, toItem: actionView, attribute: NSLayoutAttribute.right, multiplier: 1, constant: 0)
         
-        let labelBottomConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.label, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: actionView, attribute: NSLayoutAttribute.Bottom, multiplier: 1, constant: 0)
+        let labelBottomConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.label, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: actionView, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: 0)
         
         // Add the constraints to the parent view
         actionView.addConstraints([buttonTopConstraint, buttonLeftConstraint, buttonRightConstraint, buttonBottomConstraint, labelLeftConstraint, labelRightConstraint, labelBottomConstraint])
@@ -318,19 +318,19 @@ class HomeVC: UIViewController {
     
     func ductButtonTapped() {
         print("ductButtonTapped")
-        performSegueWithIdentifier("toDuct", sender: self)
+        performSegue(withIdentifier: "toDuct", sender: self)
     }
     func pipeButtonTapped() {
         print("pipeButtonTapped")
-        performSegueWithIdentifier("toPipe", sender: self)
+        performSegue(withIdentifier: "toPipe", sender: self)
     }
     func waterButtonTapped() {
         print("waterButtonTapped")
-        performSegueWithIdentifier("toWater", sender: self)
+        performSegue(withIdentifier: "toWater", sender: self)
     }
     func daylightButtonTapped() {
         print("daylightButtonTapped")
-        performSegueWithIdentifier("toDaylight", sender: self)
+        performSegue(withIdentifier: "toDaylight", sender: self)
     }
 
     /*

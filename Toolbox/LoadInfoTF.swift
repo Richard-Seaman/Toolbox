@@ -10,7 +10,7 @@ import UIKit
 
 class LoadInfoTF: UITextField {
 
-    var indexPath:NSIndexPath = NSIndexPath()
+    var indexPath:IndexPath = IndexPath()
     var row:Int = Int()
     
 

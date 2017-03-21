@@ -7,6 +7,30 @@
 //
 
 import UIKit
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l > r
+  default:
+    return rhs < lhs
+  }
+}
+
 
 class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
     
@@ -21,10 +45,10 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DaylightCalculatorInfoVC.keyboardNotification(_:)), name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(DaylightCalculatorInfoVC.keyboardNotification(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
 
         // Set up nav bar
-        self.navigationItem.titleView = getNavImageView(UIApplication.sharedApplication().statusBarOrientation)
+        self.navigationItem.titleView = getNavImageView(UIApplication.shared.statusBarOrientation)
         
         // Apply tableview to Table View Controller (needed to get rid of blank space)
         tableViewController.tableView = tableView
@@ -46,10 +70,10 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
     }
     
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
     }
     
-    override func willRotateToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
+    override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
         // Make sure the nav bar image fits within the new orientation
         self.navigationItem.titleView = getNavImageView(toInterfaceOrientation)
     }
@@ -59,7 +83,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
         // Dispose of any resources that can be recreated.
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         
         self.textFields = [UITextField(),UITextField(),UITextField(),UITextField(),UITextField(),UITextField(),UITextField()]
         self.tableView.reloadData()
@@ -68,9 +92,9 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
         self.backgroundTapped(self)
         
         // Make sure the nav bar image fits within the new orientation
-        if (UIDevice.currentDevice().orientation.isLandscape) {
+        if (UIDevice.current.orientation.isLandscape) {
             if (self.navigationItem.titleView?.frame.height > 400/16) {
-                self.navigationItem.titleView = getNavImageView(UIApplication.sharedApplication().statusBarOrientation)
+                self.navigationItem.titleView = getNavImageView(UIApplication.shared.statusBarOrientation)
             }
         }
     }
@@ -79,21 +103,21 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
     // MARK: - Data Persistence
     
     // Save defaults whenever the view disappears
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
         // Save the values (must be a string array)
         let filePath = dataFilePath()
         
         var stringArray:[String] = [String]()
-        for var index = 0; index < daylightCalculatorDefaults.count; index += 1 {
+        for index in 0 ..< daylightCalculatorDefaults.count {
             
             stringArray.append(String(format: "%.2f", daylightCalculatorDefaults[index]))
             
         }
         
         let array = stringArray as NSArray
-        array.writeToFile(filePath, atomically: true)
+        array.write(toFile: filePath, atomically: true)
         
         // Prevents keyboard issues
         self.backgroundTapped(self)
@@ -103,14 +127,14 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
     // MARK: - Tableview methods
     
     // Determine Number of sections
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int{
+    func numberOfSectionsInTableView(_ tableView: UITableView) -> Int{
         
         return self.sectionHeadings.count
         
     }
     
     // Assign the rows per section
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         switch section {
             
@@ -129,21 +153,21 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
     
     
     // Set properties of section header
-    func tableView(tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         
         returnHeader(view, colourOption: 4)
         
     }
     
     // Assign Section Header Text
-    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String?{
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String?{
         
         return self.sectionHeadings[section]
         
     }
     
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAtIndexPath indexPath: IndexPath) -> UITableViewCell {
         
         //println("cellForRowAtIndexPath \(indexPath.row)")
         var cell:UITableViewCell? = UITableViewCell()
@@ -154,9 +178,9 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
             
         case 0: // Description
             
-            cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+            cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
             if (cell == nil) {
-                cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
             }
             
             let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -170,9 +194,9 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 
             case 0:
                 
-                cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -182,9 +206,9 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 
             case 1:
                 
-                cell = tableView.dequeueReusableCellWithIdentifier("ImageCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "ImageCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "ImageCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "ImageCell")
                 }
                 
                 let imageView:UIImageView = cell!.viewWithTag(1) as! UIImageView
@@ -197,9 +221,9 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 
             case 2:
                 
-                cell = tableView.dequeueReusableCellWithIdentifier("CenterCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "CenterCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "CenterCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "CenterCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -209,9 +233,9 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 
             case 3:
                 
-                cell = tableView.dequeueReusableCellWithIdentifier("SettingsCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "SettingsCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "SettingsCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "SettingsCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -227,9 +251,9 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 
             case 4:
                 
-                cell = tableView.dequeueReusableCellWithIdentifier("SettingsCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "SettingsCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "SettingsCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "SettingsCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -246,9 +270,9 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 
             case 5:
                 
-                cell = tableView.dequeueReusableCellWithIdentifier("SettingsCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "SettingsCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "SettingsCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "SettingsCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -265,9 +289,9 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 
             case 6:
                 
-                cell = tableView.dequeueReusableCellWithIdentifier("SettingsCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "SettingsCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "SettingsCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "SettingsCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -284,28 +308,28 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 
             case 7:
                 
-                cell = tableView.dequeueReusableCellWithIdentifier("ResetCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "ResetCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "ResetCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "ResetCell")
                 }
                 
                 let button:ButtonWithRow = cell!.viewWithTag(1) as! ButtonWithRow
                 button.row = 1  // use row to store section
-                button.addTarget(self, action: #selector(DaylightCalculatorInfoVC.resetButtonTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+                button.addTarget(self, action: #selector(DaylightCalculatorInfoVC.resetButtonTapped(_:)), for: UIControlEvents.touchUpInside)
                 
-                button.layer.borderColor = UIColor.darkGrayColor().CGColor
+                button.layer.borderColor = UIColor.darkGray.cgColor
                 button.layer.borderWidth = 1.5
                 button.layer.cornerRadius = 5
-                button.layer.backgroundColor = UIColor.whiteColor().CGColor
-                button.setTitle("Reset", forState: UIControlState.Normal)
-                button.tintColor = UIColor.darkGrayColor()
+                button.layer.backgroundColor = UIColor.white.cgColor
+                button.setTitle("Reset", for: UIControlState())
+                button.tintColor = UIColor.darkGray
                 
             default:
                 
                 // Dummy cell with error
-                cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -321,9 +345,9 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 
             case 0:
                 
-                cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -333,9 +357,9 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 
             case 1:
                 
-                cell = tableView.dequeueReusableCellWithIdentifier("ImageCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "ImageCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "ImageCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "ImageCell")
                 }
                 
                 let imageView:UIImageView = cell!.viewWithTag(1) as! UIImageView
@@ -348,9 +372,9 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 
             case 2:
                 
-                cell = tableView.dequeueReusableCellWithIdentifier("CenterCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "CenterCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "CenterCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "CenterCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -360,9 +384,9 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 
             case 3:
                 
-                cell = tableView.dequeueReusableCellWithIdentifier("SettingsCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "SettingsCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "SettingsCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "SettingsCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -379,9 +403,9 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 
             case 4:
                 
-                cell = tableView.dequeueReusableCellWithIdentifier("SettingsCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "SettingsCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "SettingsCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "SettingsCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -398,9 +422,9 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 
             case 5:
                 
-                cell = tableView.dequeueReusableCellWithIdentifier("SettingsCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "SettingsCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "SettingsCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "SettingsCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -418,28 +442,28 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 
             case 6:
                 
-                cell = tableView.dequeueReusableCellWithIdentifier("ResetCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "ResetCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "ResetCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "ResetCell")
                 }
                 
                 let button:ButtonWithRow = cell!.viewWithTag(1) as! ButtonWithRow
                 button.row = 2  // use row to store section
-                button.addTarget(self, action: #selector(DaylightCalculatorInfoVC.resetButtonTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+                button.addTarget(self, action: #selector(DaylightCalculatorInfoVC.resetButtonTapped(_:)), for: UIControlEvents.touchUpInside)
                 
-                button.layer.borderColor = UIColor.darkGrayColor().CGColor
+                button.layer.borderColor = UIColor.darkGray.cgColor
                 button.layer.borderWidth = 1.5
                 button.layer.cornerRadius = 5
-                button.layer.backgroundColor = UIColor.whiteColor().CGColor
-                button.setTitle("Reset", forState: UIControlState.Normal)
-                button.tintColor = UIColor.darkGrayColor()
+                button.layer.backgroundColor = UIColor.white.cgColor
+                button.setTitle("Reset", for: UIControlState())
+                button.tintColor = UIColor.darkGray
                 
             default:
                 
                 // Dummy cell with error
-                cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -453,9 +477,9 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
         default:
             
             // Dummy cell with error
-            cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+            cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
             if (cell == nil) {
-                cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
             }
             
             let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -467,7 +491,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
         
         
         let background:UIControl = cell!.viewWithTag(9) as! UIControl
-        background.addTarget(self, action: #selector(DaylightCalculatorInfoVC.backgroundTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+        background.addTarget(self, action: #selector(DaylightCalculatorInfoVC.backgroundTapped(_:)), for: UIControlEvents.touchUpInside)
         
         
         return cell!
@@ -477,7 +501,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
     
     // MARK: - Button Functions
     
-    func resetButtonTapped(sender: ButtonWithRow) {
+    func resetButtonTapped(_ sender: ButtonWithRow) {
         
         if (sender.row == 1) {
             print("resetRoomPropertyDefaults")
@@ -499,39 +523,39 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
     // MARK: - Keyboard Functions
     
     // Keyboard Move Screen Up If Required
-    func keyboardNotification(notification: NSNotification) {
+    func keyboardNotification(_ notification: Notification) {
         if let userInfo = notification.userInfo {
-            let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.CGRectValue()
-            let duration:NSTimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
+            let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
+            let duration:TimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
             let animationCurveRawNSN = userInfo[UIKeyboardAnimationCurveUserInfoKey] as? NSNumber
-            let animationCurveRaw = animationCurveRawNSN?.unsignedLongValue ?? UIViewAnimationOptions.CurveEaseInOut.rawValue
+            let animationCurveRaw = animationCurveRawNSN?.uintValue ?? UIViewAnimationOptions().rawValue
             let animationCurve:UIViewAnimationOptions = UIViewAnimationOptions(rawValue: animationCurveRaw)
             self.keyboardHeightLayoutConstraint?.constant = endFrame?.size.height ?? 0.0
-            UIView.animateWithDuration(duration,
-                delay: NSTimeInterval(0),
+            UIView.animate(withDuration: duration,
+                delay: TimeInterval(0),
                 options: animationCurve,
                 animations: { self.view.layoutIfNeeded() },
                 completion: nil)
         }
     }
     
-    func backgroundTapped(sender:AnyObject) {
+    func backgroundTapped(_ sender:AnyObject) {
         print("Background Tapped")
-        var index:Int = Int()
-        for index = 0; index < self.textFields.count; index += 1 {
+        var index:Int = Int()        
+        for index:Int in 0..<self.textFields.count {
             textFields[index].resignFirstResponder()
             self.keyboardHeightLayoutConstraint.constant = 0
         }
     }
     
-    func setupTextFieldInputAccessoryView(sender:UITextField) {
+    func setupTextFieldInputAccessoryView(_ sender:UITextField) {
                 
-        let doneToolbar: UIToolbar = UIToolbar(frame: CGRectMake(0, 0, 320, 50))
-        doneToolbar.barStyle = UIBarStyle.BlackTranslucent
+        let doneToolbar: UIToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
+        doneToolbar.barStyle = UIBarStyle.blackTranslucent
         
-        let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: #selector(DaylightCalculatorInfoVC.applyButtonAction))
-        done.tintColor = UIColor.whiteColor()
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.flexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.done, target: self, action: #selector(DaylightCalculatorInfoVC.applyButtonAction))
+        done.tintColor = UIColor.white
         
         var items = [UIBarButtonItem]()
         items.append(flexSpace)
@@ -549,7 +573,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
         self.backgroundTapped(self)
     }
     
-    func textFieldDidBeginEditing(textField: UITextField) {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
         
         if let actualTextField = textField as? TextFieldWithRow {
             
@@ -558,7 +582,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
         }
     }
     
-    func textFieldDidEndEditing(textField: UITextField) {
+    func textFieldDidEndEditing(_ textField: UITextField) {
         
         if let actualTextField = textField as? TextFieldWithRow {
             
@@ -579,7 +603,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
     
     // MARK: - Data Entry Checks
     
-    func checkPercentage(sender: TextFieldWithRow)  {
+    func checkPercentage(_ sender: TextFieldWithRow)  {
         
         print("Checking percentage value for TextField \(sender.row)")
         
@@ -606,7 +630,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
         
     }
     
-    func checkDegrees(sender: TextFieldWithRow)  {
+    func checkDegrees(_ sender: TextFieldWithRow)  {
         
         print("Checking degrees value for TextField \(sender.row)")
         
@@ -633,7 +657,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
         print("text updated to: \(sender.text)\n")
     }
     
-    func checkCorrectionFactor(sender: TextFieldWithRow)  {
+    func checkCorrectionFactor(_ sender: TextFieldWithRow)  {
         
         print("Checking CF value for TextField \(sender.row)")
         

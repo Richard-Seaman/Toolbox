@@ -7,6 +7,41 @@
 //
 
 import UIKit
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func >= <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l >= r
+  default:
+    return !(lhs < rhs)
+  }
+}
+
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l > r
+  default:
+    return rhs < lhs
+  }
+}
+
 
 class WaterPipeSizerVC2: UIViewController {
 
@@ -55,7 +90,7 @@ class WaterPipeSizerVC2: UIViewController {
         
         loadLoadingUnits()
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(WaterPipeSizerVC2.keyboardNotification(_:)), name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(WaterPipeSizerVC2.keyboardNotification(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
         
         self.automaticallyAdjustsScrollViewInsets = false
         
@@ -63,17 +98,17 @@ class WaterPipeSizerVC2: UIViewController {
         self.navigationController?.navigationBar.topItem?.title = ""
         
         // Set up nav bar
-        self.navigationItem.titleView = getNavImageView(UIApplication.sharedApplication().statusBarOrientation)
+        self.navigationItem.titleView = getNavImageView(UIApplication.shared.statusBarOrientation)
         
         // Add tap background
         for view in self.staticBackgroundViews {
-            view.addTarget(self, action: #selector(WaterPipeSizerVC2.backgroundTapped), forControlEvents: UIControlEvents.TouchUpInside)
+            view.addTarget(self, action: #selector(WaterPipeSizerVC2.backgroundTapped), for: UIControlEvents.touchUpInside)
         }
         
         // Set up flow views
         for view in self.pipeViews {
             view.layer.borderWidth = 0.5
-            view.layer.borderColor = UIColor.darkGrayColor().CGColor
+            view.layer.borderColor = UIColor.darkGray.cgColor
         }
         
         // Apply the row height
@@ -85,7 +120,7 @@ class WaterPipeSizerVC2: UIViewController {
         
     }    
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         self.backgroundTapped()
     }
 
@@ -97,7 +132,7 @@ class WaterPipeSizerVC2: UIViewController {
     
     
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
     }
     
     
@@ -218,10 +253,9 @@ class WaterPipeSizerVC2: UIViewController {
         
         var index:Int = Int()
         // Cycle through each outlet type
-        for index = 0; index < numberOfOutlets.count; index += 1 {
+        for index:Int in 0..<numberOfOutlets.count {
             
-            var pipeTypeIndex:Int = Int()
-            for (pipeTypeIndex = 0; pipeTypeIndex < totalLoadingUnits.count; pipeTypeIndex += 1) {
+            for pipeTypeIndex:Int in 0..<totalLoadingUnits.count {
                 
                 totalLoadingUnits[pipeTypeIndex] = totalLoadingUnits[pipeTypeIndex] + Float(numberOfOutlets[index]) * loadingUnitsApplied[index][pipeTypeIndex]
                 
@@ -237,10 +271,9 @@ class WaterPipeSizerVC2: UIViewController {
         
         // Interpolate the flowrate for the calculated Total Demand
         
-        var pipeIndex:Int = Int()
-        for (pipeIndex = 0; pipeIndex < self.pipeFlows.count; pipeIndex += 1) {
+        for pipeIndex:Int in 0..<pipeFlows.count {
             
-            for index = 0; index < demandUnits.count; index += 1 {
+            for index:Int in 0..<demandUnits.count {
                 
                 if (totalLoadingUnits[pipeIndex] >= demandUnits.last) {
                     // If it's out of range
@@ -268,9 +301,9 @@ class WaterPipeSizerVC2: UIViewController {
         var pipeSizes:[Int] = [12, 15, 22, 28, 35, 42, 54, 67]
         var maxFlowRates:[Float] = [0.091, 0.143, 0.311, 0.527, 0.833, 1.18, 2.41, 4.8]
         
-        for (pipeIndex = 0; pipeIndex < self.pipeFlows.count; pipeIndex += 1) {
+        for pipeIndex:Int in 0..<pipeFlows.count {
             
-            for index = 0; index < pipeSizes.count; index += 1 {
+            for index:Int in 0..<pipeSizes.count {
                 
                 if (self.pipeFlows[pipeIndex] < maxFlowRates[index]) {
                     self.pipeSizes[pipeIndex] = pipeSizes[index]
@@ -284,7 +317,7 @@ class WaterPipeSizerVC2: UIViewController {
             }
         }
         
-        for (pipeIndex = 0; pipeIndex < self.pipeFlows.count; pipeIndex += 1) {
+        for pipeIndex:Int in 0..<pipeFlows.count {
             
             // If the pipe size works out as 12, manually set it to 15
             if (self.pipeSizes[pipeIndex] == 12) {
@@ -310,7 +343,7 @@ class WaterPipeSizerVC2: UIViewController {
 
 
     // Assign the rows per section
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         switch section {
             
@@ -326,28 +359,28 @@ class WaterPipeSizerVC2: UIViewController {
     }
 
     // Determine Number of sections
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int{
+    func numberOfSectionsInTableView(_ tableView: UITableView) -> Int{
         
         return 2
         
     }
 
     // Set properties of section header
-    func tableView(tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         
         returnHeader(view, colourOption: 4)
         
     }
 
     // Assign Section Header Text
-    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String?{
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String?{
         
         let headings:[String] = ["Add Outlets","Add Flowrates"]
         return headings[section]
         
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAtIndexPath indexPath: IndexPath) -> UITableViewCell {
         
         
         var cell:UITableViewCell? = UITableViewCell()
@@ -358,10 +391,10 @@ class WaterPipeSizerVC2: UIViewController {
             
             // Outlets section
             
-            cell = tableView.dequeueReusableCellWithIdentifier("OutletCell") as UITableViewCell!
+            cell = tableView.dequeueReusableCell(withIdentifier: "OutletCell") as UITableViewCell!
             if (cell == nil) {
                 // print("new cell used")
-                cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "OutletCell")
+                cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "OutletCell")
             }
             
             
@@ -379,7 +412,7 @@ class WaterPipeSizerVC2: UIViewController {
             // Set Pipe type (will automatically set image)
             changePipeTypeButton.combination = self.pipeTypeArray[indexPath.row]
             changePipeTypeButton.row = indexPath.row
-            changePipeTypeButton.addTarget(self, action: #selector(WaterPipeSizerVC2.changePipeTypeTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+            changePipeTypeButton.addTarget(self, action: #selector(WaterPipeSizerVC2.changePipeTypeTapped(_:)), for: UIControlEvents.touchUpInside)
             self.outletPipeTypeButtons[indexPath.row] = changePipeTypeButton
             
             // Set Outlet image
@@ -405,7 +438,7 @@ class WaterPipeSizerVC2: UIViewController {
             
             // Set up the textfield
             outletTextField.text = String(format: "%i", self.numberOfOutlets[indexPath.row])
-            outletTextField.addTarget(self, action: #selector(WaterPipeSizerVC2.outletTextFieldEditDidEnd(_:)), forControlEvents: UIControlEvents.EditingDidEnd)
+            outletTextField.addTarget(self, action: #selector(WaterPipeSizerVC2.outletTextFieldEditDidEnd(_:)), for: UIControlEvents.editingDidEnd)
             outletTextField.row = indexPath.row
             self.setupTextFieldInputAccessoryView(outletTextField)
             self.outletTextFields[indexPath.row] = outletTextField
@@ -415,22 +448,22 @@ class WaterPipeSizerVC2: UIViewController {
             minusButton.row = indexPath.row
             clearButton.row = indexPath.row
             
-            plusButton.addTarget(self, action: #selector(WaterPipeSizerVC2.plusButtonTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
-            minusButton.addTarget(self, action: #selector(WaterPipeSizerVC2.minusButtonTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
-            clearButton.addTarget(self, action: #selector(WaterPipeSizerVC2.outletClearButtonTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+            plusButton.addTarget(self, action: #selector(WaterPipeSizerVC2.plusButtonTapped(_:)), for: UIControlEvents.touchUpInside)
+            minusButton.addTarget(self, action: #selector(WaterPipeSizerVC2.minusButtonTapped(_:)), for: UIControlEvents.touchUpInside)
+            clearButton.addTarget(self, action: #selector(WaterPipeSizerVC2.outletClearButtonTapped(_:)), for: UIControlEvents.touchUpInside)
             
             // Assign background taps to views
-            countView.addTarget(self, action: #selector(WaterPipeSizerVC2.backgroundTapped), forControlEvents: UIControlEvents.TouchUpInside)
-            imageContainerView.addTarget(self, action: #selector(WaterPipeSizerVC2.backgroundTapped), forControlEvents: UIControlEvents.TouchUpInside)
+            countView.addTarget(self, action: #selector(WaterPipeSizerVC2.backgroundTapped), for: UIControlEvents.touchUpInside)
+            imageContainerView.addTarget(self, action: #selector(WaterPipeSizerVC2.backgroundTapped), for: UIControlEvents.touchUpInside)
             
             
         case 1:
             
             // Flow section
             
-            cell = tableView.dequeueReusableCellWithIdentifier("FlowCell") as UITableViewCell!
+            cell = tableView.dequeueReusableCell(withIdentifier: "FlowCell") as UITableViewCell!
             if (cell == nil) {
-                cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "FlowCell")
+                cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "FlowCell")
             }
             
             // Grab up the cell components
@@ -468,8 +501,8 @@ class WaterPipeSizerVC2: UIViewController {
             leftTextField.row = indexPath.row
             rightTextField.row = indexPath.row + 2
             
-            leftTextField.addTarget(self, action: #selector(WaterPipeSizerVC2.flowTextFieldEditingDidEnd(_:)), forControlEvents: UIControlEvents.EditingDidEnd)
-            rightTextField.addTarget(self, action: #selector(WaterPipeSizerVC2.flowTextFieldEditingDidEnd(_:)), forControlEvents: UIControlEvents.EditingDidEnd)
+            leftTextField.addTarget(self, action: #selector(WaterPipeSizerVC2.flowTextFieldEditingDidEnd(_:)), for: UIControlEvents.editingDidEnd)
+            rightTextField.addTarget(self, action: #selector(WaterPipeSizerVC2.flowTextFieldEditingDidEnd(_:)), for: UIControlEvents.editingDidEnd)
             
             self.setupTextFieldInputAccessoryView(leftTextField)
             self.setupTextFieldInputAccessoryView(rightTextField)
@@ -482,13 +515,13 @@ class WaterPipeSizerVC2: UIViewController {
             leftClearButton.row = indexPath.row
             rightClearButton.row = indexPath.row + 2
             
-            leftClearButton.addTarget(self, action: #selector(WaterPipeSizerVC2.flowClearButtonTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
-            rightClearButton.addTarget(self, action: #selector(WaterPipeSizerVC2.flowClearButtonTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+            leftClearButton.addTarget(self, action: #selector(WaterPipeSizerVC2.flowClearButtonTapped(_:)), for: UIControlEvents.touchUpInside)
+            rightClearButton.addTarget(self, action: #selector(WaterPipeSizerVC2.flowClearButtonTapped(_:)), for: UIControlEvents.touchUpInside)
             
             
             // Background taps
-            leftView.addTarget(self, action: #selector(WaterPipeSizerVC2.backgroundTapped), forControlEvents: UIControlEvents.TouchUpInside)
-            rightView.addTarget(self, action: #selector(WaterPipeSizerVC2.backgroundTapped), forControlEvents: UIControlEvents.TouchUpInside)
+            leftView.addTarget(self, action: #selector(WaterPipeSizerVC2.backgroundTapped), for: UIControlEvents.touchUpInside)
+            rightView.addTarget(self, action: #selector(WaterPipeSizerVC2.backgroundTapped), for: UIControlEvents.touchUpInside)
             
             
             
@@ -506,7 +539,7 @@ class WaterPipeSizerVC2: UIViewController {
     
     // MARK: - Flow functions
     
-    func flowTextFieldEditingDidEnd(sender:TextFieldWithRow) {
+    func flowTextFieldEditingDidEnd(_ sender:TextFieldWithRow) {
         
         print("flow textField editing did end @ index \(sender.row)")
         
@@ -530,7 +563,7 @@ class WaterPipeSizerVC2: UIViewController {
         
     }
     
-    func flowClearButtonTapped(sender:ButtonWithRow) {
+    func flowClearButtonTapped(_ sender:ButtonWithRow) {
         
         print("clear flow button tapped @ index \(sender.row)")
         
@@ -542,7 +575,7 @@ class WaterPipeSizerVC2: UIViewController {
     
     // MARK: - Outlet functions
     
-    func changePipeTypeTapped(sender:PipeTypeButton) {
+    func changePipeTypeTapped(_ sender:PipeTypeButton) {
         
         print("pipe type button tapped @ row \(sender.row)")
         
@@ -602,7 +635,7 @@ class WaterPipeSizerVC2: UIViewController {
         
     }
     
-    func outletTextFieldEditDidEnd(sender:TextFieldWithRow) {
+    func outletTextFieldEditDidEnd(_ sender:TextFieldWithRow) {
         
         print("outlet textField editing did end @ row \(sender.row)")
         
@@ -631,7 +664,7 @@ class WaterPipeSizerVC2: UIViewController {
         
     }
     
-    func outletClearButtonTapped(sender:ButtonWithRow) {
+    func outletClearButtonTapped(_ sender:ButtonWithRow) {
         
         print("clear button tapped @ row \(sender.row)")
         
@@ -640,7 +673,7 @@ class WaterPipeSizerVC2: UIViewController {
         
     }
     
-    func minusButtonTapped(sender:ButtonWithRow) {
+    func minusButtonTapped(_ sender:ButtonWithRow) {
         
         print("minus button tapped @ row \(sender.row)")
         
@@ -653,7 +686,7 @@ class WaterPipeSizerVC2: UIViewController {
         
     }
     
-    func plusButtonTapped(sender:ButtonWithRow) {
+    func plusButtonTapped(_ sender:ButtonWithRow) {
         
         print("plus button tapped @ row \(sender.row)")
         
@@ -670,16 +703,16 @@ class WaterPipeSizerVC2: UIViewController {
     // MARK: - Keyboard Related
     
     // Keyboard Move Screen Up If Required
-    func keyboardNotification(notification: NSNotification) {
+    func keyboardNotification(_ notification: Notification) {
         if let userInfo = notification.userInfo {
-            let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.CGRectValue()
-            let duration:NSTimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
+            let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
+            let duration:TimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
             let animationCurveRawNSN = userInfo[UIKeyboardAnimationCurveUserInfoKey] as? NSNumber
-            let animationCurveRaw = animationCurveRawNSN?.unsignedLongValue ?? UIViewAnimationOptions.CurveEaseInOut.rawValue
+            let animationCurveRaw = animationCurveRawNSN?.uintValue ?? UIViewAnimationOptions().rawValue
             let animationCurve:UIViewAnimationOptions = UIViewAnimationOptions(rawValue: animationCurveRaw)
             self.keyboardHeightLayoutConstraint?.constant = endFrame?.size.height ?? 0.0
-            UIView.animateWithDuration(duration,
-                delay: NSTimeInterval(0),
+            UIView.animate(withDuration: duration,
+                delay: TimeInterval(0),
                 options: animationCurve,
                 animations: { self.view.layoutIfNeeded() },
                 completion: nil)
@@ -701,14 +734,14 @@ class WaterPipeSizerVC2: UIViewController {
         
     }
     
-    func setupTextFieldInputAccessoryView(sender:UITextField) {
+    func setupTextFieldInputAccessoryView(_ sender:UITextField) {
         
-        let doneToolbar: UIToolbar = UIToolbar(frame: CGRectMake(0, 0, 320, 50))
-        doneToolbar.barStyle = UIBarStyle.BlackTranslucent
+        let doneToolbar: UIToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
+        doneToolbar.barStyle = UIBarStyle.blackTranslucent
         
-        let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: #selector(WaterPipeSizerVC2.backgroundTapped))
-        done.tintColor = UIColor.whiteColor()
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.flexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.done, target: self, action: #selector(WaterPipeSizerVC2.backgroundTapped))
+        done.tintColor = UIColor.white
         
         var items = [UIBarButtonItem]()
         items.append(flexSpace)

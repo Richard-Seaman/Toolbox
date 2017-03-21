@@ -46,7 +46,7 @@ class DuctSizerVC: UIViewController {
     }
     @IBOutlet weak var ySlider: UISlider!{
         didSet{
-            ySlider.transform = CGAffineTransformMakeRotation(CGFloat(-M_PI_2))
+            ySlider.transform = CGAffineTransform(rotationAngle: CGFloat(-M_PI_2))
         }
     }
     
@@ -122,13 +122,13 @@ class DuctSizerVC: UIViewController {
         loadDuctSizerProperties()
         
         // Listen for keyboard changes
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DuctSizerVC.keyboardNotification(_:)), name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(DuctSizerVC.keyboardNotification(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
         
         // Get rid of the back button text (get rid of "Back")
         self.navigationController?.navigationBar.topItem?.title = ""
         
         // Set up nav bar
-        self.navigationItem.titleView = getNavImageView(UIApplication.sharedApplication().statusBarOrientation)
+        self.navigationItem.titleView = getNavImageView(UIApplication.shared.statusBarOrientation)
         
         // Initally set to flowrate view
         self.flowrateView.alpha = 1
@@ -136,7 +136,7 @@ class DuctSizerVC: UIViewController {
         
         let topViews:[UIView] = [self.flowrateView, self.achView]
         for view in topViews {
-            view.layer.borderColor = UIColor.darkGrayColor().CGColor
+            view.layer.borderColor = UIColor.darkGray.cgColor
             view.layer.borderWidth = 1
         }
         
@@ -152,25 +152,25 @@ class DuctSizerVC: UIViewController {
         // Set up the text fields
         for textField in self.textFields {
             self.setupTextFieldInputAccessoryView(textField)
-            textField.addTarget(self, action: #selector(DuctSizerVC.textFieldEditingDidEnd(_:)), forControlEvents: UIControlEvents.EditingDidEnd)
+            textField.addTarget(self, action: #selector(DuctSizerVC.textFieldEditingDidEnd(_:)), for: UIControlEvents.editingDidEnd)
         }
         
         // Apply the background tap function to the backgrounds
         for view in self.backGroundControlViews {
-            view.addTarget(self, action: #selector(DuctSizerVC.backgroundTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+            view.addTarget(self, action: #selector(DuctSizerVC.backgroundTapped(_:)), for: UIControlEvents.touchUpInside)
         }
         
         // Set up the sliders
         let sliders:[UISlider] = [self.xSlider, self.ySlider]
         for slider in sliders {
-            slider.addTarget(self, action: #selector(DuctSizerVC.sliderDidChange(_:)), forControlEvents: UIControlEvents.ValueChanged)
-            slider.addTarget(self, action: #selector(DuctSizerVC.sliderTouched(_:)), forControlEvents: UIControlEvents.TouchDown)
-            slider.addTarget(self, action: #selector(DuctSizerVC.sliderReleased(_:)), forControlEvents: UIControlEvents.TouchUpInside)
-            slider.addTarget(self, action: #selector(DuctSizerVC.sliderReleased(_:)), forControlEvents: UIControlEvents.TouchUpOutside)
+            slider.addTarget(self, action: #selector(DuctSizerVC.sliderDidChange(_:)), for: UIControlEvents.valueChanged)
+            slider.addTarget(self, action: #selector(DuctSizerVC.sliderTouched(_:)), for: UIControlEvents.touchDown)
+            slider.addTarget(self, action: #selector(DuctSizerVC.sliderReleased(_:)), for: UIControlEvents.touchUpInside)
+            slider.addTarget(self, action: #selector(DuctSizerVC.sliderReleased(_:)), for: UIControlEvents.touchUpOutside)
         }
         
         // Set up the velocity selector
-        self.velocitySelector.addTarget(self, action: #selector(DuctSizerVC.velocitySelectorDidChange(_:)), forControlEvents: UIControlEvents.ValueChanged)
+        self.velocitySelector.addTarget(self, action: #selector(DuctSizerVC.velocitySelectorDidChange(_:)), for: UIControlEvents.valueChanged)
         
         // Set up th highlight views
         let highlightViews:[UIView] = [self.xHighlighterView, self.yHighlighterView]
@@ -199,7 +199,7 @@ class DuctSizerVC: UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         self.backgroundTapped(self)
     }
     
@@ -239,45 +239,45 @@ class DuctSizerVC: UIViewController {
     func setUpButtons() {
         
         // Add methods
-        self.ductButton.addTarget(self, action: #selector(DuctSizerVC.ductButtonTapped), forControlEvents: UIControlEvents.TouchUpInside)
-        self.autoSizeButton.addTarget(self, action: #selector(DuctSizerVC.autosizeButtonTapped), forControlEvents: UIControlEvents.TouchUpInside)
-        self.xLockButton.addTarget(self, action: #selector(DuctSizerVC.lockTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
-        self.yLockButton.addTarget(self, action: #selector(DuctSizerVC.lockTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+        self.ductButton.addTarget(self, action: #selector(DuctSizerVC.ductButtonTapped), for: UIControlEvents.touchUpInside)
+        self.autoSizeButton.addTarget(self, action: #selector(DuctSizerVC.autosizeButtonTapped), for: UIControlEvents.touchUpInside)
+        self.xLockButton.addTarget(self, action: #selector(DuctSizerVC.lockTapped(_:)), for: UIControlEvents.touchUpInside)
+        self.yLockButton.addTarget(self, action: #selector(DuctSizerVC.lockTapped(_:)), for: UIControlEvents.touchUpInside)
         
         // Change autosize appearance
-        self.autoSizeButton.setTitle("Autosize", forState: UIControlState.Normal)
-        self.autoSizeButton.layer.backgroundColor = UIColor.whiteColor().CGColor
+        self.autoSizeButton.setTitle("Autosize", for: UIControlState())
+        self.autoSizeButton.layer.backgroundColor = UIColor.white.cgColor
         self.autoSizeButton.layer.borderWidth = 2.5
-        self.autoSizeButton.layer.borderColor = UIColor.darkGrayColor().CGColor
+        self.autoSizeButton.layer.borderColor = UIColor.darkGray.cgColor
         self.autoSizeButton.layer.cornerRadius = self.ductButton.frame.size.height/3
         self.autoSizeButton.clipsToBounds = true
         
         // Get rid of lock button titles
-        self.xLockButton.setTitle("", forState: UIControlState.Normal)
-        self.yLockButton.setTitle("", forState: UIControlState.Normal)
+        self.xLockButton.setTitle("", for: UIControlState())
+        self.yLockButton.setTitle("", for: UIControlState())
         
     }
     
-    func lockChanged(sender:UIButton) {
+    func lockChanged(_ sender:UIButton) {
         
         let greenColour:UIColor = UIColor(red: 100/255, green: 180/255, blue: 0/255, alpha: 1)
-        let redColour:UIColor = UIColor.redColor()
+        let redColour:UIColor = UIColor.red
         
         // Called whenever xLocked or yLocked is changed
         
         if (sender == self.xLockButton) {
             
             if (self.xLocked) {
-                self.xLockButton.setImage(UIImage(named: "Locked"), forState: UIControlState.Normal)
+                self.xLockButton.setImage(UIImage(named: "Locked"), for: UIControlState())
                 self.xLockButton.tintColor = redColour
-                self.xSlider.userInteractionEnabled = false
+                self.xSlider.isUserInteractionEnabled = false
                 self.xSlider.alpha = shaded
                 //if (self.yLocked) {self.yLocked = false}    // Only 1 side locked at a time
             }
             else {
-                self.xLockButton.setImage(UIImage(named: "Unlocked"), forState: UIControlState.Normal)
+                self.xLockButton.setImage(UIImage(named: "Unlocked"), for: UIControlState())
                 self.xLockButton.tintColor = greenColour
-                self.xSlider.userInteractionEnabled = true
+                self.xSlider.isUserInteractionEnabled = true
                 self.xSlider.alpha = 1
             }
             
@@ -285,16 +285,16 @@ class DuctSizerVC: UIViewController {
         else if (sender == self.yLockButton) {
             
             if (self.yLocked) {
-                self.yLockButton.setImage(UIImage(named: "Locked"), forState: UIControlState.Normal)
+                self.yLockButton.setImage(UIImage(named: "Locked"), for: UIControlState())
                 self.yLockButton.tintColor = redColour
-                self.ySlider.userInteractionEnabled = false
+                self.ySlider.isUserInteractionEnabled = false
                 self.ySlider.alpha = shaded
                 //if (self.xLocked) {self.xLocked = false}    // Only 1 side locked at a time
             }
             else {
-                self.yLockButton.setImage(UIImage(named: "Unlocked"), forState: UIControlState.Normal)
+                self.yLockButton.setImage(UIImage(named: "Unlocked"), for: UIControlState())
                 self.yLockButton.tintColor = greenColour
-                self.ySlider.userInteractionEnabled = true
+                self.ySlider.isUserInteractionEnabled = true
                 self.ySlider.alpha = 1
             }
         }
@@ -511,7 +511,7 @@ class DuctSizerVC: UIViewController {
         
     }
     
-    func autosize(velocity:Float, aspect:Float?) {
+    func autosize(_ velocity:Float, aspect:Float?) {
         
         // Have already checked that both dimensions are not locked
         // Also, whenever circ duct is selected, both Dims are unlocked
@@ -653,7 +653,7 @@ class DuctSizerVC: UIViewController {
     
     // MARK: - TextField Functions
     
-    func textFieldEditingDidEnd(sender:UITextField) {
+    func textFieldEditingDidEnd(_ sender:UITextField) {
         
         print("textFieldEditingDidEnd")
         
@@ -717,7 +717,7 @@ class DuctSizerVC: UIViewController {
         
     }
     
-    func updateFlowrate(sender:UITextField) {
+    func updateFlowrate(_ sender:UITextField) {
         
         let shade:CGFloat = 0.5
         
@@ -759,12 +759,12 @@ class DuctSizerVC: UIViewController {
     
     // MARK: - Slider & Selector Functions
     
-    func sliderDidChange(sender:UISlider) {
+    func sliderDidChange(_ sender:UISlider) {
         
         // Get value
         var newDim:Float = (self.maxDim - self.minDim) * sender.value + self.minDim
         
-        let remainder:Float = newDim % self.increment
+        let remainder:Float = newDim.truncatingRemainder(dividingBy: self.increment)
         let smallerSize:Float = (newDim - remainder)
         
         if (remainder >= self.increment/2) {
@@ -788,7 +788,7 @@ class DuctSizerVC: UIViewController {
         
     }
     
-    func sliderTouched(sender:UISlider) {
+    func sliderTouched(_ sender:UISlider) {
         
         if (sender == self.xSlider) {
             print("xSlider touched")
@@ -801,7 +801,7 @@ class DuctSizerVC: UIViewController {
         
     }
     
-    func sliderReleased(sender:UISlider) {
+    func sliderReleased(_ sender:UISlider) {
         
         if (sender == self.xSlider) {
             print("xSlider released")
@@ -814,17 +814,17 @@ class DuctSizerVC: UIViewController {
         
     }
     
-    func velocitySelectorDidChange(sender:UISegmentedControl) {
+    func velocitySelectorDidChange(_ sender:UISegmentedControl) {
         
         print("velocitySelectorDidChange")
         
         switch sender.selectedSegmentIndex {
             
         case 0:
-            self.velocityTextField.userInteractionEnabled = true
+            self.velocityTextField.isUserInteractionEnabled = true
             self.velocityTextField.alpha = 1
         default:
-            self.velocityTextField.userInteractionEnabled = false
+            self.velocityTextField.isUserInteractionEnabled = false
             self.velocityTextField.alpha = 0.8
             
         }
@@ -868,7 +868,7 @@ class DuctSizerVC: UIViewController {
             // Set duct shape
             self.ductShapeView.layer.cornerRadius = 0
             self.ductShapeView.clipsToBounds = true
-            self.ductShapeView.layer.borderColor = UIColor.darkGrayColor().CGColor
+            self.ductShapeView.layer.borderColor = UIColor.darkGray.cgColor
             self.ductShapeView.layer.borderWidth = 5
             
             // Show elements
@@ -884,10 +884,10 @@ class DuctSizerVC: UIViewController {
             self.ySlider.value = (self.yDimension - self.minDim) / (self.maxDim - self.minDim)
             
             // Change button
-            self.ductButton.setTitle("", forState: UIControlState.Normal)
-            self.ductButton.layer.backgroundColor = UIColor.whiteColor().CGColor
+            self.ductButton.setTitle("", for: UIControlState())
+            self.ductButton.layer.backgroundColor = UIColor.white.cgColor
             self.ductButton.layer.borderWidth = 2.5
-            self.ductButton.layer.borderColor = UIColor.darkGrayColor().CGColor
+            self.ductButton.layer.borderColor = UIColor.darkGray.cgColor
             self.ductButton.layer.cornerRadius = self.ductButton.frame.size.width/2
             self.ductButton.clipsToBounds = true
             
@@ -903,7 +903,7 @@ class DuctSizerVC: UIViewController {
             // Set duct shape
             self.ductShapeView.layer.cornerRadius = self.ductShapeView.frame.size.width/2
             self.ductShapeView.clipsToBounds = true
-            self.ductShapeView.layer.borderColor = UIColor.darkGrayColor().CGColor
+            self.ductShapeView.layer.borderColor = UIColor.darkGray.cgColor
             self.ductShapeView.layer.borderWidth = 5
             
             // Hide elements
@@ -918,10 +918,10 @@ class DuctSizerVC: UIViewController {
             self.xSlider.value = (self.diameter - self.minDim) / (self.maxDim - self.minDim)
             
             // Change button
-            self.ductButton.setTitle("", forState: UIControlState.Normal)
-            self.ductButton.layer.backgroundColor = UIColor.whiteColor().CGColor
+            self.ductButton.setTitle("", for: UIControlState())
+            self.ductButton.layer.backgroundColor = UIColor.white.cgColor
             self.ductButton.layer.borderWidth = 2.5
-            self.ductButton.layer.borderColor = UIColor.darkGrayColor().CGColor
+            self.ductButton.layer.borderColor = UIColor.darkGray.cgColor
             self.ductButton.layer.cornerRadius = 0
             self.ductButton.clipsToBounds = true
         }
@@ -948,10 +948,10 @@ class DuctSizerVC: UIViewController {
                 
                 // Create the alert controller
                 message = "I can't autosize the duct if both dimensions are locked"
-                alertController = UIAlertController(title: "Must Unlock Dimension", message: message, preferredStyle: .Alert)
+                alertController = UIAlertController(title: "Must Unlock Dimension", message: message, preferredStyle: .alert)
                 
                 // Create the actions
-                cancelAction = UIAlertAction(title: "Whoops", style: UIAlertActionStyle.Cancel) {
+                cancelAction = UIAlertAction(title: "Whoops", style: UIAlertActionStyle.cancel) {
                     UIAlertAction in
                     NSLog("Cancel Pressed")
                     
@@ -963,7 +963,7 @@ class DuctSizerVC: UIViewController {
                 alertController.addAction(cancelAction)
                 
                 // Present the controller
-                self.presentViewController(alertController, animated: true, completion: nil)
+                self.present(alertController, animated: true, completion: nil)
             }
             else {
                 
@@ -990,10 +990,10 @@ class DuctSizerVC: UIViewController {
                     
                     // Create the alert controller
                     message = "I can't autosize the duct if you don't give me a velocity..."
-                    alertController = UIAlertController(title: "Must Enter Velocity", message: message, preferredStyle: .Alert)
+                    alertController = UIAlertController(title: "Must Enter Velocity", message: message, preferredStyle: .alert)
                     
                     // Create the actions
-                    cancelAction = UIAlertAction(title: "Whoops", style: UIAlertActionStyle.Cancel) {
+                    cancelAction = UIAlertAction(title: "Whoops", style: UIAlertActionStyle.cancel) {
                         UIAlertAction in
                         NSLog("Cancel Pressed")
                         
@@ -1005,7 +1005,7 @@ class DuctSizerVC: UIViewController {
                     alertController.addAction(cancelAction)
                     
                     // Present the controller
-                    self.presentViewController(alertController, animated: true, completion: nil)
+                    self.present(alertController, animated: true, completion: nil)
                 }
                 
             }
@@ -1017,10 +1017,10 @@ class DuctSizerVC: UIViewController {
             
             // Create the alert controller
             message = "I can't autosize the duct if you don't give me a flowrate..."
-            alertController = UIAlertController(title: "Must Enter Flowrate", message: message, preferredStyle: .Alert)
+            alertController = UIAlertController(title: "Must Enter Flowrate", message: message, preferredStyle: .alert)
             
             // Create the actions
-            cancelAction = UIAlertAction(title: "Whoops", style: UIAlertActionStyle.Cancel) {
+            cancelAction = UIAlertAction(title: "Whoops", style: UIAlertActionStyle.cancel) {
                 UIAlertAction in
                 NSLog("Cancel Pressed")
                 
@@ -1032,7 +1032,7 @@ class DuctSizerVC: UIViewController {
             alertController.addAction(cancelAction)
             
             // Present the controller
-            self.presentViewController(alertController, animated: true, completion: nil)
+            self.present(alertController, animated: true, completion: nil)
             
         }
         
@@ -1040,7 +1040,7 @@ class DuctSizerVC: UIViewController {
         
     }
     
-    func lockTapped(sender:UIButton) {
+    func lockTapped(_ sender:UIButton) {
         
         if (sender == self.xLockButton) {
             self.xLocked = !self.xLocked
@@ -1064,11 +1064,11 @@ class DuctSizerVC: UIViewController {
         if (self.yLocked || self.xLocked || self.ySlider.alpha != 1) {
             self.autosizeAspect = nil
             self.aspectTextField.text = ""
-            self.aspectTextField.userInteractionEnabled = false
+            self.aspectTextField.isUserInteractionEnabled = false
             self.aspectTextField.alpha = 0.8
         }
         else {
-            self.aspectTextField.userInteractionEnabled = true
+            self.aspectTextField.isUserInteractionEnabled = true
             self.aspectTextField.alpha = 1
         }
     }
@@ -1077,39 +1077,38 @@ class DuctSizerVC: UIViewController {
     // MARK: - Keyboard Related
     
     // Keyboard Move Screen Up If Required
-    func keyboardNotification(notification: NSNotification) {
+    func keyboardNotification(_ notification: Notification) {
         if let userInfo = notification.userInfo {
-            let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.CGRectValue()
-            let duration:NSTimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
+            let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
+            let duration:TimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
             let animationCurveRawNSN = userInfo[UIKeyboardAnimationCurveUserInfoKey] as? NSNumber
-            let animationCurveRaw = animationCurveRawNSN?.unsignedLongValue ?? UIViewAnimationOptions.CurveEaseInOut.rawValue
+            let animationCurveRaw = animationCurveRawNSN?.uintValue ?? UIViewAnimationOptions().rawValue
             let animationCurve:UIViewAnimationOptions = UIViewAnimationOptions(rawValue: animationCurveRaw)
             self.keyboardHeightLayoutConstraint?.constant = endFrame?.size.height ?? 0.0
-            UIView.animateWithDuration(duration,
-                delay: NSTimeInterval(0),
+            UIView.animate(withDuration: duration,
+                delay: TimeInterval(0),
                 options: animationCurve,
                 animations: { self.view.layoutIfNeeded() },
                 completion: nil)
         }
     }
     
-    func backgroundTapped(sender:AnyObject) {
-        print("backgroundTapped")
-        var index:Int = Int()
-        for index = 0; index < self.textFields.count; index += 1 {
+    func backgroundTapped(_ sender:AnyObject) {
+        print("backgroundTapped")        
+        for index:Int in 0..<self.textFields.count {
             self.textFields[index].resignFirstResponder()
         }
         self.keyboardHeightLayoutConstraint.constant = 0
     }
     
-    func setupTextFieldInputAccessoryView(sender:UITextField) {
+    func setupTextFieldInputAccessoryView(_ sender:UITextField) {
         
-        let doneToolbar: UIToolbar = UIToolbar(frame: CGRectMake(0, 0, 320, 50))
-        doneToolbar.barStyle = UIBarStyle.BlackTranslucent
+        let doneToolbar: UIToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
+        doneToolbar.barStyle = UIBarStyle.blackTranslucent
         
-        let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: #selector(DuctSizerVC.applyButtonAction))
-        done.tintColor = UIColor.whiteColor()
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.flexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.done, target: self, action: #selector(DuctSizerVC.applyButtonAction))
+        done.tintColor = UIColor.white
         
         var items = [UIBarButtonItem]()
         items.append(flexSpace)

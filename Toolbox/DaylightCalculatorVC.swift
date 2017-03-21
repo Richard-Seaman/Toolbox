@@ -7,6 +7,30 @@
 //
 
 import UIKit
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l > r
+  default:
+    return rhs < lhs
+  }
+}
+
 
 class DaylightCalculatorVC: UIViewController {
     
@@ -44,23 +68,24 @@ class DaylightCalculatorVC: UIViewController {
     var primaryRanges:[Float] = [2.0, 4.5, 5.0]     // if (DF < value) will be used
     var postPrimaryRanges:[Float] = [2.0, 4.2, 5.0]
     var comments:[String] = ["Poor daylight", "Not acceptable for a classroom","Acceptable for a classroom","Excessive daylight"]
-    var labelColours:[UIColor] = [UIColor.redColor(), UIColor.orangeColor(), UIColor.greenColor(), UIColor.orangeColor()]
+    var labelColours:[UIColor] = [UIColor.red, UIColor.orange, UIColor.green, UIColor.orange]
     
     // Track glazing area between functions
     var glazingAreaPercentage:Float = Float()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DaylightCalculatorVC.keyboardNotification(_:)), name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(DaylightCalculatorVC.keyboardNotification(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
         
         // Set up nav bar
-        self.navigationItem.titleView = getNavImageView(UIApplication.sharedApplication().statusBarOrientation)
+        self.navigationItem.titleView = getNavImageView(UIApplication.shared.statusBarOrientation)
         
         var index:Int = Int()
         
         // Make the labels multi-line
         var labels:[UILabel] = [roomLengthLabel, roomDepthLabel, roomHeightLabel, windowLengthLabel, windowHeightLabel]
-        for index=0; index < labels.count; index += 1 {
+        
+        for index:Int in 0..<labels.count {
             labels[index].numberOfLines = 0
         }
         
@@ -75,35 +100,38 @@ class DaylightCalculatorVC: UIViewController {
         
         // Set up the views
         var views:[UIView] = [topView, roomVariablesView]
-        for index=0; index < views.count ; index += 1 {
-            views[index].layer.backgroundColor = UIColor.whiteColor().CGColor
+        
+        for index:Int in 0..<views.count {
+            views[index].layer.backgroundColor = UIColor.white.cgColor
             if (index == 0) {
                 views[index].layer.cornerRadius = 20
             }
             else {
                 views[index].layer.cornerRadius = 10
             }
-            views[index].layer.borderColor = UIColor.blackColor().CGColor
+            views[index].layer.borderColor = UIColor.black.cgColor
             views[index].layer.borderWidth = 1
         }
         
         // Add data check, tags, keyboard bar and apply button and default values to textfields
-        for index=0; index < textFields.count; index += 1 {
+        
+        for index:Int in 0..<textFields.count {
             textFields[index].text = String(format: "%.1f", defaults[index])
             textFields[index].tag = index
-            textFields[index].addTarget(self, action: #selector(DaylightCalculatorVC.checkValue(_:)), forControlEvents: UIControlEvents.EditingDidEnd)
+            textFields[index].addTarget(self, action: #selector(DaylightCalculatorVC.checkValue(_:)), for: UIControlEvents.editingDidEnd)
             self.setupTextFieldInputAccessoryView(textFields[index])
         }
         
         // Add update action to segmented control
-        self.schoolSelector.addTarget(self, action: #selector(DaylightCalculatorVC.updateCalculation), forControlEvents: UIControlEvents.ValueChanged)
+        self.schoolSelector.addTarget(self, action: #selector(DaylightCalculatorVC.updateCalculation), for: UIControlEvents.valueChanged)
         self.schoolSelector.tintColor = bdpColour
         
         // Update max window dimensions
         self.setMaxWindowSizes()
         
         // Keep track of current values
-        for index=0; index < currentValues.count; index += 1 {
+        
+        for index:Int in 0..<currentValues.count {
             self.currentValues[index] = self.defaults[index]
         }
         
@@ -119,7 +147,7 @@ class DaylightCalculatorVC: UIViewController {
     }
 
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
                 
         // Makes sure no keyboard and view reset when it appears
         self.backgroundTapped(self)
@@ -129,24 +157,24 @@ class DaylightCalculatorVC: UIViewController {
         self.updateCalculation()
         
         // Make sure the nav bar image fits within the new orientation
-        if (UIDevice.currentDevice().orientation.isLandscape) {
+        if (UIDevice.current.orientation.isLandscape) {
             if (self.navigationItem.titleView?.frame.height > 400/16) {
-                self.navigationItem.titleView = getNavImageView(UIApplication.sharedApplication().statusBarOrientation)
+                self.navigationItem.titleView = getNavImageView(UIApplication.shared.statusBarOrientation)
             }
         }
     }
     
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         self.backgroundTapped(self)
     }
     
-    override func willRotateToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
+    override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
         // Make sure the nav bar image fits within the new orientation
         self.navigationItem.titleView = getNavImageView(toInterfaceOrientation)
     }
     
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
     }
     
     override func didReceiveMemoryWarning() {
@@ -158,39 +186,40 @@ class DaylightCalculatorVC: UIViewController {
     // MARK: - Keyboard Related
     
     // Keyboard Move Screen Up If Required
-    func keyboardNotification(notification: NSNotification) {
+    func keyboardNotification(_ notification: Notification) {
         if let userInfo = notification.userInfo {
-            let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.CGRectValue()
-            let duration:NSTimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
+            let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
+            let duration:TimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
             let animationCurveRawNSN = userInfo[UIKeyboardAnimationCurveUserInfoKey] as? NSNumber
-            let animationCurveRaw = animationCurveRawNSN?.unsignedLongValue ?? UIViewAnimationOptions.CurveEaseInOut.rawValue
+            let animationCurveRaw = animationCurveRawNSN?.uintValue ?? UIViewAnimationOptions().rawValue
             let animationCurve:UIViewAnimationOptions = UIViewAnimationOptions(rawValue: animationCurveRaw)
             self.keyboardHeightLayoutConstraint?.constant = endFrame?.size.height ?? 0.0
-            UIView.animateWithDuration(duration,
-                delay: NSTimeInterval(0),
+            UIView.animate(withDuration: duration,
+                delay: TimeInterval(0),
                 options: animationCurve,
                 animations: { self.view.layoutIfNeeded() },
                 completion: nil)
         }
     }
     
-    @IBAction func backgroundTapped(sender:AnyObject) {
+    @IBAction func backgroundTapped(_ sender:AnyObject) {
         var index:Int = Int()
-        for index = 0; index < self.textFields.count; index += 1 {
+        
+        for index:Int in 0..<self.textFields.count {
             textFields[index].resignFirstResponder()
             self.keyboardHeightLayoutConstraint.constant = 0
             contentView.layoutIfNeeded()
         }
     }
 
-    func setupTextFieldInputAccessoryView(sender:UITextField) {
+    func setupTextFieldInputAccessoryView(_ sender:UITextField) {
         
-        let doneToolbar: UIToolbar = UIToolbar(frame: CGRectMake(0, 0, 320, 50))
-        doneToolbar.barStyle = UIBarStyle.BlackTranslucent
+        let doneToolbar: UIToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
+        doneToolbar.barStyle = UIBarStyle.blackTranslucent
         
-        let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: #selector(DaylightCalculatorVC.applyButtonAction))
-        done.tintColor = UIColor.whiteColor()
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.flexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.done, target: self, action: #selector(DaylightCalculatorVC.applyButtonAction))
+        done.tintColor = UIColor.white
         
         var items = [UIBarButtonItem]()
         items.append(flexSpace)
@@ -228,7 +257,7 @@ class DaylightCalculatorVC: UIViewController {
         var daylightFactorPositionInRange:Int = 0
         var index:Int = Int()
         
-        for index = 0; index < ranges.count; index += 1 {
+        for index:Int in 0..<ranges.count {
             
             // Find where the daylight factor lies within the range
             if (daylightFactor > ranges[index]) {
@@ -297,7 +326,7 @@ class DaylightCalculatorVC: UIViewController {
     
     // MARK: - Data Entry Checks
     
-    func checkValue(sender: UITextField)  {
+    func checkValue(_ sender: UITextField)  {
         
         let value:Float = sender.text!.floatValue
         let maxLimit:Float = self.maxLimits[sender.tag]

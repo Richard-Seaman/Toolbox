@@ -15,8 +15,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "737"
             endingLineNumber = "737"
-            landmarkName = "textFieldEditingDidEnd(_:)"
-            landmarkType = "5">
+            landmarkName = "sizeFromFlow(_:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

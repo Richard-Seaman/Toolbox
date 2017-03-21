@@ -20,7 +20,7 @@ class PipeTypeButton: UIButton {
         // Automatically change the image when the combination is changed
         didSet {
             if (self.combination < self.images.count) {
-                self.setImage(self.images[self.combination], forState: UIControlState.Normal)
+                self.setImage(self.images[self.combination], for: UIControlState())
             }
         }
         

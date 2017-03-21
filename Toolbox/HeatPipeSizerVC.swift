@@ -8,6 +8,30 @@
 
 import UIKit
 import Darwin
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func <= <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l <= r
+  default:
+    return !(rhs < lhs)
+  }
+}
+
 
 class HeatPipeSizerVC: UIViewController {
     
@@ -90,7 +114,7 @@ class HeatPipeSizerVC: UIViewController {
         self.loadProperties()
         
         // Listen for keyboard changes
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(HeatPipeSizerVC.keyboardNotification(_:)), name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(HeatPipeSizerVC.keyboardNotification(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
         
         self.automaticallyAdjustsScrollViewInsets = false
         
@@ -98,13 +122,13 @@ class HeatPipeSizerVC: UIViewController {
         self.maxPdTextfield.clearsOnBeginEditing = true
         self.maxPdTextfield.adjustsFontSizeToFitWidth = true
         self.setupTextFieldInputAccessoryView(self.maxPdTextfield)
-        self.maxPdTextfield.addTarget(self, action: #selector(HeatPipeSizerVC.textFieldEditingDidEnd(_:)), forControlEvents: UIControlEvents.EditingDidEnd)
+        self.maxPdTextfield.addTarget(self, action: #selector(HeatPipeSizerVC.textFieldEditingDidEnd(_:)), for: UIControlEvents.editingDidEnd)
         
         // Get rid of the back button text (get rid of "Back")
         self.navigationController?.navigationBar.topItem?.title = ""
         
         // Set up nav bar
-        self.navigationItem.titleView = getNavImageView(UIApplication.sharedApplication().statusBarOrientation)
+        self.navigationItem.titleView = getNavImageView(UIApplication.shared.statusBarOrientation)
         
         // self.tableView.separatorColor = UIColor.darkGrayColor() // Does work but the inset is still white so doesnlt look great
         
@@ -128,14 +152,14 @@ class HeatPipeSizerVC: UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         // Load the properties incase they were changed in the settings and recalculate
         // All of which is done in refresh
         self.refresh()
         
         self.backgroundTapped(self)
     }
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         
         // Prevents keyboard issues
         self.backgroundTapped(self)
@@ -181,8 +205,8 @@ class HeatPipeSizerVC: UIViewController {
         self.pdLabels = [UILabel]()
         
         // Make the arrays the correct size
-        var index:Int = Int()
-        for index = 0; index < self.numberOfLoads; index += 1 {
+        
+        for _ in 0..<self.numberOfLoads {
             
             // [kW, kg/s, Qty]
             let newTextFieldArray:[LoadInfoTF] = [LoadInfoTF(),LoadInfoTF(),LoadInfoTF()]
@@ -215,8 +239,8 @@ class HeatPipeSizerVC: UIViewController {
     func setUpButtons() {
         
         // Add methods
-        self.materialButton.addTarget(self, action: #selector(HeatPipeSizerVC.materialButtonTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
-        self.fluidButton.addTarget(self, action: #selector(HeatPipeSizerVC.fluidButtonTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+        self.materialButton.addTarget(self, action: #selector(HeatPipeSizerVC.materialButtonTapped(_:)), for: UIControlEvents.touchUpInside)
+        self.fluidButton.addTarget(self, action: #selector(HeatPipeSizerVC.fluidButtonTapped(_:)), for: UIControlEvents.touchUpInside)
         
         // Material Button Appearance - temporarily change to copper, then tap the button so it changes to steel and sets appearance
         self.steelSelected = false
@@ -235,11 +259,11 @@ class HeatPipeSizerVC: UIViewController {
         
     }
     
-    func setUpErrorView(view:UIView) {
+    func setUpErrorView(_ view:UIView) {
         
         view.alpha = 0
-        view.layer.backgroundColor = UIColor.redColor().CGColor
-        view.layer.borderColor = UIColor.darkGrayColor().CGColor
+        view.layer.backgroundColor = UIColor.red.cgColor
+        view.layer.borderColor = UIColor.darkGray.cgColor
         view.layer.borderWidth = 2
         // view.layer.cornerRadius = 10
         
@@ -327,7 +351,7 @@ class HeatPipeSizerVC: UIViewController {
                 
     }
     
-    func updateRow(row:Int) {
+    func updateRow(_ row:Int) {
       
         // Set kW text & alpha
         if let load = self.loads[row] {
@@ -446,7 +470,7 @@ class HeatPipeSizerVC: UIViewController {
     
     // MARK: - Flowrates/Loads
     
-    func updateLoadOrFlowForRow(sender:LoadInfoTF) {
+    func updateLoadOrFlowForRow(_ sender:LoadInfoTF) {
         
         // Figure out if a load or flow textfield called this
         
@@ -516,7 +540,7 @@ class HeatPipeSizerVC: UIViewController {
         
     }
     
-    func flowFromLoad(load:Float) -> Float {
+    func flowFromLoad(_ load:Float) -> Float {
         
         if (self.lphwSelected) {
             return load / (self.lphwProperties[0] * self.lphwDt)
@@ -529,7 +553,7 @@ class HeatPipeSizerVC: UIViewController {
         
     }
     
-    func loadFromFlow(flow:Float) -> Float {
+    func loadFromFlow(_ flow:Float) -> Float {
         if (self.lphwSelected) {
             return flow * self.lphwProperties[0] * self.lphwDt
         }
@@ -542,9 +566,7 @@ class HeatPipeSizerVC: UIViewController {
     
     func updateFlowAfterFluidChange() {
         
-        var index:Int = Int()
-        
-        for index = 0; index < self.flows.count; index += 1 {
+        for index:Int in 0..<self.flows.count {
             
             // Check if there is a load
             if (self.loads[index] != nil) {
@@ -576,8 +598,7 @@ class HeatPipeSizerVC: UIViewController {
         var totLoad:Float = 0
         var totFlow:Float = 0
         
-        var index:Int = 0
-        for index = 0; index < self.numberOfLoads; index += 1 {
+        for index:Int in 0..<self.numberOfLoads {
             
             // Only sum if there is a load
             if let number = self.quantities[index] {
@@ -640,7 +661,7 @@ class HeatPipeSizerVC: UIViewController {
         
     }
     
-    func sizeFromFlow(flow:Float) -> (size:Int?, pd:Float?) {
+    func sizeFromFlow(_ flow:Float) -> (size:Int?, pd:Float?) {
         
         var diametersToUse:[Float] = [Float]()
         var nomDiametersToUse:[Int] = [Int]()
@@ -676,9 +697,8 @@ class HeatPipeSizerVC: UIViewController {
         
         var size:Int? = nil
         var pdToReturn:Float? = nil
-        var index:Int = Int()
         
-        for index = 0; index < diametersToUse.count; index += 1 {
+        for index:Int in 0..<diametersToUse.count {
         
             let d:Float = diametersToUse[index]
             let m:Float = flow          // kg/s
@@ -732,7 +752,7 @@ class HeatPipeSizerVC: UIViewController {
     
     // MARK: - TextField Functions
     
-    func textFieldEditingDidEnd(sender:LoadInfoTF) {
+    func textFieldEditingDidEnd(_ sender:LoadInfoTF) {
         
         print("textFieldEditingDidEnd")
         
@@ -794,7 +814,7 @@ class HeatPipeSizerVC: UIViewController {
     // MARK: - Button Functions
     // Colours defined in constants file
     
-    func materialButtonTapped(sender:UIButton) {
+    func materialButtonTapped(_ sender:UIButton) {
         
         print("materialButtonTapped")
         
@@ -802,30 +822,30 @@ class HeatPipeSizerVC: UIViewController {
             
             // Change to copper
             self.steelSelected = false
-            self.materialButton.setTitle("Copper", forState: UIControlState.Normal)
+            self.materialButton.setTitle("Copper", for: UIControlState())
             /*
             self.materialButton.tintColor = copperColour
             self.materialButton.layer.backgroundColor = UIColor.whiteColor().CGColor
             self.materialButton.layer.borderColor = copperColour.CGColor
             */
-            self.materialButton.tintColor = UIColor.whiteColor()
-            self.materialButton.layer.backgroundColor = copperColour.CGColor
-            self.materialButton.layer.borderColor = UIColor.darkGrayColor().CGColor
+            self.materialButton.tintColor = UIColor.white
+            self.materialButton.layer.backgroundColor = copperColour.cgColor
+            self.materialButton.layer.borderColor = UIColor.darkGray.cgColor
             
         }
         else {
             
             // Change to steel
             self.steelSelected = true
-            self.materialButton.setTitle("Steel", forState: UIControlState.Normal)
+            self.materialButton.setTitle("Steel", for: UIControlState())
             /*
             self.materialButton.tintColor = UIColor.darkGrayColor()
             self.materialButton.layer.backgroundColor = UIColor.whiteColor().CGColor
             self.materialButton.layer.borderColor = UIColor.darkGrayColor().CGColor
             */
-            self.materialButton.tintColor = UIColor.whiteColor()
-            self.materialButton.layer.backgroundColor = steelColour.CGColor
-            self.materialButton.layer.borderColor = UIColor.darkGrayColor().CGColor
+            self.materialButton.tintColor = UIColor.white
+            self.materialButton.layer.backgroundColor = steelColour.cgColor
+            self.materialButton.layer.borderColor = UIColor.darkGray.cgColor
 
         }
         
@@ -833,7 +853,7 @@ class HeatPipeSizerVC: UIViewController {
         
     }
     
-    func fluidButtonTapped(sender:UIButton) {
+    func fluidButtonTapped(_ sender:UIButton) {
         
         print("fluidButtonTapped")
         
@@ -841,30 +861,30 @@ class HeatPipeSizerVC: UIViewController {
             
             // Change to CHW
             self.lphwSelected = false
-            self.fluidButton.setTitle("CHW", forState: UIControlState.Normal)
+            self.fluidButton.setTitle("CHW", for: UIControlState())
             /*
             self.fluidButton.tintColor = chwColour
             self.fluidButton.layer.backgroundColor = UIColor.whiteColor().CGColor
             self.fluidButton.layer.borderColor = chwColour.CGColor
             */
-            self.fluidButton.tintColor = UIColor.whiteColor()
-            self.fluidButton.layer.backgroundColor = chwColour.CGColor
-            self.fluidButton.layer.borderColor = UIColor.darkGrayColor().CGColor
+            self.fluidButton.tintColor = UIColor.white
+            self.fluidButton.layer.backgroundColor = chwColour.cgColor
+            self.fluidButton.layer.borderColor = UIColor.darkGray.cgColor
             
         }
         else {
             
             // Change to LPHW
             self.lphwSelected = true
-            self.fluidButton.setTitle("LPHW", forState: UIControlState.Normal)
+            self.fluidButton.setTitle("LPHW", for: UIControlState())
             /*
             self.fluidButton.tintColor = lphwColour
             self.fluidButton.layer.backgroundColor = UIColor.whiteColor().CGColor
             self.fluidButton.layer.borderColor = lphwColour.CGColor
             */
-            self.fluidButton.tintColor = UIColor.whiteColor()
-            self.fluidButton.layer.backgroundColor = lphwColour.CGColor
-            self.fluidButton.layer.borderColor = UIColor.darkGrayColor().CGColor
+            self.fluidButton.tintColor = UIColor.white
+            self.fluidButton.layer.backgroundColor = lphwColour.cgColor
+            self.fluidButton.layer.borderColor = UIColor.darkGray.cgColor
         }
         
         
@@ -874,7 +894,7 @@ class HeatPipeSizerVC: UIViewController {
     }
     
     
-    func minusQtyButtonTapped(sender:LoadQuantityButton) {
+    func minusQtyButtonTapped(_ sender:LoadQuantityButton) {
         
         print("minusQtyButtonTapped for row: \(sender.row)")
         if (self.quantities[sender.row] == nil || self.quantities[sender.row] <= 1) {
@@ -888,7 +908,7 @@ class HeatPipeSizerVC: UIViewController {
         
     }
     
-    func plusQtyButtonTapped(sender:LoadQuantityButton) {
+    func plusQtyButtonTapped(_ sender:LoadQuantityButton) {
         
         print("plusQtyButtonTapped for row: \(sender.row)")
         if (self.quantities[sender.row] == nil || self.quantities[sender.row] == 0) {
@@ -906,14 +926,14 @@ class HeatPipeSizerVC: UIViewController {
     
     
     // Assign the rows per section
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         return self.numberOfLoads
         
     }
     
     // Determine Number of sections
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int{
+    func numberOfSectionsInTableView(_ tableView: UITableView) -> Int{
         
         return 1
         
@@ -921,7 +941,7 @@ class HeatPipeSizerVC: UIViewController {
     
     
     // Set properties of section header
-    func tableView(tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         
         if (self.lphwSelected) {
             returnHeader(view, colourOption:1)
@@ -932,22 +952,22 @@ class HeatPipeSizerVC: UIViewController {
     }
     
     // Assign Section Header Text
-    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String?{
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String?{
         
         return "Configure Loads"
         
     }
     
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAtIndexPath indexPath: IndexPath) -> UITableViewCell {
         
         // println("cellForRowAtIndexPath \(indexPath.row)")
         
         var cell:UITableViewCell? = UITableViewCell()
         
-        cell = tableView.dequeueReusableCellWithIdentifier("HeatingLoadCell") as UITableViewCell!
+        cell = tableView.dequeueReusableCell(withIdentifier: "HeatingLoadCell") as UITableViewCell!
         if (cell == nil) {
-            cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "HeatingLoadCell")
+            cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "HeatingLoadCell")
         }
         
         // Grab the components
@@ -983,15 +1003,14 @@ class HeatPipeSizerVC: UIViewController {
         self.errorLabels[indexPath.row] = errorLabel
         
         // Configure the text fields
-        var index:Int = Int()
-        for index = 0; index < loadTextFields.count; index += 1 {
+        for index:Int in 0..<loadTextFields.count {
             
             loadTextFields[index].clearsOnBeginEditing = true
             loadTextFields[index].indexPath = indexPath
             loadTextFields[index].row = indexPath.row
             loadTextFields[index].adjustsFontSizeToFitWidth = true
             self.setupTextFieldInputAccessoryView(loadTextFields[index])
-            loadTextFields[index].addTarget(self, action: #selector(HeatPipeSizerVC.textFieldEditingDidEnd(_:)), forControlEvents: UIControlEvents.EditingDidEnd)
+            loadTextFields[index].addTarget(self, action: #selector(HeatPipeSizerVC.textFieldEditingDidEnd(_:)), for: UIControlEvents.editingDidEnd)
             
         }
         
@@ -1005,8 +1024,8 @@ class HeatPipeSizerVC: UIViewController {
         
         
         // Configure the plus/minus buttons
-        minusButton.addTarget(self, action: #selector(HeatPipeSizerVC.minusQtyButtonTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
-        plusButton.addTarget(self, action: #selector(HeatPipeSizerVC.plusQtyButtonTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+        minusButton.addTarget(self, action: #selector(HeatPipeSizerVC.minusQtyButtonTapped(_:)), for: UIControlEvents.touchUpInside)
+        plusButton.addTarget(self, action: #selector(HeatPipeSizerVC.plusQtyButtonTapped(_:)), for: UIControlEvents.touchUpInside)
         
         minusButton.row = indexPath.row
         minusButton.indexPath = indexPath
@@ -1030,26 +1049,25 @@ class HeatPipeSizerVC: UIViewController {
     // MARK: - Keyboard Related
     
     // Keyboard Move Screen Up If Required
-    func keyboardNotification(notification: NSNotification) {
+    func keyboardNotification(_ notification: Notification) {
         if let userInfo = notification.userInfo {
-            let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.CGRectValue()
-            let duration:NSTimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
+            let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
+            let duration:TimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
             let animationCurveRawNSN = userInfo[UIKeyboardAnimationCurveUserInfoKey] as? NSNumber
-            let animationCurveRaw = animationCurveRawNSN?.unsignedLongValue ?? UIViewAnimationOptions.CurveEaseInOut.rawValue
+            let animationCurveRaw = animationCurveRawNSN?.uintValue ?? UIViewAnimationOptions().rawValue
             let animationCurve:UIViewAnimationOptions = UIViewAnimationOptions(rawValue: animationCurveRaw)
             self.keyboardHeightLayoutConstraint?.constant = endFrame?.size.height ?? 0.0
-            UIView.animateWithDuration(duration,
-                delay: NSTimeInterval(0),
+            UIView.animate(withDuration: duration,
+                delay: TimeInterval(0),
                 options: animationCurve,
                 animations: { self.view.layoutIfNeeded() },
                 completion: nil)
         }
     }
     
-    func backgroundTapped(sender:AnyObject) {
+    func backgroundTapped(_ sender:AnyObject) {
         print("backgroundTapped")
-        var index:Int = Int()
-        for index = 0; index < self.textFields.count; index += 1 {
+        for index:Int in 0..<self.textFields.count {
             for textField in self.textFields[index] {
                 textField.resignFirstResponder()
             }
@@ -1058,14 +1076,14 @@ class HeatPipeSizerVC: UIViewController {
         self.keyboardHeightLayoutConstraint.constant = 0
     }
     
-    func setupTextFieldInputAccessoryView(sender:UITextField) {
+    func setupTextFieldInputAccessoryView(_ sender:UITextField) {
         
-        let doneToolbar: UIToolbar = UIToolbar(frame: CGRectMake(0, 0, 320, 50))
-        doneToolbar.barStyle = UIBarStyle.BlackTranslucent
+        let doneToolbar: UIToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
+        doneToolbar.barStyle = UIBarStyle.blackTranslucent
         
-        let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: #selector(HeatPipeSizerVC.applyButtonAction))
-        done.tintColor = UIColor.whiteColor()
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.flexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.done, target: self, action: #selector(HeatPipeSizerVC.applyButtonAction))
+        done.tintColor = UIColor.white
         
         var items = [UIBarButtonItem]()
         items.append(flexSpace)
@@ -1084,9 +1102,9 @@ class HeatPipeSizerVC: UIViewController {
     }
 
     
-    func addBackgroundTap(view:UIControl) {
+    func addBackgroundTap(_ view:UIControl) {
         
-        view.addTarget(self, action: #selector(HeatPipeSizerVC.backgroundTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+        view.addTarget(self, action: #selector(HeatPipeSizerVC.backgroundTapped(_:)), for: UIControlEvents.touchUpInside)
         
     }
     

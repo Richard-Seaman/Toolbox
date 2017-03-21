@@ -37,12 +37,12 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(WaterPipeSizerSettingsVC.keyboardNotification(_:)), name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(WaterPipeSizerSettingsVC.keyboardNotification(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
         
         self.automaticallyAdjustsScrollViewInsets = false
         
-        self.selector.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.selectorDidChange), forControlEvents: UIControlEvents.ValueChanged)
-        self.selector.tintColor = UIColor.darkGrayColor()
+        self.selector.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.selectorDidChange), for: UIControlEvents.valueChanged)
+        self.selector.tintColor = UIColor.darkGray
         
         self.setUpUI()
         
@@ -57,7 +57,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
         self.navigationController?.navigationBar.topItem?.title = ""
         
         // Set up nav bar
-        self.navigationItem.titleView = getNavImageView(UIApplication.sharedApplication().statusBarOrientation)
+        self.navigationItem.titleView = getNavImageView(UIApplication.shared.statusBarOrientation)
         
         // Also includes refresh method
         self.selectorDidChange()
@@ -66,7 +66,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
         
     }
     
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         
         // Save loading Units
         
@@ -76,7 +76,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
         // Save the values
         let filePath = loadingUnitsFilePath()
         let array = loadingUnits as NSArray
-        if (array.writeToFile(filePath, atomically: true)) {
+        if (array.write(toFile: filePath, atomically: true)) {
             print("Loading Units saved Successfully")
             
         }
@@ -128,12 +128,12 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
         self.refresh()
     }
     
-    func addBorderAndBackgroundTap(view:UIControl) {
+    func addBorderAndBackgroundTap(_ view:UIControl) {
         
-        view.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.backgroundTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+        view.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.backgroundTapped(_:)), for: UIControlEvents.touchUpInside)
         
         view.layer.borderWidth = 0.5
-        view.layer.borderColor = UIColor.darkGrayColor().CGColor
+        view.layer.borderColor = UIColor.darkGray.cgColor
         
     }
     
@@ -141,7 +141,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
     
     
     // Assign the rows per section
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         
         switch tableView {
@@ -176,7 +176,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
     }
     
     // Determine Number of sections
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int{
+    func numberOfSections(in tableView: UITableView) -> Int{
         
         switch tableView {
             
@@ -195,7 +195,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
     
     
     // Set properties of section header
-    func tableView(tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         
         switch tableView {
             
@@ -213,7 +213,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
     
     
     // Assign Section Header Text
-    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String?{
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String?{
         
         switch tableView {
             
@@ -231,7 +231,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
     }
     
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         //println("cellForRowAtIndexPath \(indexPath.row)")
         
@@ -241,10 +241,10 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
             
         case self.demandUnitTableView:
             
-            cell = tableView.dequeueReusableCellWithIdentifier("DemandUnitCell") as UITableViewCell!
+            cell = tableView.dequeueReusableCell(withIdentifier: "DemandUnitCell") as UITableViewCell!
             if (cell == nil) {
                 print("new cell used")
-                cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "DemandUnitCell")
+                cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "DemandUnitCell")
             }
             
             
@@ -321,7 +321,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
             for textField in textFields {
                 textField.minimumFontSize = 5
                 textField.adjustsFontSizeToFitWidth = true
-                textField.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.textFieldEditingDidEnd(_:)), forControlEvents: UIControlEvents.EditingDidEnd)
+                textField.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.textFieldEditingDidEnd(_:)), for: UIControlEvents.editingDidEnd)
                 textField.indexPath = indexPath
                 textField.row = indexPath.row
                 textField.column = currentColumn
@@ -372,8 +372,8 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
             
             
             // Set the text field texts
-            var index:Int = Int()
-            for index = 0; index < textFields.count; index += 1 {
+            
+            for index:Int in 0..<textFields.count  {
                 if (loadingUnits[indexPath.row][index] != 0) {
                     textFields[index].text = String(format: "%.1f", loadingUnits[indexPath.row][index])
                 }
@@ -392,19 +392,19 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
                 
             case 0: // Pipe Type
                 
-                cell = tableView.dequeueReusableCellWithIdentifier("PipeTypeCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "PipeTypeCell") as UITableViewCell!
                 if (cell == nil) {
                     print("new cell used")
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "PipeTypeCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "PipeTypeCell")
                 }
                 
                 
             case 1: // Methodology
                 
-                cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                 if (cell == nil) {
                     print("new cell used")
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                 }
                 
                 // Set up the cell components
@@ -417,10 +417,10 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
                     
                 case 0: // Explanation
                     
-                    cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+                    cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                     if (cell == nil) {
                         print("new cell used")
-                        cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                        cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                     }
                     
                     // Set up the cell components
@@ -429,10 +429,10 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
                     
                 case self.unitColumn.count + 1: // Source
                     
-                    cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+                    cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                     if (cell == nil) {
                         print("new cell used")
-                        cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                        cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                     }
                     
                     // Set up the cell components
@@ -442,10 +442,10 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
                     
                 default:    // Data Row
                     
-                    cell = tableView.dequeueReusableCellWithIdentifier("DataCell") as UITableViewCell!
+                    cell = tableView.dequeueReusableCell(withIdentifier: "DataCell") as UITableViewCell!
                     if (cell == nil) {
                         print("new cell used")
-                        cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "DataCell")
+                        cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "DataCell")
                     }
                     
                     // Set up the cell components
@@ -462,10 +462,10 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
                     
                 case 0: // Explanation
                     
-                    cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+                    cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                     if (cell == nil) {
                         print("new cell used")
-                        cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                        cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                     }
                     
                     // Set up the cell components
@@ -475,10 +475,10 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
                     
                 default:    // Data Row
                     
-                    cell = tableView.dequeueReusableCellWithIdentifier("DataCell") as UITableViewCell!
+                    cell = tableView.dequeueReusableCell(withIdentifier: "DataCell") as UITableViewCell!
                     if (cell == nil) {
                         print("new cell used")
-                        cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "DataCell")
+                        cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "DataCell")
                     }
                     
                     // Set up the cell components
@@ -511,7 +511,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
     
     
     // MARK: - Text Field Functions
-    func textFieldEditingDidEnd(sender:DemandUnitTF) {
+    func textFieldEditingDidEnd(_ sender:DemandUnitTF) {
         print("flowTextFieldEditingDidEnd")
         
         if (sender.text != "") {
@@ -530,7 +530,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
     }
     
     
-    func setTextFieldText(sender:DemandUnitTF) {
+    func setTextFieldText(_ sender:DemandUnitTF) {
         print("setTextFieldText")
         
         if (loadingUnits[sender.row][sender.column] != 0) {
@@ -547,23 +547,23 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
     // MARK: - Keyboard Related
     
     // Keyboard Move Screen Up If Required
-    func keyboardNotification(notification: NSNotification) {
+    func keyboardNotification(_ notification: Notification) {
         if let userInfo = notification.userInfo {
-            let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.CGRectValue()
-            let duration:NSTimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
+            let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
+            let duration:TimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
             let animationCurveRawNSN = userInfo[UIKeyboardAnimationCurveUserInfoKey] as? NSNumber
-            let animationCurveRaw = animationCurveRawNSN?.unsignedLongValue ?? UIViewAnimationOptions.CurveEaseInOut.rawValue
+            let animationCurveRaw = animationCurveRawNSN?.uintValue ?? UIViewAnimationOptions().rawValue
             let animationCurve:UIViewAnimationOptions = UIViewAnimationOptions(rawValue: animationCurveRaw)
             self.keyboardHeightLayoutConstraint?.constant = endFrame?.size.height ?? 0.0
-            UIView.animateWithDuration(duration,
-                delay: NSTimeInterval(0),
+            UIView.animate(withDuration: duration,
+                delay: TimeInterval(0),
                 options: animationCurve,
                 animations: { self.view.layoutIfNeeded() },
                 completion: nil)
         }
     }
     
-    func backgroundTapped(sender:AnyObject) {
+    func backgroundTapped(_ sender:AnyObject) {
         print("backgroundTapped")
         
         for array in self.textFieldArrays {
@@ -576,14 +576,14 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
         }
     }
     
-    func setupTextFieldInputAccessoryView(sender:UITextField) {
+    func setupTextFieldInputAccessoryView(_ sender:UITextField) {
         
-        let doneToolbar: UIToolbar = UIToolbar(frame: CGRectMake(0, 0, 320, 50))
-        doneToolbar.barStyle = UIBarStyle.BlackTranslucent
+        let doneToolbar: UIToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
+        doneToolbar.barStyle = UIBarStyle.blackTranslucent
         
-        let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: #selector(WaterPipeSizerSettingsVC.applyButtonAction))
-        done.tintColor = UIColor.whiteColor()
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.flexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.done, target: self, action: #selector(WaterPipeSizerSettingsVC.applyButtonAction))
+        done.tintColor = UIColor.white
         
         var items = [UIBarButtonItem]()
         items.append(flexSpace)

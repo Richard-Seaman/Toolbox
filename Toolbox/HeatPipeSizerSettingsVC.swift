@@ -33,12 +33,12 @@ class HeatPipeSizerSettingsVC: UIViewController {
         
         loadPipeSizerProperties()
                 
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(HeatPipeSizerSettingsVC.keyboardNotification(_:)), name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(HeatPipeSizerSettingsVC.keyboardNotification(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
         
         self.automaticallyAdjustsScrollViewInsets = false
         
-        self.selector.addTarget(self, action: #selector(HeatPipeSizerSettingsVC.selectorDidChange), forControlEvents: UIControlEvents.ValueChanged)
-        self.selector.tintColor = UIColor.darkGrayColor()
+        self.selector.addTarget(self, action: #selector(HeatPipeSizerSettingsVC.selectorDidChange), for: UIControlEvents.valueChanged)
+        self.selector.tintColor = UIColor.darkGray
         
         self.setUpUI()
         
@@ -50,7 +50,7 @@ class HeatPipeSizerSettingsVC: UIViewController {
         self.navigationController?.navigationBar.topItem?.title = ""
         
         // Set up nav bar
-        self.navigationItem.titleView = getNavImageView(UIApplication.sharedApplication().statusBarOrientation)
+        self.navigationItem.titleView = getNavImageView(UIApplication.shared.statusBarOrientation)
         
         // Also includes refresh method
         self.selectorDidChange()
@@ -58,12 +58,12 @@ class HeatPipeSizerSettingsVC: UIViewController {
         
     }
     
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         
         // Save the values
         let filePath = pipeSizerPropertiesFilePath()
         let array = pipeSizerProperties as NSArray
-        if (array.writeToFile(filePath, atomically: true)) {
+        if (array.write(toFile: filePath, atomically: true)) {
             print("Pipe Sizer Properties saved Successfully")
             
         }
@@ -103,16 +103,16 @@ class HeatPipeSizerSettingsVC: UIViewController {
             self.addBackgroundTap(view)
         }
         
-        let formulaePath:NSURL = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("PipeSizerFormulae", ofType: "pdf")!)
+        let formulaePath:URL = URL(fileURLWithPath: Bundle.main.path(forResource: "PipeSizerFormulae", ofType: "pdf")!)
         
         // Load the formulae into the web view
-        self.webview.loadRequest(NSURLRequest(URL: formulaePath))
+        self.webview.loadRequest(URLRequest(url: formulaePath))
         
     }
     
-    func addBackgroundTap(view:UIControl) {
+    func addBackgroundTap(_ view:UIControl) {
         
-        view.addTarget(self, action: #selector(HeatPipeSizerSettingsVC.backgroundTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+        view.addTarget(self, action: #selector(HeatPipeSizerSettingsVC.backgroundTapped(_:)), for: UIControlEvents.touchUpInside)
         
     }
     
@@ -155,7 +155,7 @@ class HeatPipeSizerSettingsVC: UIViewController {
     
     
     // Assign the rows per section
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         switch self.selector.selectedSegmentIndex {
             
@@ -186,7 +186,7 @@ class HeatPipeSizerSettingsVC: UIViewController {
     }
     
     // Determine Number of sections
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int{
+    func numberOfSectionsInTableView(_ tableView: UITableView) -> Int{
         
         // Method - Variables - Formulae
         
@@ -210,7 +210,7 @@ class HeatPipeSizerSettingsVC: UIViewController {
     
     
     // Set properties of section header
-    func tableView(tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         
         
         returnHeader(view, colourOption: 4)
@@ -234,7 +234,7 @@ class HeatPipeSizerSettingsVC: UIViewController {
     }
     
     // Assign Section Header Text
-    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String?{
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String?{
         
         // Method - Variables - Formulae
         
@@ -256,7 +256,7 @@ class HeatPipeSizerSettingsVC: UIViewController {
     }
     
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAtIndexPath indexPath: IndexPath) -> UITableViewCell {
         
         //println("cellForRowAtIndexPath \(indexPath.row)")
         
@@ -272,9 +272,9 @@ class HeatPipeSizerSettingsVC: UIViewController {
             if (indexPath.section == 0) {
                 
                 // Methodology
-                cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -286,9 +286,9 @@ class HeatPipeSizerSettingsVC: UIViewController {
             else if (indexPath.section == 1) {
                 
                 // Set Up
-                cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -300,9 +300,9 @@ class HeatPipeSizerSettingsVC: UIViewController {
             else if (indexPath.section == 2) {
                 
                 // Configuring Loads
-                cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -314,9 +314,9 @@ class HeatPipeSizerSettingsVC: UIViewController {
             else {
                 
                 // Dummy cell with error
-                cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -332,9 +332,9 @@ class HeatPipeSizerSettingsVC: UIViewController {
             if (indexPath.row == 4 || (indexPath.section == 2 && indexPath.row == 3)) {   // There's no fifth row in Misc section so this is fine
                 
                 // Reset defaults button
-                cell = tableView.dequeueReusableCellWithIdentifier("PipeSizerButtonCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "PipeSizerButtonCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "PipeSizerButtonCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "PipeSizerButtonCell")
                 }
                 
                 let button:UIButton = cell!.viewWithTag(1) as! UIButton
@@ -343,29 +343,29 @@ class HeatPipeSizerSettingsVC: UIViewController {
                 // Set background tap
                 self.addBackgroundTap(contentView)
                 
-                button.layer.borderColor = UIColor.darkGrayColor().CGColor
+                button.layer.borderColor = UIColor.darkGray.cgColor
                 button.layer.borderWidth = 1.5
                 button.layer.cornerRadius = 5
-                button.layer.backgroundColor = UIColor.whiteColor().CGColor
-                button.setTitle("    Reset Defaults    ", forState: UIControlState.Normal)
-                button.tintColor = UIColor.darkGrayColor()
+                button.layer.backgroundColor = UIColor.white.cgColor
+                button.setTitle("    Reset Defaults    ", for: UIControlState())
+                button.tintColor = UIColor.darkGray
                 
                 if (indexPath.section == 0) {
-                    button.addTarget(self, action: #selector(HeatPipeSizerSettingsVC.resetLPHWDefaults), forControlEvents: UIControlEvents.TouchUpInside)
+                    button.addTarget(self, action: #selector(HeatPipeSizerSettingsVC.resetLPHWDefaults), for: UIControlEvents.touchUpInside)
                 }
                 else if (indexPath.section == 1) {
-                    button.addTarget(self, action: #selector(HeatPipeSizerSettingsVC.resetCHWDefaults), forControlEvents: UIControlEvents.TouchUpInside)
+                    button.addTarget(self, action: #selector(HeatPipeSizerSettingsVC.resetCHWDefaults), for: UIControlEvents.touchUpInside)
                 }
                 else if (indexPath.section == 2) {
-                    button.addTarget(self, action: #selector(HeatPipeSizerSettingsVC.resetMiscDefaults), forControlEvents: UIControlEvents.TouchUpInside)
+                    button.addTarget(self, action: #selector(HeatPipeSizerSettingsVC.resetMiscDefaults), for: UIControlEvents.touchUpInside)
                 }
                 
                 
             }
             else {
-                cell = tableView.dequeueReusableCellWithIdentifier("PipeSizerVariableCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "PipeSizerVariableCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "PipeSizerVariableCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "PipeSizerVariableCell")
                 }
                 
                 // Grab the components
@@ -403,7 +403,7 @@ class HeatPipeSizerSettingsVC: UIViewController {
                     textField.alpha = 1
                     textField.minimumFontSize = 5
                     textField.adjustsFontSizeToFitWidth = true
-                    textField.addTarget(self, action: #selector(HeatPipeSizerSettingsVC.textFieldEditingDidEnd(_:)), forControlEvents: UIControlEvents.EditingDidEnd)
+                    textField.addTarget(self, action: #selector(HeatPipeSizerSettingsVC.textFieldEditingDidEnd(_:)), for: UIControlEvents.editingDidEnd)
                     self.setupTextFieldInputAccessoryView(textField)
                     
                     // Get the property value
@@ -424,12 +424,12 @@ class HeatPipeSizerSettingsVC: UIViewController {
                     // Set the text field texts
                     if (floatValue <= 0.009) {
                         
-                        let formatter = NSNumberFormatter()
-                        formatter.numberStyle = NSNumberFormatterStyle.ScientificStyle
+                        let formatter = NumberFormatter()
+                        formatter.numberStyle = NumberFormatter.Style.scientific
                         formatter.usesSignificantDigits = false
                         formatter.maximumSignificantDigits = 3
                         formatter.minimumSignificantDigits = 3
-                        textField.text = formatter.stringFromNumber(floatValue)
+                        textField.text = formatter.string(from: NSNumber(value: floatValue))
                     }
                     else {
                         textField.text = String(format: "%.2f", floatValue)
@@ -492,9 +492,9 @@ class HeatPipeSizerSettingsVC: UIViewController {
         default: // Formulae
             
             // Dummy cell with error
-            cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+            cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
             if (cell == nil) {
-                cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
             }
             
             let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -510,7 +510,7 @@ class HeatPipeSizerSettingsVC: UIViewController {
     
     
     // MARK: - Text Field Functions
-    func textFieldEditingDidEnd(sender:LoadInfoTF) {
+    func textFieldEditingDidEnd(_ sender:LoadInfoTF) {
         print("textFieldEditingDidEnd for section: \(sender.indexPath.section) row: \(sender.indexPath.row)")
         
         var index:Int = Int()
@@ -537,12 +537,12 @@ class HeatPipeSizerSettingsVC: UIViewController {
         // Reset the text so that stored value is actually displayed (this is need in case 2 decimal points are entered etc)
         if (pipeSizerProperties[index] <= 0.009) {
             
-            let formatter = NSNumberFormatter()
-            formatter.numberStyle = NSNumberFormatterStyle.ScientificStyle
+            let formatter = NumberFormatter()
+            formatter.numberStyle = NumberFormatter.Style.scientific
             formatter.usesSignificantDigits = false
             formatter.maximumSignificantDigits = 3
             formatter.minimumSignificantDigits = 3
-            sender.text = formatter.stringFromNumber(pipeSizerProperties[index])
+            sender.text = formatter.string(from: NSNumber(value: pipeSizerProperties[index]))
             
         }
         else {
@@ -556,23 +556,23 @@ class HeatPipeSizerSettingsVC: UIViewController {
     // MARK: - Keyboard Related
     
     // Keyboard Move Screen Up If Required
-    func keyboardNotification(notification: NSNotification) {
+    func keyboardNotification(_ notification: Notification) {
         if let userInfo = notification.userInfo {
-            let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.CGRectValue()
-            let duration:NSTimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
+            let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
+            let duration:TimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
             let animationCurveRawNSN = userInfo[UIKeyboardAnimationCurveUserInfoKey] as? NSNumber
-            let animationCurveRaw = animationCurveRawNSN?.unsignedLongValue ?? UIViewAnimationOptions.CurveEaseInOut.rawValue
+            let animationCurveRaw = animationCurveRawNSN?.uintValue ?? UIViewAnimationOptions().rawValue
             let animationCurve:UIViewAnimationOptions = UIViewAnimationOptions(rawValue: animationCurveRaw)
             self.keyboardHeightLayoutConstraint?.constant = endFrame?.size.height ?? 0.0
-            UIView.animateWithDuration(duration,
-                delay: NSTimeInterval(0),
+            UIView.animate(withDuration: duration,
+                delay: TimeInterval(0),
                 options: animationCurve,
                 animations: { self.view.layoutIfNeeded() },
                 completion: nil)
         }
     }
     
-    func backgroundTapped(sender:AnyObject) {
+    func backgroundTapped(_ sender:AnyObject) {
         print("backgroundTapped")
         
         for textField in self.textFields {
@@ -583,14 +583,14 @@ class HeatPipeSizerSettingsVC: UIViewController {
         
     }
     
-    func setupTextFieldInputAccessoryView(sender:UITextField) {
+    func setupTextFieldInputAccessoryView(_ sender:UITextField) {
         
-        let doneToolbar: UIToolbar = UIToolbar(frame: CGRectMake(0, 0, 320, 50))
-        doneToolbar.barStyle = UIBarStyle.BlackTranslucent
+        let doneToolbar: UIToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
+        doneToolbar.barStyle = UIBarStyle.blackTranslucent
         
-        let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: #selector(HeatPipeSizerSettingsVC.applyButtonAction))
-        done.tintColor = UIColor.whiteColor()
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.flexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.done, target: self, action: #selector(HeatPipeSizerSettingsVC.applyButtonAction))
+        done.tintColor = UIColor.white
         
         var items = [UIBarButtonItem]()
         items.append(flexSpace)

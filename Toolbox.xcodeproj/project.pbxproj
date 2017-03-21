@@ -17,6 +17,9 @@
 		9B094BAE1B5996C3002AB4A6 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B094BAD1B5996C3002AB4A6 /* Constants.swift */; };
 		9B11A5F31B5BB64000695804 /* PipeTypeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B11A5F21B5BB64000695804 /* PipeTypeButton.swift */; };
 		9B11A5F51B5BC24700695804 /* WaterPipeSizerSettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B11A5F41B5BC24700695804 /* WaterPipeSizerSettingsVC.swift */; };
+		9B1285761E587DA4002B9CB7 /* Calculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B1285751E587DA4002B9CB7 /* Calculator.swift */; };
+		9B1285771E587DA4002B9CB7 /* Calculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B1285751E587DA4002B9CB7 /* Calculator.swift */; };
+		9B20DF7B1E81806400288283 /* CalculatorUnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B20DF7A1E81806400288283 /* CalculatorUnitTests.swift */; };
 		9B4AD64F1BB5DF1400AF9091 /* WaterPipeSizerVC2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4AD64E1BB5DF1400AF9091 /* WaterPipeSizerVC2.swift */; };
 		9B4AD6511BB5E31300AF9091 /* ButtonWithRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4AD6501BB5E31300AF9091 /* ButtonWithRow.swift */; };
 		9B4AD6541BB5E34500AF9091 /* TextFieldWithRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4AD6531BB5E34500AF9091 /* TextFieldWithRow.swift */; };
@@ -59,6 +62,8 @@
 		9B094BAD1B5996C3002AB4A6 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		9B11A5F21B5BB64000695804 /* PipeTypeButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PipeTypeButton.swift; sourceTree = "<group>"; };
 		9B11A5F41B5BC24700695804 /* WaterPipeSizerSettingsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaterPipeSizerSettingsVC.swift; sourceTree = "<group>"; };
+		9B1285751E587DA4002B9CB7 /* Calculator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Calculator.swift; sourceTree = "<group>"; };
+		9B20DF7A1E81806400288283 /* CalculatorUnitTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalculatorUnitTests.swift; sourceTree = "<group>"; };
 		9B4AD64E1BB5DF1400AF9091 /* WaterPipeSizerVC2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaterPipeSizerVC2.swift; sourceTree = "<group>"; };
 		9B4AD6501BB5E31300AF9091 /* ButtonWithRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ButtonWithRow.swift; sourceTree = "<group>"; };
 		9B4AD6531BB5E34500AF9091 /* TextFieldWithRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextFieldWithRow.swift; sourceTree = "<group>"; };
@@ -146,6 +151,7 @@
 			isa = PBXGroup;
 			children = (
 				9B094B9E1B599628002AB4A6 /* ToolboxTests.swift */,
+				9B20DF7A1E81806400288283 /* CalculatorUnitTests.swift */,
 				9B094B9C1B599628002AB4A6 /* Supporting Files */,
 			);
 			path = ToolboxTests;
@@ -184,6 +190,7 @@
 			children = (
 				9B4AD6501BB5E31300AF9091 /* ButtonWithRow.swift */,
 				9B4AD6531BB5E34500AF9091 /* TextFieldWithRow.swift */,
+				9B1285751E587DA4002B9CB7 /* Calculator.swift */,
 			);
 			name = Objects;
 			sourceTree = "<group>";
@@ -269,9 +276,11 @@
 					9B094B821B599628002AB4A6 = {
 						CreatedOnToolsVersion = 6.4;
 						DevelopmentTeam = 747FHAXMVE;
+						LastSwiftMigration = 0820;
 					};
 					9B094B971B599628002AB4A6 = {
 						CreatedOnToolsVersion = 6.4;
+						LastSwiftMigration = 0820;
 						TestTargetID = 9B094B821B599628002AB4A6;
 					};
 				};
@@ -335,6 +344,7 @@
 				9B094BAB1B5996A7002AB4A6 /* DaylightCalculatorVC.swift in Sources */,
 				9B094BAA1B5996A7002AB4A6 /* DaylightCalculatorInfoVC.swift in Sources */,
 				9B4AD6541BB5E34500AF9091 /* TextFieldWithRow.swift in Sources */,
+				9B1285761E587DA4002B9CB7 /* Calculator.swift in Sources */,
 				9BE0EFFC1C149E2700E37680 /* ActionView.swift in Sources */,
 				9BF7E3431B655FDF00FF247E /* HeatPipeSizerVC.swift in Sources */,
 				9BFC6B981B6FA33B0004DB58 /* HeatPipeSizerSettingsVC.swift in Sources */,
@@ -349,6 +359,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				9B094B9F1B599628002AB4A6 /* ToolboxTests.swift in Sources */,
+				9B20DF7B1E81806400288283 /* CalculatorUnitTests.swift in Sources */,
+				9B1285771E587DA4002B9CB7 /* Calculator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -474,6 +486,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.richapps.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -488,6 +501,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.richapps.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -508,6 +522,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.richapps.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Toolbox.app/Toolbox";
 			};
 			name = Debug;
@@ -524,6 +539,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.richapps.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Toolbox.app/Toolbox";
 			};
 			name = Release;

@@ -29,12 +29,12 @@ class DuctSizerSettingsVC: UIViewController {
         super.viewDidLoad()
         
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DuctSizerSettingsVC.keyboardNotification(_:)), name: UIKeyboardWillChangeFrameNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(DuctSizerSettingsVC.keyboardNotification(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
         
         self.automaticallyAdjustsScrollViewInsets = false
         
-        self.selector.addTarget(self, action: #selector(DuctSizerSettingsVC.selectorDidChange), forControlEvents: UIControlEvents.ValueChanged)
-        self.selector.tintColor = UIColor.darkGrayColor()
+        self.selector.addTarget(self, action: #selector(DuctSizerSettingsVC.selectorDidChange), for: UIControlEvents.valueChanged)
+        self.selector.tintColor = UIColor.darkGray
         
         self.setUpUI()
         
@@ -46,7 +46,7 @@ class DuctSizerSettingsVC: UIViewController {
         self.navigationController?.navigationBar.topItem?.title = ""
         
         // Set up nav bar
-        self.navigationItem.titleView = getNavImageView(UIApplication.sharedApplication().statusBarOrientation)
+        self.navigationItem.titleView = getNavImageView(UIApplication.shared.statusBarOrientation)
         
         // Also includes refresh method
         self.selectorDidChange()
@@ -54,17 +54,17 @@ class DuctSizerSettingsVC: UIViewController {
         
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         // In case coming from settings, need to recalculate
         self.refresh()
     }
     
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         
         // Save the values
         let filePath = ductSizerPropertiesFilePath()
         let array = ductSizerProperties as NSArray
-        if (array.writeToFile(filePath, atomically: true)) {
+        if (array.write(toFile: filePath, atomically: true)) {
             print("Duct Sizer Properties saved Successfully")
             
         }
@@ -102,16 +102,16 @@ class DuctSizerSettingsVC: UIViewController {
             self.addBackgroundTap(view)
         }
         
-        let formulaePath:NSURL = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("DuctSizerFormulae", ofType: "pdf")!)
+        let formulaePath:URL = URL(fileURLWithPath: Bundle.main.path(forResource: "DuctSizerFormulae", ofType: "pdf")!)
         
         // Load the formulae into the web view
-        self.webview.loadRequest(NSURLRequest(URL: formulaePath))
+        self.webview.loadRequest(URLRequest(url: formulaePath))
         
     }
     
-    func addBackgroundTap(view:UIControl) {
+    func addBackgroundTap(_ view:UIControl) {
         
-        view.addTarget(self, action: #selector(DuctSizerSettingsVC.backgroundTapped(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+        view.addTarget(self, action: #selector(DuctSizerSettingsVC.backgroundTapped(_:)), for: UIControlEvents.touchUpInside)
         
     }
     
@@ -142,7 +142,7 @@ class DuctSizerSettingsVC: UIViewController {
     
     
     // Assign the rows per section
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         // Method - Variables - Formulae
         
@@ -172,7 +172,7 @@ class DuctSizerSettingsVC: UIViewController {
     }
     
     // Determine Number of sections
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int{
+    func numberOfSectionsInTableView(_ tableView: UITableView) -> Int{
         
         // Method - Variables - Formulae
         
@@ -196,14 +196,14 @@ class DuctSizerSettingsVC: UIViewController {
     
     
     // Set properties of section header
-    func tableView(tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         
         returnHeader(view, colourOption: 4)
         
     }
     
     // Assign Section Header Text
-    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String?{
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String?{
         
         // Method - Variables - Formulae
         
@@ -227,7 +227,7 @@ class DuctSizerSettingsVC: UIViewController {
     }
     
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAtIndexPath indexPath: IndexPath) -> UITableViewCell {
         
         //println("cellForRowAtIndexPath \(indexPath.row)")
         var cell:UITableViewCell? = UITableViewCell()
@@ -241,9 +241,9 @@ class DuctSizerSettingsVC: UIViewController {
             if (indexPath.section == 0) {
                 
                 // Methodology
-                cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -255,9 +255,9 @@ class DuctSizerSettingsVC: UIViewController {
             else if (indexPath.section == 1) {
                 
                 // Flowrate
-                cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -269,9 +269,9 @@ class DuctSizerSettingsVC: UIViewController {
             else if (indexPath.section == 2) {
                 
                 // Manual Sizing
-                cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -283,9 +283,9 @@ class DuctSizerSettingsVC: UIViewController {
             else if (indexPath.section == 3) {
                 
                 // Automatic Sizing
-                cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -297,9 +297,9 @@ class DuctSizerSettingsVC: UIViewController {
             else {
                 
                 // Dummy cell with error
-                cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                 }
                 
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -314,9 +314,9 @@ class DuctSizerSettingsVC: UIViewController {
             if (indexPath.section == 0 && indexPath.row == 3) {
                 
                 // Reset defaults button
-                cell = tableView.dequeueReusableCellWithIdentifier("DuctSizerButtonCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "DuctSizerButtonCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "DuctSizerButtonCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "DuctSizerButtonCell")
                 }
                 
                 let button:UIButton = cell!.viewWithTag(1) as! UIButton
@@ -325,19 +325,19 @@ class DuctSizerSettingsVC: UIViewController {
                 // Set background tap
                 self.addBackgroundTap(contentView)
                 
-                button.layer.borderColor = UIColor.darkGrayColor().CGColor
+                button.layer.borderColor = UIColor.darkGray.cgColor
                 button.layer.borderWidth = 1.5
                 button.layer.cornerRadius = 5
-                button.layer.backgroundColor = UIColor.whiteColor().CGColor
-                button.setTitle("    Reset Defaults    ", forState: UIControlState.Normal)
-                button.tintColor = UIColor.darkGrayColor()
-                button.addTarget(self, action: #selector(DuctSizerSettingsVC.resetDefaults), forControlEvents: UIControlEvents.TouchUpInside)
+                button.layer.backgroundColor = UIColor.white.cgColor
+                button.setTitle("    Reset Defaults    ", for: UIControlState())
+                button.tintColor = UIColor.darkGray
+                button.addTarget(self, action: #selector(DuctSizerSettingsVC.resetDefaults), for: UIControlEvents.touchUpInside)
                 
             }
             else {
-                cell = tableView.dequeueReusableCellWithIdentifier("DuctSizerVariableCell") as UITableViewCell!
+                cell = tableView.dequeueReusableCell(withIdentifier: "DuctSizerVariableCell") as UITableViewCell!
                 if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "DuctSizerVariableCell")
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "DuctSizerVariableCell")
                 }
                 
                 // Grab the components
@@ -361,18 +361,18 @@ class DuctSizerSettingsVC: UIViewController {
                     textField.alpha = 1
                     textField.minimumFontSize = 5
                     textField.adjustsFontSizeToFitWidth = true
-                    textField.addTarget(self, action: #selector(DuctSizerSettingsVC.textFieldEditingDidEnd(_:)), forControlEvents: UIControlEvents.EditingDidEnd)
+                    textField.addTarget(self, action: #selector(DuctSizerSettingsVC.textFieldEditingDidEnd(_:)), for: UIControlEvents.editingDidEnd)
                     self.setupTextFieldInputAccessoryView(textField)
                     
                     // Set the text field texts
                     if (ductSizerProperties[indexPath.row] <= 0.009) {
                         
-                        let formatter = NSNumberFormatter()
-                        formatter.numberStyle = NSNumberFormatterStyle.ScientificStyle
+                        let formatter = NumberFormatter()
+                        formatter.numberStyle = NumberFormatter.Style.scientific
                         formatter.usesSignificantDigits = false
                         formatter.maximumSignificantDigits = 3
                         formatter.minimumSignificantDigits = 3
-                        textField.text = formatter.stringFromNumber(ductSizerProperties[indexPath.row])
+                        textField.text = formatter.string(from: NSNumber(value: ductSizerProperties[indexPath.row]))
                     }
                     else {
                         textField.text = String(format: "%.2f", ductSizerProperties[indexPath.row])
@@ -457,9 +457,9 @@ class DuctSizerSettingsVC: UIViewController {
         default: // Method
             
             // Dummy cell with error
-            cell = tableView.dequeueReusableCellWithIdentifier("MethodCell") as UITableViewCell!
+            cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
             if (cell == nil) {
-                cell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "MethodCell")
+                cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
             }
             
             let label:UILabel = cell!.viewWithTag(1) as! UILabel
@@ -476,13 +476,11 @@ class DuctSizerSettingsVC: UIViewController {
     
     
     // MARK: - Text Field Functions
-    func textFieldEditingDidEnd(sender:UITextField) {
+    func textFieldEditingDidEnd(_ sender:UITextField) {
         print("flowTextFieldEditingDidEnd")
         
         // Make the changes to the Property Record
-        var index:Int = 0
-        for index = 0; index < self.textFields.count; index += 1 {
-            
+        for index:Int in 0..<self.textFields.count {
             // Find the right textField
             if (sender == self.textFields[index]) {
                 
@@ -494,12 +492,12 @@ class DuctSizerSettingsVC: UIViewController {
                 // Reset the text so that stored value is actually displayed (this is need in case 2 decimal points are entered etc)
                 if (sender.text!.floatValue <= 0.009) {
                     
-                    let formatter = NSNumberFormatter()
-                    formatter.numberStyle = NSNumberFormatterStyle.ScientificStyle
+                    let formatter = NumberFormatter()
+                    formatter.numberStyle = NumberFormatter.Style.scientific
                     formatter.usesSignificantDigits = false
                     formatter.maximumSignificantDigits = 3
                     formatter.minimumSignificantDigits = 3
-                    sender.text = formatter.stringFromNumber(ductSizerProperties[index])
+                    sender.text = formatter.string(from: NSNumber(value: ductSizerProperties[index]))
                     
                 }
                 else {
@@ -517,23 +515,23 @@ class DuctSizerSettingsVC: UIViewController {
     // MARK: - Keyboard Related
     
     // Keyboard Move Screen Up If Required
-    func keyboardNotification(notification: NSNotification) {
+    func keyboardNotification(_ notification: Notification) {
         if let userInfo = notification.userInfo {
-            let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.CGRectValue()
-            let duration:NSTimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
+            let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
+            let duration:TimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
             let animationCurveRawNSN = userInfo[UIKeyboardAnimationCurveUserInfoKey] as? NSNumber
-            let animationCurveRaw = animationCurveRawNSN?.unsignedLongValue ?? UIViewAnimationOptions.CurveEaseInOut.rawValue
+            let animationCurveRaw = animationCurveRawNSN?.uintValue ?? UIViewAnimationOptions().rawValue
             let animationCurve:UIViewAnimationOptions = UIViewAnimationOptions(rawValue: animationCurveRaw)
             self.keyboardHeightLayoutConstraint?.constant = endFrame?.size.height ?? 0.0
-            UIView.animateWithDuration(duration,
-                delay: NSTimeInterval(0),
+            UIView.animate(withDuration: duration,
+                delay: TimeInterval(0),
                 options: animationCurve,
                 animations: { self.view.layoutIfNeeded() },
                 completion: nil)
         }
     }
     
-    func backgroundTapped(sender:AnyObject) {
+    func backgroundTapped(_ sender:AnyObject) {
         print("backgroundTapped")
         
         for textField in self.textFields {
@@ -544,14 +542,14 @@ class DuctSizerSettingsVC: UIViewController {
         
     }
     
-    func setupTextFieldInputAccessoryView(sender:UITextField) {
+    func setupTextFieldInputAccessoryView(_ sender:UITextField) {
         
-        let doneToolbar: UIToolbar = UIToolbar(frame: CGRectMake(0, 0, 320, 50))
-        doneToolbar.barStyle = UIBarStyle.BlackTranslucent
+        let doneToolbar: UIToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
+        doneToolbar.barStyle = UIBarStyle.blackTranslucent
         
-        let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.Done, target: self, action: #selector(DuctSizerSettingsVC.applyButtonAction))
-        done.tintColor = UIColor.whiteColor()
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.flexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.done, target: self, action: #selector(DuctSizerSettingsVC.applyButtonAction))
+        done.tintColor = UIColor.white
         
         var items = [UIBarButtonItem]()
         items.append(flexSpace)
