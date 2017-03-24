@@ -41,7 +41,7 @@ class Calculator: NSObject {
             Calculator.properties.append(Float())
         }
         
-        // Load the saved/ default properties
+        // Load the saved / default properties
         loadProperties()
         
     }
@@ -49,7 +49,36 @@ class Calculator: NSObject {
     
     
     
+    // MARK: Ducts
     
+    enum DuctMaterial {
+        
+        // See CIBSE Guide C for Reference Data
+        
+        case Rect
+        case Circ
+        
+        var material: String {
+            switch self {
+            case .Rect:
+                return "rectangular ductwork"
+            case .Circ:
+                return "circular ductwork"
+            }
+        }
+        
+        var kValue: Float {
+            switch self {
+            case .Rect:
+                return properties[SavedProperties.k_DuctRect.index]
+            case .Circ:
+                return properties[SavedProperties.k_DuctCirc.index]
+            }
+        }
+        
+        
+    }
+
     
     // MARK: Pipes
     
@@ -135,6 +164,7 @@ class Calculator: NSObject {
         case HWS
         case MWS
         case RWS
+        case Air
         
         var description: String {
             switch self {
@@ -150,6 +180,8 @@ class Calculator: NSObject {
                 return "Mains Water Supply"
             case .RWS:
                 return "Rain Water Supply"
+            case .Air:
+                return "Air"
             }
         }
         
@@ -168,6 +200,8 @@ class Calculator: NSObject {
                 return properties[SavedProperties.c_MWS.index]
             case .RWS:
                 return properties[SavedProperties.c_RWS.index]
+            case .Air:
+                return properties[SavedProperties.c_Air.index]
             }
         }
         
@@ -186,6 +220,8 @@ class Calculator: NSObject {
                 return properties[SavedProperties.visco_MWS.index]
             case .RWS:
                 return properties[SavedProperties.visco_RWS.index]
+            case .Air:
+                return properties[SavedProperties.visco_Air.index]
             }
         }
         
@@ -204,6 +240,8 @@ class Calculator: NSObject {
                 return properties[SavedProperties.density_MWS.index]
             case .RWS:
                 return properties[SavedProperties.density_RWS.index]
+            case .Air:
+                return properties[SavedProperties.density_Air.index]
             }
         }
         
@@ -221,6 +259,8 @@ class Calculator: NSObject {
             case .MWS:
                 return nil
             case .RWS:
+                return nil
+            case .Air:
                 return nil
             }
         }
@@ -240,6 +280,8 @@ class Calculator: NSObject {
                 return properties[SavedProperties.maxPd_MWS.index]
             case .RWS:
                 return properties[SavedProperties.maxPd_RWS.index]
+            case .Air:
+                return properties[SavedProperties.maxPd_Air.index]
             }
         }
         
@@ -258,6 +300,8 @@ class Calculator: NSObject {
                 return properties[SavedProperties.maxVelocity_MWS.index]
             case .RWS:
                 return properties[SavedProperties.maxVelocity_RWS.index]
+            case .Air:
+                return properties[SavedProperties.maxVelocity_Air.index]
             }
         }
         
@@ -301,21 +345,27 @@ class Calculator: NSObject {
     
     enum SavedProperties {
         
+        // NB: If you add another case to SavedProperties make sure you add it to the all array [SavedProperties]
+        
         case maxPd_LPHW
         case maxPd_CHW
         case maxPd_MWS
         case maxPd_CWS
         case maxPd_HWS
         case maxPd_RWS
+        case maxPd_Air
         case k_Steel
         case k_Copper
         case k_Plastic
+        case k_DuctRect
+        case k_DuctCirc
         case c_LPHW
         case c_CHW
         case c_MWS
         case c_CWS
         case c_HWS
         case c_RWS
+        case c_Air
         case dt_LPHW
         case dt_CHW
         case visco_LPHW
@@ -324,29 +374,32 @@ class Calculator: NSObject {
         case visco_CWS
         case visco_HWS
         case visco_RWS
+        case visco_Air
         case density_LPHW
         case density_CHW
         case density_MWS
         case density_CWS
         case density_HWS
         case density_RWS
+        case density_Air
         case maxVelocity_LPHW
         case maxVelocity_CHW
         case maxVelocity_MWS
         case maxVelocity_CWS
         case maxVelocity_HWS
         case maxVelocity_RWS
+        case maxVelocity_Air
         
         // Create an array with all the types available
         // This allows us to cycle through them all (no in built way of doing this)
         
         static let all:[SavedProperties] = [
-            maxPd_LPHW,maxPd_CHW,maxPd_MWS,maxPd_CWS,maxPd_HWS,maxPd_RWS,
-            k_Steel,k_Copper,k_Plastic,
-            c_LPHW,c_CHW,c_MWS,c_CWS,c_HWS,c_RWS,
-            dt_LPHW,dt_CHW,visco_LPHW,visco_CHW,visco_MWS,visco_CWS,visco_HWS,visco_RWS,
-            density_LPHW,density_CHW,density_MWS,density_CWS,density_HWS,density_RWS,
-            maxVelocity_LPHW,maxVelocity_CHW,maxVelocity_HWS,maxVelocity_CWS,maxVelocity_HWS,maxVelocity_RWS]
+            maxPd_LPHW,maxPd_CHW,maxPd_MWS,maxPd_CWS,maxPd_HWS,maxPd_RWS,maxPd_Air,
+            k_Steel,k_Copper,k_Plastic,k_DuctRect,k_DuctCirc,
+            c_LPHW,c_CHW,c_MWS,c_CWS,c_HWS,c_RWS,c_Air,
+            dt_LPHW,dt_CHW,visco_LPHW,visco_CHW,visco_MWS,visco_CWS,visco_HWS,visco_RWS,visco_Air,
+            density_LPHW,density_CHW,density_MWS,density_CWS,density_HWS,density_RWS,density_Air,
+            maxVelocity_LPHW,maxVelocity_CHW,maxVelocity_HWS,maxVelocity_CWS,maxVelocity_HWS,maxVelocity_RWS,maxVelocity_Air]
         
         
         // NB: always add new properties to the end (later index) so existing saved files don't get confused
@@ -365,12 +418,18 @@ class Calculator: NSObject {
                 return 4
             case .maxPd_RWS:
                 return 5
+            case .maxPd_Air:
+                return 35
             case .k_Steel:
                 return 6
             case .k_Copper:
                 return 7
             case .k_Plastic:
                 return 8
+            case .k_DuctRect:
+                return 40
+            case .k_DuctCirc:
+                return 41
             case .c_LPHW:
                 return 9
             case .c_CHW:
@@ -383,6 +442,8 @@ class Calculator: NSObject {
                 return 13
             case .c_RWS:
                 return 14
+            case .c_Air:
+                return 36
             case .dt_LPHW:
                 return 15
             case .dt_CHW:
@@ -399,6 +460,8 @@ class Calculator: NSObject {
                 return 21
             case .visco_RWS:
                 return 22
+            case .visco_Air:
+                return 37
             case .density_LPHW:
                 return 23
             case .density_CHW:
@@ -411,6 +474,8 @@ class Calculator: NSObject {
                 return 27
             case .density_RWS:
                 return 28
+            case .density_Air:
+                return 38
             case .maxVelocity_LPHW:
                 return 29
             case .maxVelocity_CHW:
@@ -423,6 +488,8 @@ class Calculator: NSObject {
                 return 33
             case .maxVelocity_RWS:
                 return 34
+            case .maxVelocity_Air:
+                return 39
             }
             
         }
@@ -442,12 +509,18 @@ class Calculator: NSObject {
                 return 250
             case .maxPd_RWS:
                 return 250
+            case .maxPd_Air:
+                return 1
             case .k_Steel:
                 return 0.046
             case .k_Copper:
                 return 0.0015
             case .k_Plastic:
                 return 0.007
+            case .k_DuctRect:
+                return 0.075    // based on galvanised steel
+            case .k_DuctCirc:
+                return 0.090    // based on spirally wound galvanised steel
             case .c_LPHW:
                 return 4.18
             case .c_CHW:
@@ -460,6 +533,8 @@ class Calculator: NSObject {
                 return 4.18
             case .c_RWS:
                 return 4.18
+            case .c_Air:
+                return 1.025
             case .dt_LPHW:
                 return 20
             case .dt_CHW:
@@ -476,6 +551,8 @@ class Calculator: NSObject {
                 return 0.4091 * powf(10, -6)
             case .visco_RWS:
                 return 0.4091 * powf(10, -6)
+            case .visco_Air:
+                return 1.8178 * pow(10, -5)
             case .density_LPHW:
                 return 977.8
             case .density_CHW:
@@ -488,6 +565,8 @@ class Calculator: NSObject {
                 return 1000
             case .density_RWS:
                 return 1000
+            case .density_Air:
+                return 1.2041
             case .maxVelocity_LPHW:
                 return 1.1
             case .maxVelocity_CHW:
@@ -500,6 +579,8 @@ class Calculator: NSObject {
                 return 1.1
             case .maxVelocity_RWS:
                 return 1.1
+            case .maxVelocity_Air:
+                return 2.5
             }
         }
         
@@ -518,12 +599,18 @@ class Calculator: NSObject {
                 return "HWS maximum pressure drop"
             case .maxPd_RWS:
                 return "RWS maximum pressure drop"
+            case .maxPd_Air:
+                return "Air maximum pressure drop"
             case .k_Steel:
                 return "k value for steel"
             case .k_Copper:
                 return "k value for copper"
             case .k_Plastic:
                 return "k value for plastic"
+            case .k_DuctRect:
+                return "k value for rectangular ductwork"
+            case .k_DuctCirc:
+                return "k value for circular ductwork"
             case .c_LPHW:
                 return "LPHW specific heat capacity"
             case .c_CHW:
@@ -536,6 +623,8 @@ class Calculator: NSObject {
                 return "HWS specific heat capacity"
             case .c_RWS:
                 return "RWS specific heat capacity"
+            case .c_Air:
+                return "Air specific heat capacity"
             case .dt_LPHW:
                 return "LPHW flow & return temperature difference"
             case .dt_CHW:
@@ -552,6 +641,8 @@ class Calculator: NSObject {
                 return "HWS kinematic viscosity"
             case .visco_RWS:
                 return "RWS kinematic viscosity"
+            case .visco_Air:
+                return "Air kinematic viscosity"
             case .density_LPHW:
                 return "LPHW density"
             case .density_CHW:
@@ -564,6 +655,8 @@ class Calculator: NSObject {
                 return "HWS density"
             case .density_RWS:
                 return "RWS density"
+            case .density_Air:
+                return "Air density"
             case .maxVelocity_LPHW:
                 return "LPHW maximum velocity"
             case .maxVelocity_CHW:
@@ -576,6 +669,8 @@ class Calculator: NSObject {
                 return "MWS maximum velocity"
             case .maxVelocity_RWS:
                 return "RWS maximum velocity"
+            case .maxVelocity_Air:
+                return "Air maximum velocity"
             }
         }
         
@@ -583,6 +678,27 @@ class Calculator: NSObject {
     
     
     // MARK: Update Saved Properties
+    
+    func setKValue(duct:DuctMaterial, kValue:Float) {
+        
+        // Update the appropriate value
+        if (kValue > 0) {
+            
+            switch duct {
+            case .Rect:
+                Calculator.properties[SavedProperties.k_DuctRect.index] = kValue
+            case .Circ:
+                Calculator.properties[SavedProperties.k_DuctCirc.index] = kValue
+            }
+            
+            // Save the change
+            saveCurrentProperties()
+            
+        } else {
+            print("kValue must be greater than 0, no change made")
+        }
+        
+    }
     
     func setKValue(pipe:PipeMaterial, kValue:Float) {
         
@@ -625,6 +741,8 @@ class Calculator: NSObject {
                 Calculator.properties[SavedProperties.c_HWS.index] = specificHeatCapacity
             case .RWS:
                 Calculator.properties[SavedProperties.c_RWS.index] = specificHeatCapacity
+            case .Air:
+                Calculator.properties[SavedProperties.c_Air.index] = specificHeatCapacity
             }
             
             // Save the change
@@ -654,6 +772,8 @@ class Calculator: NSObject {
                 Calculator.properties[SavedProperties.density_HWS.index] = density
             case .RWS:
                 Calculator.properties[SavedProperties.density_RWS.index] = density
+            case .Air:
+                Calculator.properties[SavedProperties.density_Air.index] = density
             }
             
             // Save the change
@@ -683,6 +803,8 @@ class Calculator: NSObject {
                 Calculator.properties[SavedProperties.visco_HWS.index] = visco
             case .RWS:
                 Calculator.properties[SavedProperties.visco_RWS.index] = visco
+            case .Air:
+                Calculator.properties[SavedProperties.visco_Air.index] = visco
             }
             
             // Save the change
@@ -740,6 +862,8 @@ class Calculator: NSObject {
                 Calculator.properties[SavedProperties.maxPd_HWS.index] = maxPd
             case .RWS:
                 Calculator.properties[SavedProperties.maxPd_RWS.index] = maxPd
+            case .Air:
+                Calculator.properties[SavedProperties.maxPd_Air.index] = maxPd
             }
             
             // Save the change
@@ -769,6 +893,8 @@ class Calculator: NSObject {
                 Calculator.properties[SavedProperties.maxVelocity_HWS.index] = maxVelocity
             case .RWS:
                 Calculator.properties[SavedProperties.maxVelocity_RWS.index] = maxVelocity
+            case .Air:
+                Calculator.properties[SavedProperties.maxVelocity_Air.index] = maxVelocity
             }
             
             // Save the change
@@ -827,6 +953,12 @@ class Calculator: NSObject {
             setMaxPd(fluid: fluid, maxPd: SavedProperties.maxPd_RWS.defaultValue)
             setMaxVelocity(fluid: fluid, maxVelocity: SavedProperties.maxVelocity_RWS.defaultValue)
             setViscosity(fluid: fluid, visco: SavedProperties.visco_RWS.defaultValue)
+        case .Air:
+            setSpecificHeatCapacity(fluid: fluid, specificHeatCapacity: SavedProperties.c_Air.defaultValue)
+            setDensity(fluid: fluid, density: SavedProperties.density_Air.defaultValue)
+            setMaxPd(fluid: fluid, maxPd: SavedProperties.maxPd_Air.defaultValue)
+            setMaxVelocity(fluid: fluid, maxVelocity: SavedProperties.maxVelocity_Air.defaultValue)
+            setViscosity(fluid: fluid, visco: SavedProperties.visco_Air.defaultValue)
         }
         
         print("Properties reset to default for \(fluid.description)")
@@ -842,6 +974,16 @@ class Calculator: NSObject {
         setKValue(pipe: .Steel, kValue: SavedProperties.k_Steel.defaultValue)
         
         print("Pipe k values reset to default")
+    }
+    
+    func resetDefaultDuctProperties() {
+        
+        // Reset all of the pipe k values
+        
+        setKValue(duct: .Rect, kValue: SavedProperties.k_DuctRect.defaultValue)
+        setKValue(duct: .Circ, kValue: SavedProperties.k_DuctCirc.defaultValue)
+        
+        print("Duct k values reset to default")
     }
     
     // MARK: Write / Read Properties from file
@@ -936,6 +1078,366 @@ class Calculator: NSObject {
         let documentsDirectory = paths[0] as NSString
         return documentsDirectory.appendingPathComponent(fileName) as String
     }
+    
+    
+    
+    
+    // MARK: Duct Sizer Calculations
+    
+    let ductDimensionIncrement:Float = 50 / 1000    // must be in m
+    
+    func resultsForDuct(massFlowrate:Float, duct:DuctMaterial, maxPd:Float?, maxVelocity:Float?, length:Float?, width:Float?, aspect:Float?) -> (length:Float, width:Float, aspect:Float, pd:Float, v:Float)? {
+        
+        // NB: be careful with units
+        // massFlowrate     kg/s
+        // maxPd            Pa/m  
+        // maxVelocity      m/s 
+        // length           m
+        // width            m
+        // aspect           -       (length:width)
+        
+        // Air is assumed to be the fluid for duct sizing
+        // If either length or width are provided, then these are considered locked and can't be incremented
+        
+        // Check inputs
+        
+        if (massFlowrate < 0) {
+            print("massflowrate must be > 0 to size duct")
+            return nil
+        }
+        
+        if (maxPd != nil) {
+            if (maxPd! < 0) {
+                print("If a maxPd is specified, it must be > 0 to size duct")
+                return nil
+            }
+        }
+        
+        if (maxVelocity != nil) {
+            if (maxVelocity! < 0) {
+                print("If a maxVelocity is specified, it must be > 0 to size duct")
+                return nil
+            }
+        }
+        
+        if (length != nil) {
+            if (length! < 0) {
+                print("If a length is specified, it must be > 0 to size duct")
+                return nil
+            }
+        }
+        
+        if (width != nil) {
+            if (width! < 0) {
+                print("If a length is specified, it must be > 0 to size duct")
+                return nil
+            }
+        }
+        
+        if (aspect != nil) {
+            if (aspect! < 0) {
+                print("If an aspect is specified, it must be > 0 to size duct")
+                return nil
+            }
+        }
+        
+        if (length != nil && width != nil) {
+            
+            // Both dimensions have been specified
+            // Just grab the results (and ignore the maxPd and maxVel constraints)
+            
+            let pressureDrop = pd(massFlowrate: massFlowrate, length: length!, width: width!, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+            let velocity = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: length!, width: width!)
+            
+            var aspt = length!/width!
+            if (aspt < 1) {
+                aspt = width! / length!
+            }
+            
+            return (length:length!, width:width!, aspect:aspt,pd:pressureDrop,v:velocity)
+            
+        } else if (length == nil && width == nil) {
+            
+            // if both are nil, both can be altered
+            var widthToUse = ductDimensionIncrement
+            var lengthToUse = ductDimensionIncrement
+            if let actualAspect = aspect {
+                 lengthToUse = widthToUse * actualAspect
+            }
+            
+            // Initial calcs
+            var actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+            var actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+            
+            if (maxPd == nil && maxVelocity == nil) {
+                
+                // No contraints provided, no need to do anymore, will just return initial values
+                
+            } else {
+                
+                // At least one constraint provided
+                var lengthLastIncremented:Bool = false
+                
+                if (maxPd != nil && maxVelocity != nil) {
+                    
+                    // Both constraints provided, size to both
+                    while (actualPd >= maxPd! || actualVel >= maxVelocity!) {
+                        
+                        // Increment the duct size
+                        
+                        // if the aspect is defined, we have to use that
+                        if let actualAspect = aspect {
+                            widthToUse = widthToUse + ductDimensionIncrement
+                            lengthToUse = widthToUse * actualAspect
+                        } else {
+                            
+                            // if the aspect isn't defined, take it in turns to increment each duct dimension
+                            if (lengthLastIncremented) {
+                                widthToUse = widthToUse + ductDimensionIncrement
+                                lengthLastIncremented = false
+                            } else {
+                                lengthToUse = lengthToUse + ductDimensionIncrement
+                                lengthLastIncremented = true
+                            }
+                        }
+                        
+                        // Recalculate
+                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+                        
+                    }
+                    
+                    
+                } else if (maxPd != nil) {
+                    
+                    // Only a maximum Pd has been specified
+                    while (actualPd >= maxPd!) {
+                        
+                        // Increment the duct size
+                        
+                        // if the aspect is defined, we have to use that
+                        if let actualAspect = aspect {
+                            widthToUse = widthToUse + ductDimensionIncrement
+                            lengthToUse = widthToUse * actualAspect
+                        } else {
+                            
+                            // if the aspect isn't defined, take it in turns to increment each duct dimension
+                            if (lengthLastIncremented) {
+                                widthToUse = widthToUse + ductDimensionIncrement
+                                lengthLastIncremented = false
+                            } else {
+                                lengthToUse = lengthToUse + ductDimensionIncrement
+                                lengthLastIncremented = true
+                            }
+                        }
+                        
+                        // Recalculate
+                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+                        
+                    }
+                    
+                } else {
+                    
+                    // Only a maximum velocity has been specified
+                    while (actualVel >= maxVelocity!) {
+                        
+                        // Increment the duct size
+                        
+                        // if the aspect is defined, we have to use that
+                        if let actualAspect = aspect {
+                            widthToUse = widthToUse + ductDimensionIncrement
+                            lengthToUse = widthToUse * actualAspect
+                        } else {
+                            
+                            // if the aspect isn't defined, take it in turns to increment each duct dimension
+                            if (lengthLastIncremented) {
+                                widthToUse = widthToUse + ductDimensionIncrement
+                                lengthLastIncremented = false
+                            } else {
+                                lengthToUse = lengthToUse + ductDimensionIncrement
+                                lengthLastIncremented = true
+                            }
+                        }
+                        
+                        // Recalculate
+                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+                        
+                    }
+                }
+                
+            }
+            
+            // Once we've got a big enough size
+            
+            // Calculate the new aspect
+            var aspt = lengthToUse/widthToUse
+            if (aspt < 1) {
+                aspt = widthToUse / lengthToUse
+            }
+            
+            // Return the results
+            return (length:lengthToUse, width:widthToUse, aspect:aspt,pd:actualPd,v:actualVel)
+            
+        } else if (length == nil) {
+            
+            // width must not be nil or it would have been caught by if statement above
+            // keep width contstant and change length as required
+            
+            let widthToUse = width!
+            var lengthToUse = ductDimensionIncrement
+            
+            // Initial calcs
+            var actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+            var actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+            
+            if (maxPd == nil && maxVelocity == nil) {
+                
+                // No contraints provided, no need to do anymore, will just return initial values
+                
+            } else {
+                
+                // At least one constraint provided
+                
+                if (maxPd != nil && maxVelocity != nil) {
+                    
+                    // Both constraints provided, size to both
+                    while (actualPd >= maxPd! || actualVel >= maxVelocity!) {
+                        
+                        // Increment the duct size
+                        lengthToUse = lengthToUse + ductDimensionIncrement
+                        
+                        // Recalculate
+                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+                        
+                    }
+                    
+                    
+                } else if (maxPd != nil) {
+                    
+                    // Only a maximum Pd has been specified
+                    while (actualPd >= maxPd!) {
+                        
+                        // Increment the duct size
+                        lengthToUse = lengthToUse + ductDimensionIncrement
+                        
+                        // Recalculate
+                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+                        
+                    }
+                    
+                } else {
+                    
+                    // Only a maximum velocity has been specified
+                    while (actualVel >= maxVelocity!) {
+                        
+                        // Increment the duct size
+                        lengthToUse = lengthToUse + ductDimensionIncrement
+                        
+                        // Recalculate
+                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+                        
+                    }
+                }
+                
+            }
+            
+            // Once we've got a big enough size
+            
+            // Calculate the new aspect
+            var aspt = lengthToUse/widthToUse
+            if (aspt < 1) {
+                aspt = widthToUse / lengthToUse
+            }
+            
+            // Return the results
+            return (length:lengthToUse, width:widthToUse, aspect:aspt,pd:actualPd,v:actualVel)
+            
+        } else {
+            
+            // length must not be nil or it would have been caught by if statement above
+            // keep length contstant and change width as required
+            
+            var widthToUse = ductDimensionIncrement
+            let lengthToUse = length!
+            
+            // Initial calcs
+            var actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+            var actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+            
+            if (maxPd == nil && maxVelocity == nil) {
+                
+                // No contraints provided, no need to do anymore, will just return initial values
+                
+            } else {
+                
+                // At least one constraint provided
+                
+                if (maxPd != nil && maxVelocity != nil) {
+                    
+                    // Both constraints provided, size to both
+                    while (actualPd >= maxPd! || actualVel >= maxVelocity!) {
+                        
+                        // Increment the duct size
+                        widthToUse = widthToUse + ductDimensionIncrement
+                        
+                        // Recalculate
+                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+                        
+                    }
+                    
+                    
+                } else if (maxPd != nil) {
+                    
+                    // Only a maximum Pd has been specified
+                    while (actualPd >= maxPd!) {
+                        
+                        // Increment the duct size
+                        widthToUse = widthToUse + ductDimensionIncrement
+                        
+                        // Recalculate
+                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+                        
+                    }
+                    
+                } else {
+                    
+                    // Only a maximum velocity has been specified
+                    while (actualVel >= maxVelocity!) {
+                        
+                        // Increment the duct size
+                        widthToUse = widthToUse + ductDimensionIncrement
+                        
+                        // Recalculate
+                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+                        
+                    }
+                }
+                
+            }
+            
+            // Once we've got a big enough size
+            
+            // Calculate the new aspect
+            var aspt = lengthToUse/widthToUse
+            if (aspt < 1) {
+                aspt = widthToUse / lengthToUse
+            }
+            
+            // Return the results
+            return (length:lengthToUse, width:widthToUse, aspect:aspt,pd:actualPd,v:actualVel)
+            
+        }
+        
+    }
+    
     
     
     
@@ -1056,7 +1558,7 @@ class Calculator: NSObject {
     
     // Calculate Pressure Drop and Velocity for all available pipes sizes for a given flowrate, material and fluid
     
-    private func resultsForPipe(massFlowrate:Float, fluid:Fluid, material:PipeMaterial) -> [(nomDia:Int, pd:Float, v:Float)]? {
+    func resultsForPipe(massFlowrate:Float, fluid:Fluid, material:PipeMaterial) -> [(nomDia:Int, pd:Float, v:Float)]? {
         
         // Initialise a tuple
         var results = [(nomDia:Int, pd:Float, v:Float)]()
@@ -1141,13 +1643,49 @@ class Calculator: NSObject {
         
         let v:Float  = self.circularVelocity(volumeFlowrate: q, dia: dia)   // m/s
         
+        return pd(velocity: v, dia: dia, density: density, visco: visco, k: k, printCalc: printCalc) // Pa/m
+        
+    }
+    
+    private func pd(massFlowrate:Float, length:Float, width:Float, density:Float, visco:Float, k:Float, printCalc:Bool) -> Float {
+        
+        // massFlowrate     kg/s
+        // length           m
+        // width            m
+        // density          kg/m3
+        // visco            m2/s
+        // k                /mm
+        
+        // Pd returned in Pa/m
+        
+        let q = volumeFlowRate(massFlowrate: massFlowrate, density: density)     // m3/s
+        
+        let v:Float  = self.rectangularVelocity(volumeFlowrate: q, length: length, width: width)   // m/s
+        
+        let dia:Float = self.equivalentDiameter(x: length, y: width)
+        
+        return pd(velocity: v, dia: dia, density: density, visco: visco, k: k, printCalc: printCalc) // Pa/m
+        
+    }
+    
+    private func pd(velocity:Float, dia:Float, density:Float, visco:Float, k:Float, printCalc:Bool) -> Float {
+        
+        // velocity         m/s
+        // dia              m
+        // density          kg/m3
+        // visco            m2/s
+        // k                /mm
+        
+        // Pd returned in Pa/m
+        
+        
         // Pd sub variables (formula is quite long)
         
-        let a:Float = (6.9 * visco) / ( v * dia) + powf((k/1000) / (3.71 * dia), 1.11)
+        let a:Float = (6.9 * visco) / ( velocity * dia) + powf((k/1000) / (3.71 * dia), 1.11)
         
         let b:Float = -1.8 * log10(a)
         
-        let c:Float = (0.5 * density * v * v) / dia
+        let c:Float = (0.5 * density * velocity * velocity) / dia
         
         
         // Pressure drop
@@ -1163,9 +1701,7 @@ class Calculator: NSObject {
             
             print("Variables used to calculate pressure drop")
             print("int. d = \(dia) m")
-            print("mass flowrate = \(massFlowrate) kg/s")
-            print("volume flowrate = \(q) m3/s")
-            print("velocity = \(v) m/s")
+            print("velocity = \(velocity) m/s")
             print("a = \(a)")
             print("b = \(b)")
             print("c = \(c)")
@@ -1180,7 +1716,6 @@ class Calculator: NSObject {
     }
     
     
-    // MARK: Misc
 
 
 }

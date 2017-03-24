@@ -35,6 +35,16 @@ class CalculatorUnitTests: XCTestCase {
         
         // Pipe k value (Plastic)
         newValue = 0.05
+        calculator.setKValue(duct: Calculator.DuctMaterial.Rect, kValue: newValue)
+        savedValue = Calculator.DuctMaterial.Rect.kValue
+        XCTAssert(newValue == savedValue)
+        newValue = -0.05
+        calculator.setKValue(duct: Calculator.DuctMaterial.Rect, kValue: newValue)
+        savedValue = Calculator.DuctMaterial.Rect.kValue
+        XCTAssert(newValue != savedValue)
+        
+        // Duct k value (Plastic)
+        newValue = 0.05
         calculator.setKValue(pipe: Calculator.PipeMaterial.Plastic, kValue: newValue)
         savedValue = Calculator.PipeMaterial.Plastic.kValue
         XCTAssert(newValue == savedValue)
@@ -86,6 +96,7 @@ class CalculatorUnitTests: XCTestCase {
         XCTAssert(Calculator.Fluid.CWS.temperatureDifference == nil)
         XCTAssert(Calculator.Fluid.HWS.temperatureDifference == nil)
         XCTAssert(Calculator.Fluid.RWS.temperatureDifference == nil)
+        XCTAssert(Calculator.Fluid.Air.temperatureDifference == nil)
         
         // Fluid default max Pd (RWS)
         newValue = 200
@@ -207,11 +218,135 @@ class CalculatorUnitTests: XCTestCase {
         
         // Reset them
         calculator.resetDefaultPipeProperties()
+        calculator.resetDefaultDuctProperties()
         
         // Check they've been reset to the default values
         XCTAssert(Calculator.PipeMaterial.Copper.kValue == Calculator.SavedProperties.k_Copper.defaultValue)
         XCTAssert(Calculator.PipeMaterial.Plastic.kValue == Calculator.SavedProperties.k_Plastic.defaultValue)
         XCTAssert(Calculator.PipeMaterial.Steel.kValue == Calculator.SavedProperties.k_Steel.defaultValue)
+        XCTAssert(Calculator.DuctMaterial.Rect.kValue == Calculator.SavedProperties.k_DuctRect.defaultValue)
+        XCTAssert(Calculator.DuctMaterial.Circ.kValue == Calculator.SavedProperties.k_DuctCirc.defaultValue)
+        
+    }
+    
+    func testDuctSizer() {
+        
+        // Set the properties to use
+        calculator.setKValue(duct: .Rect, kValue: 0.075)
+        calculator.setDensity(fluid: .Air, density: 1.2041)
+        calculator.setViscosity(fluid: .Air, visco: 1.8178 * pow(10, -5))
+        
+        // Check invalid parameters return nil
+        XCTAssert(calculator.resultsForDuct(massFlowrate: -1, duct: .Rect, maxPd: 1, maxVelocity: 1, length: 500, width: 500, aspect: 1) == nil)
+        XCTAssert(calculator.resultsForDuct(massFlowrate: 1, duct: .Rect, maxPd: -1, maxVelocity: 1, length: 500, width: 500, aspect: 1) == nil)
+        XCTAssert(calculator.resultsForDuct(massFlowrate: 1, duct: .Rect, maxPd: 1, maxVelocity: -1, length: 500, width: 500, aspect: 1) == nil)
+        XCTAssert(calculator.resultsForDuct(massFlowrate: 1, duct: .Rect, maxPd: 1, maxVelocity: 1, length: -500, width: 500, aspect: 1) == nil)
+        XCTAssert(calculator.resultsForDuct(massFlowrate: 1, duct: .Rect, maxPd: 1, maxVelocity: 1, length: 500, width: -500, aspect: 1) == nil)
+        XCTAssert(calculator.resultsForDuct(massFlowrate: 1, duct: .Rect, maxPd: 1, maxVelocity: 1, length: 500, width: 500, aspect: -1) == nil)
+        
+        
+        // Check against a number of known inputs and expected outputs
+        // (see excel spreadsheet)
+        
+        if let result = calculator.resultsForDuct(massFlowrate: 1.08369, duct: .Rect, maxPd: nil, maxVelocity: nil, length: 0.450, width: 0.250, aspect: nil) {
+            
+            // For some reason rounding doesn't work - check absolute difference instead
+            XCTAssert(abs(result.pd - 2.1462406) < 0.001)
+            XCTAssert(abs(result.v - 8.00) < 0.01)
+        
+        } else {
+            // something went wrong
+            XCTAssert(false)
+        }
+        
+        if let result = calculator.resultsForDuct(massFlowrate: 2.16738, duct: .Rect, maxPd: nil, maxVelocity: nil, length: 0.3, width: 0.9, aspect: nil) {
+            
+            XCTAssert(abs(result.pd - 1.017) < 0.001)
+            XCTAssert(abs(result.v - 6.667) < 0.01)
+            XCTAssert(abs(result.aspect - 3) < 0.01)
+            
+        } else {
+            XCTAssert(false)
+        }
+        
+        
+        if let result = calculator.resultsForDuct(massFlowrate: 1.08369, duct: .Rect, maxPd: 1, maxVelocity: nil, length: nil, width: nil, aspect: nil) {
+            
+            XCTAssert(abs(result.length - 0.4) < 0.001)
+            XCTAssert(abs(result.width - 0.4) < 0.001)
+            
+        } else {
+            XCTAssert(false)
+        }
+        
+        if let result = calculator.resultsForDuct(massFlowrate: 1.08369, duct: .Rect, maxPd: 1.2, maxVelocity: nil, length: nil, width: nil, aspect: nil) {
+            
+            XCTAssert(abs(result.length - 0.4) < 0.001)
+            XCTAssert(abs(result.width - 0.35) < 0.001)
+            XCTAssert(abs(result.aspect - 1.142857143) < 0.001)
+            
+        } else {
+            XCTAssert(false)
+        }
+        
+        if let result = calculator.resultsForDuct(massFlowrate: 1.08369, duct: .Rect, maxPd: 1.2, maxVelocity: nil, length: nil, width: nil, aspect: 2) {
+            
+            XCTAssert(abs(result.length - 0.6) < 0.001)
+            XCTAssert(abs(result.width - 0.3) < 0.001)
+            XCTAssert(abs(result.aspect - 2) < 0.001)
+            
+        } else {
+            XCTAssert(false)
+        }
+        
+        if let result = calculator.resultsForDuct(massFlowrate: 1.08369, duct: .Rect, maxPd: 1.2, maxVelocity: 2.5, length: nil, width: nil, aspect: nil) {
+            
+            XCTAssert(abs(result.length - 0.6) < 0.001)
+            XCTAssert(abs(result.width - 0.6) < 0.001)
+            
+        } else {
+            XCTAssert(false)
+        }
+        
+        if let result = calculator.resultsForDuct(massFlowrate: 1.08369, duct: .Rect, maxPd: 1.2, maxVelocity: 5.5, length: 0.200, width: nil, aspect: nil) {
+            
+            XCTAssert(abs(result.length - 0.2) < 0.001)
+            XCTAssert(abs(result.width - 0.85) < 0.001)
+            
+        } else {
+            XCTAssert(false)
+        }
+        
+        if let result = calculator.resultsForDuct(massFlowrate: 1.08369, duct: .Rect, maxPd: 1.2, maxVelocity: 5.5, length: nil, width: 0.200, aspect: nil) {
+            
+            XCTAssert(abs(result.length - 0.85) < 0.001)
+            XCTAssert(abs(result.width - 0.2) < 0.001)
+            
+        } else {
+            XCTAssert(false)
+        }
+        
+        if let result = calculator.resultsForDuct(massFlowrate: 1.08369, duct: .Rect, maxPd: 1.2, maxVelocity: 5.5, length: nil, width: 0.200, aspect: 2) {
+            
+            XCTAssert(abs(result.length - 0.85) < 0.001)
+            XCTAssert(abs(result.width - 0.2) < 0.001)
+            
+        } else {
+            XCTAssert(false)
+        }
+        
+        if let result = calculator.resultsForDuct(massFlowrate: 1.08369, duct: .Rect, maxPd: 1.2, maxVelocity: 5.5, length: nil, width: nil, aspect: nil) {
+            
+            XCTAssert(abs(result.length - 0.45) < 0.001)
+            XCTAssert(abs(result.width - 0.4) < 0.001)
+            
+        } else {
+            XCTAssert(false)
+        }
+        
+        // Reset defaults
+        calculator.resetDefaultDuctProperties()
+        calculator.resetDefaultFluidProperties(fluid: .Air)
         
     }
     
