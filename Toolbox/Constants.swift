@@ -18,6 +18,9 @@ extension String {
     }
 }
 
+// The global calculator used for all tools
+let calculator:Calculator = Calculator()
+
 
 // MARK: - Daylight Calculator
 

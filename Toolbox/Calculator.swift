@@ -112,6 +112,9 @@ class Calculator: NSObject {
             }
         }
         
+        // NB: Each nominal diamter must have a corresponding internal diameter
+        //     i.e. the arrays must be the same size for each material
+        
         var nominalDiameters: [Int] {
             switch self {
             case .Copper:
@@ -1086,18 +1089,36 @@ class Calculator: NSObject {
     
     let ductDimensionIncrement:Float = 50 / 1000    // must be in m
     
-    func resultsForDuct(massFlowrate:Float, duct:DuctMaterial, maxPd:Float?, maxVelocity:Float?, length:Float?, width:Float?, aspect:Float?) -> (length:Float, width:Float, aspect:Float, pd:Float, v:Float)? {
+    // Rectangular
+    // Two options for VFR or MFR
+    
+    func resultsForDuct(length:Float?, width:Float?, volumeFlowrate:Float, duct:DuctMaterial, maxPd:Float?, maxVelocity:Float?, aspect:Float?) -> (length:Float, width:Float, aspect:Float, pd:Float, v:Float)? {
         
         // NB: be careful with units
-        // massFlowrate     kg/s
-        // maxPd            Pa/m  
-        // maxVelocity      m/s 
+        // volumeFlowrate           m3/s
+        // See below for remainder
+        
+        let mfr:Float = massFlowrate(volumeFlowrate: volumeFlowrate, density: Fluid.Air.density)
+        return resultsForDuct(length: length, width: width, massFlowrate: mfr, duct: duct, maxPd: maxPd, maxVelocity: maxVelocity, aspect: aspect)
+    }
+    
+    func resultsForDuct(length:Float?, width:Float?, massFlowrate:Float, duct:DuctMaterial, maxPd:Float?, maxVelocity:Float?, aspect:Float?) -> (length:Float, width:Float, aspect:Float, pd:Float, v:Float)? {
+        
+        // NB: be careful with units
         // length           m
         // width            m
+        // massFlowrate     kg/s
+        // maxPd            Pa/m  
+        // maxVelocity      m/s
         // aspect           -       (length:width)
         
         // Air is assumed to be the fluid for duct sizing
-        // If either length or width are provided, then these are considered locked and can't be incremented
+        
+        // If both length and width are provided, results will be calculated for the given size (and constraints ignored)
+        // If either length or width are provided (but not both), then the given dimension is locked and the other dimension is sized based on the given constraints
+        // If the length and width are not provided, the duct will be sized on the given constraints (including the given aspect ratio)
+        // if there are no constraints the results for the minimum size will be provided
+        // when sizing the ducts, the dimesnions that can be altered are incremented by the ductDimensionIncrement above
         
         // Check inputs
         
@@ -1438,6 +1459,147 @@ class Calculator: NSObject {
         
     }
     
+    
+    // Circular
+    // Two options for VFR or MFR
+    
+    func resultsForDuct(diameter:Float?, volumeFlowrate:Float, duct:DuctMaterial, maxPd:Float?, maxVelocity:Float?) -> (diameter:Float, pd:Float, v:Float)? {
+        
+        // NB: be careful with units
+        // volumeFlowrate           m3/s
+        // See below for remainder
+        
+        let mfr:Float = massFlowrate(volumeFlowrate: volumeFlowrate, density: Fluid.Air.density)
+        return resultsForDuct(diameter: diameter, massFlowrate: mfr, duct: duct, maxPd: maxPd, maxVelocity: maxVelocity)
+        
+    }
+    
+    func resultsForDuct(diameter:Float?, massFlowrate:Float, duct:DuctMaterial, maxPd:Float?, maxVelocity:Float?) -> (diameter:Float, pd:Float, v:Float)? {
+        
+        // NB: be careful with units
+        // diameter         m
+        // massFlowrate     kg/s
+        // maxPd            Pa/m
+        // maxVelocity      m/s
+        
+        // Air is assumed to be the fluid for duct sizing
+        
+        // If the diameter is provided, then this is considered locked and can't be incremented, results will be calculated for the given size (and constraints ignored)
+        // If the diamter is not provided, the duct will be sized on the given constraints 
+        // if there are no constraints the results for the minimum size will be provided
+        // when sizing the ducts, the dimesnions that can be altered are incremented by the ductDimensionIncrement above
+        
+        // Check inputs
+        
+        if (massFlowrate < 0) {
+            print("massflowrate must be > 0 to size duct")
+            return nil
+        }
+        
+        if (maxPd != nil) {
+            if (maxPd! < 0) {
+                print("If a maxPd is specified, it must be > 0 to size duct")
+                return nil
+            }
+        }
+        
+        if (maxVelocity != nil) {
+            if (maxVelocity! < 0) {
+                print("If a maxVelocity is specified, it must be > 0 to size duct")
+                return nil
+            }
+        }
+        
+        if (diameter != nil) {
+            if (diameter! < 0) {
+                print("If a diameter is specified, it must be > 0 to size duct")
+                return nil
+            }
+        }
+        
+        
+        if (diameter != nil) {
+            
+            // Diameter has been specified
+            // Just grab the results (and ignore the maxPd and maxVel constraints)
+            
+            let pressureDrop = pd(massFlowrate: massFlowrate, dia: diameter!, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+            let velocity = circularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, dia: diameter!)
+            
+            
+            return (diameter:diameter!,pd:pressureDrop,v:velocity)
+            
+        } else  {
+            
+            // No Diameter entered, size on constraints provided
+            var diameterToUse = ductDimensionIncrement
+            
+            // Initial calcs
+            var actualPd = pd(massFlowrate: massFlowrate, dia: diameterToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+            var actualVel = circularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, dia: diameterToUse)
+            
+            if (maxPd == nil && maxVelocity == nil) {
+                
+                // No contraints provided, no need to do anymore, will just return initial values
+                
+            } else {
+                
+                // At least one constraint provided
+                
+                if (maxPd != nil && maxVelocity != nil) {
+                    
+                    // Both constraints provided, size to both
+                    while (actualPd >= maxPd! || actualVel >= maxVelocity!) {
+                        
+                        // Increment the duct size
+                        diameterToUse = diameterToUse + ductDimensionIncrement
+                        
+                        // Recalculate
+                        actualPd = pd(massFlowrate: massFlowrate, dia: diameterToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = circularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, dia: diameterToUse)
+                        
+                    }
+                    
+                    
+                } else if (maxPd != nil) {
+                    
+                    // Only a maximum Pd has been specified
+                    while (actualPd >= maxPd!) {
+                        
+                        // Increment the duct size
+                        diameterToUse = diameterToUse + ductDimensionIncrement
+                        
+                        // Recalculate
+                        actualPd = pd(massFlowrate: massFlowrate, dia: diameterToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = circularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, dia: diameterToUse)
+                        
+                    }
+                    
+                } else {
+                    
+                    // Only a maximum velocity has been specified
+                    while (actualVel >= maxVelocity!) {
+                        
+                        // Increment the duct size
+                        diameterToUse = diameterToUse + ductDimensionIncrement
+                        
+                        // Recalculate
+                        actualPd = pd(massFlowrate: massFlowrate, dia: diameterToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = circularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, dia: diameterToUse)
+                        
+                    }
+                }
+                
+            }
+            
+            // Once we've got a big enough size
+            
+            // Return the results
+            return (diameter:diameterToUse, pd:actualPd, v:actualVel)
+            
+        }
+       
+    }
     
     
     

@@ -72,11 +72,9 @@ class DuctSizerVC: UIViewController {
     // Constants to use
     let minDim:Float = 100
     let maxDim:Float = 1000
-    let increment:Float = 50
+    let increment:Float = calculator.ductDimensionIncrement * 1000
     
     let shaded:CGFloat = 0.3
-    
-    let pi:Float = Float(M_PI)
     
     // Variables to use
     // var flowrateSecond:Float? = nil     // m3/s
@@ -92,12 +90,8 @@ class DuctSizerVC: UIViewController {
     var xDimension:Float = Float()      // mm
     var yDimension:Float = Float()      // mm
     var diameter:Float = Float()        // mm
-    
-    var rectVelocity:Float? = nil       // m/s
-    var rectPd:Float? = nil             // Pa/m
-    var circVelocity:Float? = nil       // m/s
-    var circPd:Float? = nil             // Pa/m
     var aspect:Float = Float()          // -
+    
     
     var autosizeVelocity:[Float?] = [nil,1.5,3.5,6]   // m/s
     var autosizeAspect:Float? = nil                   // -
@@ -113,13 +107,16 @@ class DuctSizerVC: UIViewController {
         }
     }
     
+    // Calculator's results for current configuration
+    var resultsRect:(length:Float, width:Float, aspect:Float, pd:Float, v:Float)? = nil
+    var resultsCirc:(diameter:Float, pd:Float, v:Float)? = nil
+    
 
     // MARK: - System
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        loadDuctSizerProperties()
         
         // Listen for keyboard changes
         NotificationCenter.default.addObserver(self, selector: #selector(DuctSizerVC.keyboardNotification(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
@@ -311,9 +308,7 @@ class DuctSizerVC: UIViewController {
         self.setAspectRatioAlpha()
         
         // Recalculate
-        self.calculateAspectRatio()
-        self.calculate()
-        
+        self.calculate()        
         
         // Update the textfield and label texts
         self.updateTextsAndLabels()
@@ -375,18 +370,24 @@ class DuctSizerVC: UIViewController {
         }
         
         self.yTextField.text = String(format: "%.0f", self.yDimension)
-        // self.diameterTextField.text = String(format: "%.0f", self.xDimension)
         
         // Check what's displayed
-        var resultVelocity:Float? = Float()
-        var resultPd:Float? = Float()
+        var resultVelocity:Float? = nil
+        var resultPd:Float? = nil
+        
         if (self.ySlider.alpha != 0) {
-            resultVelocity = self.rectVelocity
-            resultPd = self.rectPd
+            // Rectangular
+            if let result = self.resultsRect {
+                resultVelocity = result.v
+                resultPd = result.pd
+            }
         }
         else {
-            resultVelocity = self.circVelocity
-            resultPd = self.circPd
+            // Circular
+            if let result = self.resultsCirc {
+                resultVelocity = result.v
+                resultPd = result.pd
+            }
         }
         
         // Velocity label
@@ -396,6 +397,7 @@ class DuctSizerVC: UIViewController {
         else {
             self.velocityLabel.text = "-- m/s"
         }
+        
         // Pressure drop label
         if let actualPd = resultPd {
             self.pdLabel.text = String(format: "%.2f Pa/m", actualPd)
@@ -405,6 +407,7 @@ class DuctSizerVC: UIViewController {
         }
         
         // Aspect label
+        self.calculateAspectRatio()
         self.aspectLabel.text = String(format: "%.2f", self.aspect)
         
         if (self.xDimension >= self.yDimension) {
@@ -413,7 +416,6 @@ class DuctSizerVC: UIViewController {
         else{
             self.aspectLabel.text = self.aspectLabel.text! + " (y/x)"
         }
-        
         
         
         // AUTOSIZE INPUTS
@@ -442,61 +444,15 @@ class DuctSizerVC: UIViewController {
         
         if let flowrate = self.flowrateToUse {
             
-            // Properties
-            let rho:Float = ductSizerProperties[0]
-            let visco:Float = ductSizerProperties[1]
-            let k:Float = ductSizerProperties[2]
-            
             // Dimensions
-            let q:Float = flowrate                  // m3/s
             let x:Float = self.xDimension / 1000    // m
             let y:Float = self.yDimension / 1000    // m
             let d:Float = self.diameter / 1000      // m
-            let dh:Float  = (2*x*y)/(x+y)           // m - Equivalent diameter
             
-            var aspect:Float = Float()
-            
-            if (x/y >= 1) {
-                aspect = x/y
-            }
-            else {
-                aspect = y/x
-            }
-            
-            // Velocities
-            let rectV:Float  = q / (x * y)             // m/s
-            let circV:Float  = (q * 4.0) / (d * d * pi)  // m/s
-            
-            
-            // Pd sub variables (formula is quite long)
-            
-            // Circ
-            let a:Float = 6.9 / ((rho * circV * d) / visco) + powf((k/1000) / (3.71 * d), 1.11)
-            
-            let b:Float = -1.8 * log10(a)
-            
-            let c:Float = (0.5 * rho * circV * circV) / d
-            
-            // Rect
-            
-            let l:Float = 6.9 / ((rho * rectV * dh) / visco) + powf((k/1000) / (3.71 * dh), 1.11)
-            
-            let m:Float = -1.8 * log10(l)
-            
-            let n:Float = (0.5 * rho * rectV * rectV) / dh
-            
-            
-            // Pressure drops
-            self.circPd = powf(1/b, 2) * c    // Pa/m
-            self.rectPd = powf(1/m, 2) * n    // Pa/m
-            
-            // Update the velocities
-            self.rectVelocity = rectV
-            self.circVelocity = circV
+            self.resultsRect = calculator.resultsForDuct(length: x, width: y, volumeFlowrate: flowrate, duct: .Rect, maxPd: nil, maxVelocity: nil, aspect: nil)
+            self.resultsCirc = calculator.resultsForDuct(diameter: d, volumeFlowrate: flowrate, duct: .Circ, maxPd: nil, maxVelocity: nil)
             
         }
-        
-        
         
     }
     
@@ -516,127 +472,37 @@ class DuctSizerVC: UIViewController {
         // Have already checked that both dimensions are not locked
         // Also, whenever circ duct is selected, both Dims are unlocked
         
-        
-        // Rectangular duct
+        // length or width may be specified (both not both), diameter can't be specified for autosize
+        var x:Float? = nil
+        var y:Float? = nil
         
         if (self.xLocked) {
-            
-            // Can't change x dim
-            
-            // Set minimum dimensions
-            var y:Float = self.minDim / 1000
-            let x:Float = self.xDimension / 1000
-            
-            let q:Float = self.flowrateToUse!
-            
-            var v:Float = q / (x*y)
-            
-            while v > velocity {
-                
-                y = y + self.increment / 1000
-                
-                v = q / (x * y)
-                
-            }
-            
-            self.yDimension = y * 1000
-            
-        }
-        else if (self.yLocked) {
-            
-            // Can't change y dim
-            
-            // Set minimum dimensions
-            let y:Float = self.yDimension / 1000
-            var x:Float = self.minDim / 1000
-            
-            let q:Float = self.flowrateToUse!
-            
-            var v:Float = q / (x*y)
-            
-            while v > velocity {
-                
-                x = x + self.increment / 1000
-                
-                v = q / (x * y)
-                
-            }
-            
-            self.xDimension = x * 1000
-            
-        }
-        else {
-            // No restrictions
-            
-            // Set minimum dimensions
-            var y:Float = self.minDim / 1000
-            var x:Float = Float()
-            if let actualAspect = aspect {
-                x = y * actualAspect
-            }
-            else {
-                x = self.minDim / 1000
-            }
-            
-            let q:Float = self.flowrateToUse!
-            
-            var v:Float = q / (x*y)
-            
-            while v > velocity {
-                
-                // if no aspect, increment duct sides in turn
-                if (aspect == nil) {
-                    
-                    // Increment y first
-                    y = y + self.increment / 1000
-                    
-                    // Check v
-                    v = q / (x * y)
-                    
-                    if (v > velocity) {
-                        // Increment x too
-                        x = x + self.increment / 1000
-                        v = q / (x * y)
-                    }
-                    
-                }
-                // if aspect provided, you're limited in how you expand
-                else {
-                    
-                    y = y + self.increment / 1000
-                    x = y * aspect!
-                    v = q / (x * y)
-                }
-                
-            }
-            
-            self.xDimension = x * 1000
-            self.yDimension = y * 1000
+            x = self.xDimension / 1000
+        } else if (self.yLocked) {
+            y = self.yDimension / 1000
         }
         
+        // Calculate the results
         
-        // Circular duct
-        
-        // Set minimum dimensions
-        var d:Float = self.minDim / 1000
-        
-        let q:Float = self.flowrateToUse!
-        
-        var v:Float = (q * 4) / (d * d * pi)
-        
-        while v > velocity {
+        if let flowrate = self.flowrateToUse {
             
-            d = d + self.increment / 1000
+            self.resultsRect = calculator.resultsForDuct(length: x, width: y, volumeFlowrate: flowrate, duct: .Rect, maxPd: nil, maxVelocity: velocity, aspect: aspect)
+            self.resultsCirc = calculator.resultsForDuct(diameter: nil, volumeFlowrate: flowrate, duct: .Circ, maxPd: nil, maxVelocity: velocity)
             
-            v = (q * 4) / (d * d * pi)
+            if let result = self.resultsRect {
+                self.xDimension = result.length * 1000
+                self.yDimension = result.width * 1000
+            }
+            
+            if let result = self.resultsCirc {
+                self.diameter = result.diameter * 1000
+            }
             
         }
-        
-        self.diameter = d * 1000
-        
         
         
         // Check what's displayed
+        // X either represents diameter or length
         if (self.ySlider.alpha != 0) {
             self.xSlider.value = (self.xDimension - self.minDim) / (self.maxDim - self.minDim)
         }
@@ -644,6 +510,7 @@ class DuctSizerVC: UIViewController {
             self.xSlider.value = (self.diameter - self.minDim) / (self.maxDim - self.minDim)
         }
         
+        // Y always represents width (and isn't shown when diameter is circular is selected)
         self.ySlider.value = (self.yDimension - self.minDim) / (self.maxDim - self.minDim)
         
         self.refresh()
@@ -970,7 +837,7 @@ class DuctSizerVC: UIViewController {
                 var aspect:Float? = nil
                 
                 if (self.autosizeAspect != nil) {
-                    // If an aspect has been antered, use it
+                    // If an aspect has been entered, use it
                     aspect = self.autosizeAspect!
                 }
                 
@@ -986,7 +853,6 @@ class DuctSizerVC: UIViewController {
                 else {
                     
                     // Velocity is nil, the user must have custom selected with no velocity value entered
-                    
                     
                     // Create the alert controller
                     message = "I can't autosize the duct if you don't give me a velocity..."
