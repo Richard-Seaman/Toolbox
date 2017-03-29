@@ -19,7 +19,8 @@ extension String {
 }
 
 // The global calculator used for all tools
-let calculator:Calculator = Calculator()
+// must be initialised in App Delegate so that it loads on launch
+var calculator:Calculator!
 
 
 // MARK: - Daylight Calculator
@@ -320,5 +321,6 @@ let steelColour:UIColor = UIColor(red: 153/255, green: 153/255, blue: 153/255, a
 let chwColour:UIColor = UIColor(red: 0/255, green: 51/255, blue: 204/255, alpha: 1)
 let lphwColour:UIColor = UIColor(red: 251/255, green: 38/255, blue: 50/255, alpha: 1)
 
+let primaryColour:UIColor = UIColor(red: 255/255, green: 93/255, blue: 83/255, alpha: 1)
 
 

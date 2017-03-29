@@ -24,6 +24,8 @@ class Calculator: NSObject {
     override init() {
         super.init()
         
+        print("Initialising Calculator")
+        
         // Create an array of the correct length to hold the saved properties
         Calculator.properties = [Float]()
         
@@ -43,6 +45,8 @@ class Calculator: NSObject {
         
         // Load the saved / default properties
         loadProperties()
+        
+        print("Calculator ready to go!")
         
     }
     
@@ -109,6 +113,18 @@ class Calculator: NSObject {
                 return properties[SavedProperties.k_Steel.index]
             case .Plastic:
                 return properties[SavedProperties.k_Plastic.index]
+            }
+        }
+        
+        var colour: UIColor {
+            // Used for the colour of the pipe view when selected in pipe sizer
+            switch self {
+            case .Copper:
+                return UIColor(red: 204/255, green: 102/255, blue: 0/255, alpha: 1)
+            case .Steel:
+                return UIColor(red: 153/255, green: 153/255, blue: 153/255, alpha: 1)
+            case .Plastic:
+                return UIColor.white
             }
         }
         
@@ -185,6 +201,45 @@ class Calculator: NSObject {
                 return "Rain Water Supply"
             case .Air:
                 return "Air"
+            }
+        }
+        
+        var abreviation: String {
+            switch self {
+            case .LPHW:
+                return "LPHW"
+            case .CHW:
+                return "CHW"
+            case .CWS:
+                return "CWS"
+            case .HWS:
+                return "HWS"
+            case .MWS:
+                return "MWS"
+            case .RWS:
+                return "RWS"
+            case .Air:
+                return "Air"
+            }
+        }
+        
+        var colour: UIColor {
+            // Colour of the fluid selection button when this fluid is selected
+            switch self {
+            case .LPHW:
+                return UIColor(red: 210/255, green: 0/255, blue: 0/255, alpha: 1)
+            case .CHW:
+                return UIColor(red: 0/255, green: 102/255, blue: 255/255, alpha: 1)
+            case .CWS:
+                return UIColor(red: 0/255, green: 51/255, blue: 255/255, alpha: 1)
+            case .HWS:
+                return UIColor(red: 255/255, green: 0/255, blue: 0/255, alpha: 1)
+            case .MWS:
+                return UIColor(red: 0/255, green: 246/255, blue: 0/255, alpha: 1)
+            case .RWS:
+                return UIColor(red: 0/255, green: 204/255, blue: 204/255, alpha: 1)
+            case .Air:
+                return UIColor.white
             }
         }
         
@@ -1753,11 +1808,11 @@ class Calculator: NSObject {
 
     // MARK: Fundamental Calcs
     
-    private func load(massFlowrate:Float, specificHeatCapacity:Float, temperatureDifference:Float) -> Float {
+    func load(massFlowrate:Float, specificHeatCapacity:Float, temperatureDifference:Float) -> Float {
         return massFlowrate * specificHeatCapacity * temperatureDifference  // kW
     }
     
-    private func massFlowrate(load:Float, specificHeatCapacity:Float, temperatureDifference:Float) -> Float {
+    func massFlowrate(load:Float, specificHeatCapacity:Float, temperatureDifference:Float) -> Float {
         return load / (specificHeatCapacity * temperatureDifference)    // kg/s
     }
     

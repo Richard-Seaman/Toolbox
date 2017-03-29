@@ -19,6 +19,7 @@
 		9B11A5F51B5BC24700695804 /* WaterPipeSizerSettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B11A5F41B5BC24700695804 /* WaterPipeSizerSettingsVC.swift */; };
 		9B1285761E587DA4002B9CB7 /* Calculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B1285751E587DA4002B9CB7 /* Calculator.swift */; };
 		9B1285771E587DA4002B9CB7 /* Calculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B1285751E587DA4002B9CB7 /* Calculator.swift */; };
+		9B1B64081E8692810053E957 /* PipeSizerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B1B64071E8692810053E957 /* PipeSizerVC.swift */; };
 		9B20DF7B1E81806400288283 /* CalculatorUnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B20DF7A1E81806400288283 /* CalculatorUnitTests.swift */; };
 		9B4AD64F1BB5DF1400AF9091 /* WaterPipeSizerVC2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4AD64E1BB5DF1400AF9091 /* WaterPipeSizerVC2.swift */; };
 		9B4AD6511BB5E31300AF9091 /* ButtonWithRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4AD6501BB5E31300AF9091 /* ButtonWithRow.swift */; };
@@ -63,6 +64,7 @@
 		9B11A5F21B5BB64000695804 /* PipeTypeButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PipeTypeButton.swift; sourceTree = "<group>"; };
 		9B11A5F41B5BC24700695804 /* WaterPipeSizerSettingsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaterPipeSizerSettingsVC.swift; sourceTree = "<group>"; };
 		9B1285751E587DA4002B9CB7 /* Calculator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Calculator.swift; sourceTree = "<group>"; };
+		9B1B64071E8692810053E957 /* PipeSizerVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PipeSizerVC.swift; sourceTree = "<group>"; };
 		9B20DF7A1E81806400288283 /* CalculatorUnitTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalculatorUnitTests.swift; sourceTree = "<group>"; };
 		9B4AD64E1BB5DF1400AF9091 /* WaterPipeSizerVC2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaterPipeSizerVC2.swift; sourceTree = "<group>"; };
 		9B4AD6501BB5E31300AF9091 /* ButtonWithRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ButtonWithRow.swift; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 				9B094BAC1B5996AD002AB4A6 /* Daylight */,
 				9B094BB11B59A10D002AB4A6 /* Water Pipe Sizer */,
 				9BD6C40B1B60386E006D2408 /* Duct Sizer */,
+				9B1B64061E86925D0053E957 /* Pipe Sizer */,
 				9BF7E3411B655FC600FF247E /* Heating Pipe Sizer */,
 				9B4AD6521BB5E31C00AF9091 /* Objects */,
 				9B094B8C1B599628002AB4A6 /* Main.storyboard */,
@@ -183,6 +186,14 @@
 				9B11A5F21B5BB64000695804 /* PipeTypeButton.swift */,
 			);
 			name = "Water Pipe Sizer";
+			sourceTree = "<group>";
+		};
+		9B1B64061E86925D0053E957 /* Pipe Sizer */ = {
+			isa = PBXGroup;
+			children = (
+				9B1B64071E8692810053E957 /* PipeSizerVC.swift */,
+			);
+			name = "Pipe Sizer";
 			sourceTree = "<group>";
 		};
 		9B4AD6521BB5E31C00AF9091 /* Objects */ = {
@@ -335,6 +346,7 @@
 				9BD1CD5B1B5EF98100EEFB40 /* DemandUnitTF.swift in Sources */,
 				9BF7E3451B656DC400FF247E /* LoadInfoTF.swift in Sources */,
 				9BCE1F191C6E7A0500F417FE /* InfoVC.swift in Sources */,
+				9B1B64081E8692810053E957 /* PipeSizerVC.swift in Sources */,
 				9B4AD64F1BB5DF1400AF9091 /* WaterPipeSizerVC2.swift in Sources */,
 				9B11A5F51B5BC24700695804 /* WaterPipeSizerSettingsVC.swift in Sources */,
 				9BE0EFFA1C149D2400E37680 /* HomeVC.swift in Sources */,

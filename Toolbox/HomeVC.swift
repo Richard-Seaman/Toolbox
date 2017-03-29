@@ -58,13 +58,21 @@ class HomeVC: UIViewController {
         
         generatedActionViews.append(ductSizer)
         
-        // Pipe sizer action view
+        // Pipe Sizer action view
         let pipeSizer:ActionView = ActionView()
         pipeSizer.label.text = "Pipe\nSizer"
         pipeSizer.button.setImage(UIImage(named: "PipeButton"), for: UIControlState())
-        pipeSizer.button.addTarget(self, action: #selector(HomeVC.pipeButtonTapped), for: UIControlEvents.touchUpInside)
+        pipeSizer.button.addTarget(self, action: #selector(HomeVC.pipeSizerButtonTapped), for: UIControlEvents.touchUpInside)
         
         generatedActionViews.append(pipeSizer)
+        
+        // Network sizer action view
+        let networkSizer:ActionView = ActionView()
+        networkSizer.label.text = "Network\nSizer"
+        networkSizer.button.setImage(UIImage(named: "PipeButton"), for: UIControlState())
+        networkSizer.button.addTarget(self, action: #selector(HomeVC.pipeButtonTapped), for: UIControlEvents.touchUpInside)
+        
+        generatedActionViews.append(networkSizer)
         
         // Water demand action view
         let waterDemand:ActionView = ActionView()
@@ -81,6 +89,7 @@ class HomeVC: UIViewController {
         daylightCalculator.button.addTarget(self, action: #selector(HomeVC.daylightButtonTapped), for: UIControlEvents.touchUpInside)
         
         generatedActionViews.append(daylightCalculator)
+        
         
         /*
         // Dummy action views for testing layout
@@ -318,19 +327,23 @@ class HomeVC: UIViewController {
     
     func ductButtonTapped() {
         print("ductButtonTapped")
-        performSegue(withIdentifier: "toDuct", sender: self)
+        performSegue(withIdentifier: "toDuctSizer", sender: self)
     }
     func pipeButtonTapped() {
         print("pipeButtonTapped")
-        performSegue(withIdentifier: "toPipe", sender: self)
+        performSegue(withIdentifier: "toHeatNetworkSizer", sender: self)
     }
     func waterButtonTapped() {
         print("waterButtonTapped")
-        performSegue(withIdentifier: "toWater", sender: self)
+        performSegue(withIdentifier: "toSimDemand", sender: self)
     }
     func daylightButtonTapped() {
         print("daylightButtonTapped")
         performSegue(withIdentifier: "toDaylight", sender: self)
+    }
+    func pipeSizerButtonTapped() {
+        print("pipeSizerButtonTapped")
+        performSegue(withIdentifier: "toPipeSizer", sender: self)
     }
 
     /*

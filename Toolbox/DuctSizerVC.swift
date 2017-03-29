@@ -441,6 +441,7 @@ class DuctSizerVC: UIViewController {
     // MARK: - Calculations
     
     func calculate() {
+        print("calculate")
         
         if let flowrate = self.flowrateToUse {
             
@@ -457,6 +458,7 @@ class DuctSizerVC: UIViewController {
     }
     
     func calculateAspectRatio() {
+        print("calculateAspectRatio")
         
         if (self.xDimension >= self.yDimension) {
             self.aspect = self.xDimension/self.yDimension
@@ -468,6 +470,7 @@ class DuctSizerVC: UIViewController {
     }
     
     func autosize(_ velocity:Float, aspect:Float?) {
+        print("autosize")
         
         // Have already checked that both dimensions are not locked
         // Also, whenever circ duct is selected, both Dims are unlocked
@@ -585,6 +588,7 @@ class DuctSizerVC: UIViewController {
     }
     
     func updateFlowrate(_ sender:UITextField) {
+        print("updateFlowrate")
         
         let shade:CGFloat = 0.5
         
@@ -627,6 +631,7 @@ class DuctSizerVC: UIViewController {
     // MARK: - Slider & Selector Functions
     
     func sliderDidChange(_ sender:UISlider) {
+        print("sliderDidChange")
         
         // Get value
         var newDim:Float = (self.maxDim - self.minDim) * sender.value + self.minDim
@@ -682,7 +687,6 @@ class DuctSizerVC: UIViewController {
     }
     
     func velocitySelectorDidChange(_ sender:UISegmentedControl) {
-        
         print("velocitySelectorDidChange")
         
         switch sender.selectedSegmentIndex {
@@ -907,6 +911,7 @@ class DuctSizerVC: UIViewController {
     }
     
     func lockTapped(_ sender:UIButton) {
+        print("lockTapped")
         
         if (sender == self.xLockButton) {
             self.xLocked = !self.xLocked
@@ -925,6 +930,7 @@ class DuctSizerVC: UIViewController {
     }
     
     func setAspectRatioAlpha() {
+        print("setAspectRatioAlpha")
         
         // Can't size to an aspect ratio if one side is locked or if circular duct selected
         if (self.yLocked || self.xLocked || self.ySlider.alpha != 1) {
@@ -989,6 +995,7 @@ class DuctSizerVC: UIViewController {
     
     func applyButtonAction()
     {
+        print("applyButtonAction")
         self.backgroundTapped(self)
     }
 

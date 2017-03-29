@@ -21,6 +21,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // resetLoadingUnitDefaults()
         // resetDuctSizerPropertiesDefaults()
         
+        // Initialise the calculator
+        calculator = Calculator()
         
         // Set up the navigation controller visuals
         UINavigationBar.appearance().barStyle = UIBarStyle.blackTranslucent
