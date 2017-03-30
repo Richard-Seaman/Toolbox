@@ -22,6 +22,8 @@ extension String {
 // must be initialised in App Delegate so that it loads on launch
 var calculator:Calculator!
 
+let APP_ID = 1118758962
+
 
 // MARK: - Daylight Calculator
 
@@ -305,7 +307,7 @@ func returnHeader(_ sender:UIView, colourOption option:Int = 0) -> UITableViewHe
     }
     else {
         // Default Colour
-        header.contentView.backgroundColor = bdpColour
+        header.contentView.backgroundColor = primaryColour
     }
     
     return header

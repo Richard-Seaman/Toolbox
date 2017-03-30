@@ -1,359 +1,367 @@
 //
 //  HomeVC.swift
-//  Toolbox
+//  Leaving Cert
 //
-//  Created by Richard Seaman on 06/12/2015.
-//  Copyright © 2015 RichApps. All rights reserved.
+//  Created by Richard Seaman on 11/04/2016.
+//  Copyright © 2016 RichApps. All rights reserved.
 //
 
 import UIKit
 
-class HomeVC: UIViewController {
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
 
-    @IBOutlet weak var scrollView: UIScrollView!
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l > r
+  default:
+    return rhs < lhs
+  }
+}
+
+
+class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate  {
+
+    @IBOutlet weak var tableView: UITableView!
     
-    var contentView:UIView = UIView()
+    // Order of appearance
+    // Tools section
+    let ductSizerIndex:Int = 0
+    let pipeSizerIndex:Int = 1
+    let networkSizerIndex:Int = 2
+    let simDemandIndex:Int = 3
+    let daylightIndex:Int = 4
+    let settingsIndex:Int = 5
+    // Other section
+    let rateUsIndex:Int = 1
+    let aboutIndex:Int = 0
+    let termsIndex:Int = 2
     
-    var actionViews:[ActionView] = [ActionView]()
+    let numberOfRows = [6,3]
     
-    // Change the spacing between the buttons here
-    let spacer:CGFloat = 20
+    // Table Variables
+    var tableViewController = UITableViewController()
+    let simpleCellIdentifier:String = "HomeCell"
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.        
+        
+        // Apply tableview to Table View Controller (needed to get rid of blank space)
+        tableViewController.tableView = tableView
+        
+        // Apply the row height
+        self.tableView.rowHeight = UITableViewAutomaticDimension;
+        self.tableView.estimatedRowHeight = 44
+        
+        // Get rid of the back button text (get rid of "Back")
+        self.navigationController?.navigationBar.topItem?.title = ""
         
         // Set up nav bar
         self.navigationItem.titleView = getNavImageView(UIApplication.shared.statusBarOrientation)
         
-        // Get the action views
-        self.actionViews = self.getActionViews()
-        
-        // Layout the action views
-        self.layoutViews()
-        
-        // For testing purposes
-        // self.scrollView.backgroundColor = UIColor.redColor()
-        // self.contentView.backgroundColor = UIColor.greenColor()
-        
-        // Prevent blank space appearing at top of scrollview
-        self.automaticallyAdjustsScrollViewInsets = false
     }
-
+    
+    override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
+        // Make sure the nav bar image fits within the new orientation
+        self.navigationItem.titleView = getNavImageView(toInterfaceOrientation)
+        setNeedsStatusBarAppearanceUpdate()
+    }
+    
+    override var prefersStatusBarHidden : Bool {
+        
+        switch UIDevice.current.userInterfaceIdiom {
+            
+        case .phone:
+            // It's an iPhone
+            let orientation:Int = UIDevice.current.orientation.rawValue
+            if (orientation == Int(UIInterfaceOrientation.landscapeLeft.rawValue) || orientation == Int(UIInterfaceOrientation.landscapeRight.rawValue)) {
+                return true
+            }
+            else {
+                return navigationController?.isNavigationBarHidden == true
+            }
+            
+        case .pad:
+            // It's an iPad
+            return navigationController?.isNavigationBarHidden == true
+            
+        default:
+            // Uh, oh! What could it be?
+            print("Unknown device")
+            return navigationController?.isNavigationBarHidden == true
+            
+        }
+        
+    }
+    
+    override var preferredStatusBarUpdateAnimation : UIStatusBarAnimation {
+        return UIStatusBarAnimation.fade
+    }
+    
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-    func getActionViews() -> [ActionView] {
+    override func viewWillAppear(_ animated: Bool) {
         
-        var generatedActionViews:[ActionView] = [ActionView]()
-        
-        // Duct sizer action view
-        let ductSizer:ActionView = ActionView()
-        ductSizer.label.text = "Duct\nSizer"
-        ductSizer.button.setImage(UIImage(named: "DuctButton"), for: UIControlState())
-        ductSizer.button.addTarget(self, action: #selector(HomeVC.ductButtonTapped), for: UIControlEvents.touchUpInside)
-        
-        generatedActionViews.append(ductSizer)
-        
-        // Pipe Sizer action view
-        let pipeSizer:ActionView = ActionView()
-        pipeSizer.label.text = "Pipe\nSizer"
-        pipeSizer.button.setImage(UIImage(named: "PipeButton"), for: UIControlState())
-        pipeSizer.button.addTarget(self, action: #selector(HomeVC.pipeSizerButtonTapped), for: UIControlEvents.touchUpInside)
-        
-        generatedActionViews.append(pipeSizer)
-        
-        // Network sizer action view
-        let networkSizer:ActionView = ActionView()
-        networkSizer.label.text = "Network\nSizer"
-        networkSizer.button.setImage(UIImage(named: "PipeButton"), for: UIControlState())
-        networkSizer.button.addTarget(self, action: #selector(HomeVC.pipeButtonTapped), for: UIControlEvents.touchUpInside)
-        
-        generatedActionViews.append(networkSizer)
-        
-        // Water demand action view
-        let waterDemand:ActionView = ActionView()
-        waterDemand.label.text = "Water\nDemand"
-        waterDemand.button.setImage(UIImage(named: "TapButton"), for: UIControlState())
-        waterDemand.button.addTarget(self, action: #selector(HomeVC.waterButtonTapped), for: UIControlEvents.touchUpInside)
-        
-        generatedActionViews.append(waterDemand)
-        
-        // Daylight action view
-        let daylightCalculator:ActionView = ActionView()
-        daylightCalculator.label.text = "Daylight\nCalculator"
-        daylightCalculator.button.setImage(UIImage(named: "DaylightButton"), for: UIControlState())
-        daylightCalculator.button.addTarget(self, action: #selector(HomeVC.daylightButtonTapped), for: UIControlEvents.touchUpInside)
-        
-        generatedActionViews.append(daylightCalculator)
-        
-        
-        /*
-        // Dummy action views for testing layout
-        let viewsToAdd:Int = 9
-        for index in 1...viewsToAdd {
-            let dummyActionView:ActionView = ActionView()
-            dummyActionView.label.text = "Dummy Action \(index)"
-            dummyActionView.button.addTarget(self, action: "testButtonTap", forControlEvents: UIControlEvents.TouchUpInside)
-            generatedActionViews.append(dummyActionView)
+        // Make sure the nav bar image fits within the new orientation
+        if (UIDevice.current.orientation.isLandscape) {
+            
+            // See constants file for size of image in landscape = 400/16
+            if (self.navigationItem.titleView?.frame.height > 400/16) {
+                self.navigationItem.titleView = getNavImageView(UIApplication.shared.statusBarOrientation)
+            }
+            
         }
-        */
         
-        // Return the array of action views
-        return generatedActionViews
+        // Reload Table incase colour changed
+        self.tableView.reloadData()
         
     }
     
-    func layoutViews() {
+    
+    
+    // MARK: - Tableview methods
         
+    
+    // Assign the rows per section
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return self.numberOfRows[section]
+    }
+    
+    // Determine Number of sections
+    func numberOfSections(in tableView: UITableView) -> Int{
+        return 2
+    }
+    
+    // Set properties of section header
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         
-        // Figure out how many columns we have
+        returnHeader(view, colourOption: 0)
         
-        // Get the widths of the screen and an action view
-        let screenWidth:CGFloat = self.view.frame.width
-        let actionViewWidth:CGFloat = self.actionViews[0].width
+    }
+    
+    // Assign Section Header Text
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String?{
         
-        // Measure the width when an action view is added and repeat until it doesn't fit on the screen
-        // Initial position is the width of the first spacer (for the margin)
-        var currentWidth:CGFloat = spacer
-        
-        var maxNumberOfColumns:Int = 0
-        repeat {
-            
-            // Increment the width by another actionview and spacer
-            currentWidth = currentWidth + spacer + actionViewWidth
-            
-            if (currentWidth <= screenWidth) {
-                // Increment the number of columns
-                maxNumberOfColumns = maxNumberOfColumns + 1
-            }
-            
-        } while currentWidth < screenWidth
-        
-        print("Max number of ActionView Columns = \(maxNumberOfColumns)")
-        
-        
-        var actualNumberOfColumns:Int = Int()
-        if (maxNumberOfColumns <= self.actionViews.count) {
-            actualNumberOfColumns = maxNumberOfColumns
-        }
-        else {
-            actualNumberOfColumns = self.actionViews.count
+        switch section{
+        case 1:
+            return "Other"
+        default:
+            return "Tools"
         }
         
-        print("Actual number of ActionView Columns = \(actualNumberOfColumns)")
+    }
+    
+    
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        // Determine the number of rows
-        // This is needed to determine the size of the content view which must be added before we layout the action views (which is why we can't do below)
-        var columnCount = 0
-        var rowCount = 0
+        var cell = tableView.dequeueReusableCell(withIdentifier: self.simpleCellIdentifier) as UITableViewCell?
         
-        // Loop through each of the action views
-        for index in 0...self.actionViews.count - 1 {
-            
-            // Increment the column counter
-            columnCount += 1
-            
-            // Increment the row count if it's the first view
-            if (index == 0) {
-                rowCount += 1
-            }
-            
-            // If the column reaches the max number of columns, reset it and increment the row counter
-            if columnCount > maxNumberOfColumns {
-                columnCount = 1
-                rowCount += 1
-            }
-            
+        if (cell == nil) {
+            cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: self.simpleCellIdentifier)
         }
         
-        print("Actual number of ActionView Rows = \(rowCount)")
-        
-        // Add the content view to the scroll view
-        self.contentView.translatesAutoresizingMaskIntoConstraints = false
-        self.scrollView.addSubview(self.contentView)
-        
-        // Add height constraint to the content view so that the scrollview knows how much to allow to scroll
-        let contentViewHeight:CGFloat = CGFloat(rowCount) * (self.actionViews[0].height + spacer) + spacer
-        let contentViewHeightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: self.contentView, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: contentViewHeight)
-        
-        // Add width constraint so that we can center it
-        let contentViewWidth:CGFloat = CGFloat(actualNumberOfColumns) * (self.actionViews[0].width + spacer) + spacer
-        let contentViewWidthConstraint:NSLayoutConstraint = NSLayoutConstraint(item: self.contentView, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: contentViewWidth)
-        
-        print("Content w x h : \(contentViewWidth) x \(contentViewHeight)")
-        
-        // Add the constraints
-        self.contentView.addConstraints([contentViewHeightConstraint, contentViewWidthConstraint])
-        
-        // Position the content view in the scrollview
-        let contentViewTopConstraint:NSLayoutConstraint = NSLayoutConstraint(item: self.contentView, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: self.scrollView, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0)
-        
-        let contentViewBottomConstraint:NSLayoutConstraint = NSLayoutConstraint(item: self.contentView, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: self.scrollView, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: 0)
-        
-        let contentViewHorizontalConstraint:NSLayoutConstraint = NSLayoutConstraint(item: self.contentView, attribute: NSLayoutAttribute.centerX, relatedBy: NSLayoutRelation.equal, toItem: self.scrollView, attribute: NSLayoutAttribute.centerX, multiplier: 1, constant: 0)
-        
-        // Add the contentView position constraints to the scrollview
-        self.scrollView.addConstraints([contentViewTopConstraint, contentViewBottomConstraint, contentViewHorizontalConstraint])
+        let titleLabel:UILabel = cell!.viewWithTag(1) as! UILabel
+        let detailLabel:UILabel = cell!.viewWithTag(2) as! UILabel
+        let imageView:UIImageView = cell!.viewWithTag(3) as! UIImageView
         
         
         
-        var columnCounter:Int = 0
-        var rowCounter:Int = 0
+        // Define the two height and width constraints of the image view
+        let largeImageSize:CGFloat = 60
+        let standardImageSize:CGFloat = 60
         
-        // Loop through each of the action views
-        for index in 0...self.actionViews.count - 1 {
+        let otherHeightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: imageView, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: standardImageSize)
+        let otherWidthConstraint:NSLayoutConstraint = NSLayoutConstraint(item: imageView, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: standardImageSize)
+        
+        let toolHeightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: imageView, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: largeImageSize)
+        let toolWidthConstraint:NSLayoutConstraint = NSLayoutConstraint(item: imageView, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: largeImageSize)
+        
+        // remove hangover constraints
+        imageView.removeConstraints(imageView.constraints)
+        
+        cell!.accessoryType = UITableViewCellAccessoryType.disclosureIndicator
+        
+        switch indexPath.section {
             
-            // Place the card in the view and turn off translateautoresizingmask
-            let thisActionView:ActionView = self.actionViews[index]
-            thisActionView.translatesAutoresizingMaskIntoConstraints = false
-            self.contentView.addSubview(thisActionView)
+        case 1:
             
-            // Set the height and width constraints
-            let heightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: thisActionView, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: thisActionView.height)
+            // Other Section
             
-            let widthConstraint:NSLayoutConstraint = NSLayoutConstraint(item: thisActionView, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: thisActionView.width)
+            imageView.addConstraints([otherHeightConstraint, otherWidthConstraint])
             
-            thisActionView.addConstraints([heightConstraint, widthConstraint])
-            
-            // Set autolayout constraints within ActionView
-            self.applySizeConstraintsToActionView(thisActionView)
-            self.applyPositioningConstraintsToActionView(thisActionView)
-            
-            // Set the horizontal position
-            if columnCounter > 0 {
-                // View is not in the first column
-                let actionViewOnTheLeft:ActionView = self.actionViews[index - 1]
+            switch indexPath.row {
                 
-                let leftMarginConstraint:NSLayoutConstraint = NSLayoutConstraint(item: thisActionView, attribute: NSLayoutAttribute.left, relatedBy: NSLayoutRelation.equal, toItem: actionViewOnTheLeft, attribute: NSLayoutAttribute.right, multiplier: 1, constant: spacer)
+            case self.rateUsIndex:
+                // Rate
+                titleLabel.text = "Rate Us"
+                detailLabel.text = "If you find The Building Services Toolbox useful, I'd really appreciate if you Rate it on the App Store!\nBut If you don't, I'd prefer if you didn't..."
+                imageView.image = UIImage(named: "RateStar")!
+            case self.aboutIndex:
+                // About
+                titleLabel.text = "About"
+                detailLabel.text = "Find out more about The Building Services Toolbox."
+                imageView.image = UIImage(named: "info")!
+            case self.termsIndex:
+                // Terms & Conditions
+                titleLabel.text = "Terms & Conditions"
+                detailLabel.text = "Review the terms and conditions of use."
+                imageView.image = UIImage(named: "CheckBox")!
                 
-                // Add constraint
-                self.contentView.addConstraint(leftMarginConstraint)
-            }
-            else {
-                // Card is in the first column
-                let leftMarginConstraint:NSLayoutConstraint = NSLayoutConstraint(item: thisActionView, attribute: NSLayoutAttribute.left, relatedBy: NSLayoutRelation.equal, toItem: self.contentView, attribute: NSLayoutAttribute.left, multiplier: 1, constant: spacer)
+            default:
+                titleLabel.text = ""
+                detailLabel.text = nil
+                imageView.image = nil
                 
-                // Add the constraint
-                self.contentView.addConstraint(leftMarginConstraint)
             }
             
-            // Set the vertical position
-            if rowCounter > 0 {
-                // Card is not in the first row
-                let actionViewOnTop:ActionView = self.actionViews[index - maxNumberOfColumns]
-                
-                let topMarginConstraint:NSLayoutConstraint = NSLayoutConstraint(item: thisActionView, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: actionViewOnTop, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: spacer)
-                
-                // Add constraint
-                self.contentView.addConstraint(topMarginConstraint)
-            }
-            else {
-                // Card is in the first row
-                let topMarginConstraint:NSLayoutConstraint = NSLayoutConstraint(item: thisActionView, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: self.contentView, attribute: NSLayoutAttribute.top, multiplier: 1, constant: spacer)
-                
-                // Add constraint
-                self.contentView.addConstraint(topMarginConstraint)
-            }
+        default:
             
-            // Increment the column counter
-            columnCounter += 1
+            // Tools Section
             
-            // If the column reaches the max number of columns, reset it and increment the row counter
-            if columnCounter >= maxNumberOfColumns {
-                columnCounter = 0
-                rowCounter += 1
+            imageView.addConstraints([toolHeightConstraint, toolWidthConstraint])
+            
+            switch indexPath.row {
+                
+            case self.ductSizerIndex:
+                // Duct Sizer
+                titleLabel.text = "Duct Sizer"
+                detailLabel.text = "Size circular or rectangular ductwork for a given flowrate or ACH."
+                imageView.image = UIImage(named: "DuctSizer")!
+            case self.pipeSizerIndex:
+                // Pipe Sizer
+                titleLabel.text = "Pipe Sizer"
+                detailLabel.text = "Size pipework for a given flowrate or load."
+                imageView.image = UIImage(named: "PipeSizer")!
+            case self.networkSizerIndex:
+                // Network Sizer
+                titleLabel.text = "Network Pipe Sizer"
+                detailLabel.text = "Size the pipework for a given heating/cooling network."
+                imageView.image = UIImage(named: "PipeSizer")!
+            case self.simDemandIndex:
+                // Simultaneous Demand
+                titleLabel.text = "Simultaneous Demand"
+                detailLabel.text = "Calculate the simultaneous demand for a given collection of outlets and size the water services pipework required."
+                imageView.image = UIImage(named: "tap")!
+            case self.daylightIndex:
+                // Daylight Calculator
+                titleLabel.text = "Daylight Calculator"
+                detailLabel.text = "Calculate the average daylight factor for a standard room with given dimensions."
+                imageView.image = UIImage(named: "Daylight")!
+            case self.settingsIndex:
+                // Settings
+                titleLabel.text = "Variables"
+                detailLabel.text = "Adjust the global variables that are used in the tools above."
+                imageView.image = UIImage(named: "SettingsColor")!
+                
+            default:
+                titleLabel.text = ""
+                detailLabel.text = nil
+                imageView.image = nil
+                
             }
             
         }
         
         
+        
+        
+        return cell!
     }
     
-    func applySizeConstraintsToActionView(_ actionView:ActionView) {
-        
-        // Set translates autoresizingmask to false
-        actionView.button.translatesAutoresizingMaskIntoConstraints = false
-        actionView.label.translatesAutoresizingMaskIntoConstraints = false
-        
-        // set constraints for the button
-        let buttonHeightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.button, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: actionView.width)
-        
-        let buttonWidthConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.button, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: actionView.width)
-        
-        actionView.button.addConstraints([buttonHeightConstraint, buttonWidthConstraint])
-        
-        
-        // set constraints for the button
-        let labelHeightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.label, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: actionView.labelHeight)
-        
-        let labelWidthConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.label, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: actionView.width)
-        
-        actionView.label.addConstraints([labelHeightConstraint, labelWidthConstraint])
-        
-    }
     
-    func applyPositioningConstraintsToActionView(_ actionView:ActionView) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        // Set the position of the button to the parent view
-        let buttonTopConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.button, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: actionView, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0)
+        // Animate de-selection regardless of cell...
+        tableView.deselectRow(at: indexPath, animated: true)
         
-        let buttonLeftConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.button, attribute: NSLayoutAttribute.left, relatedBy: NSLayoutRelation.equal, toItem: actionView, attribute: NSLayoutAttribute.left, multiplier: 1, constant: 0)
+        switch indexPath.section {
+            
+        case 1:
+            
+            // other section
+            switch indexPath.row {
+            case self.rateUsIndex:
+                
+                // Google Analytics
+                /*
+                 if let tracker = GAI.sharedInstance().defaultTracker {
+                 tracker.send(GAIDictionaryBuilder.createEvent(withCategory: "Ratings", action: "Rated", label: "From Homepage", value: nil).build()  as [NSObject : AnyObject])
+                 }*/
+                
+                // Rate
+                // Go to app store to rate
+                print("Attempting to open:")
+                print("itms-apps://itunes.apple.com/app/id\(APP_ID)")
+                
+                UIApplication.shared.openURL(URL(string : "itms-apps://itunes.apple.com/app/id\(APP_ID)")!)
+            case self.aboutIndex:
+                // About
+                self.performSegue(withIdentifier: "toInfo", sender: self)
+            case self.termsIndex:
+                // Terms & Conditions
+                print("Not implemented yet")
+            //self.performSegue(withIdentifier: "toTerms", sender: self)
+                
+            default:
+                print("No action for this cell")
+                
+            }
+
+            
+        default:
+            
+            // Tools section
+            switch indexPath.row {
+            case self.ductSizerIndex:
+                // Duct Sizer
+                self.performSegue(withIdentifier: "toDuctSizer", sender: self)
+            case self.pipeSizerIndex:
+                // Pipe Sizer
+                self.performSegue(withIdentifier: "toPipeSizer", sender: self)
+            case self.networkSizerIndex:
+                // Network Sizer
+                self.performSegue(withIdentifier: "toHeatNetworkSizer", sender: self)
+            case self.simDemandIndex:
+                // Simultaneous Demand ISzer
+                self.performSegue(withIdentifier: "toSimDemand", sender: self)
+            case self.daylightIndex:
+                // Daylioght Calculator
+                self.performSegue(withIdentifier: "toDaylight", sender: self)
+            case self.settingsIndex:
+                // Settings
+                print("Not implemented yet")
+                //self.performSegue(withIdentifier: "toSettings", sender: self)
+                
+            default:
+                print("No action for this cell")
+                
+            }
+
+            
+        }
         
-        let buttonRightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.button, attribute: NSLayoutAttribute.right, relatedBy: NSLayoutRelation.equal, toItem: actionView, attribute: NSLayoutAttribute.right, multiplier: 1, constant: 0)
         
-        // Set the relative position of the objects
-        let buttonBottomConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.button, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: actionView.label, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0)
-        
-        // Set the position of the label to the parent view
-        let labelLeftConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.label, attribute: NSLayoutAttribute.left, relatedBy: NSLayoutRelation.equal, toItem: actionView, attribute: NSLayoutAttribute.left, multiplier: 1, constant: 0)
-        
-        let labelRightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.label, attribute: NSLayoutAttribute.right, relatedBy: NSLayoutRelation.equal, toItem: actionView, attribute: NSLayoutAttribute.right, multiplier: 1, constant: 0)
-        
-        let labelBottomConstraint:NSLayoutConstraint = NSLayoutConstraint(item: actionView.label, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: actionView, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: 0)
-        
-        // Add the constraints to the parent view
-        actionView.addConstraints([buttonTopConstraint, buttonLeftConstraint, buttonRightConstraint, buttonBottomConstraint, labelLeftConstraint, labelRightConstraint, labelBottomConstraint])
-    }
-    
-    // MARK: - Button functions
-    
-    func testButtonTap() {
-        print("Button Tapped")
-    }
-    
-    func ductButtonTapped() {
-        print("ductButtonTapped")
-        performSegue(withIdentifier: "toDuctSizer", sender: self)
-    }
-    func pipeButtonTapped() {
-        print("pipeButtonTapped")
-        performSegue(withIdentifier: "toHeatNetworkSizer", sender: self)
-    }
-    func waterButtonTapped() {
-        print("waterButtonTapped")
-        performSegue(withIdentifier: "toSimDemand", sender: self)
-    }
-    func daylightButtonTapped() {
-        print("daylightButtonTapped")
-        performSegue(withIdentifier: "toDaylight", sender: self)
-    }
-    func pipeSizerButtonTapped() {
-        print("pipeSizerButtonTapped")
-        performSegue(withIdentifier: "toPipeSizer", sender: self)
     }
 
-    /*
-    // MARK: - Navigation
+    
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
