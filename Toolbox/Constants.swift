@@ -88,6 +88,9 @@ var loadingUnits:[[Float]] = [[Float](),[Float](),[Float](),[Float](),[Float](),
 // Reset the defaults to the built in defaults
 func resetLoadingUnitDefaults() {
     
+    // Order of loading units within array as follows:
+    // [CWS, HWS, MWS, RWS]
+    
     loadingUnits = [[Float]]()
     loadingUnits.append([2,0,0,0])     // WC - Cold
     loadingUnits.append([0,0,0,2])     // WC - Rain
@@ -303,7 +306,7 @@ func returnHeader(_ sender:UIView, colourOption option:Int = 0) -> UITableViewHe
     }
     else if (option == 4) {
         // Gray Colour
-        header.contentView.backgroundColor = bdpColour
+        header.contentView.backgroundColor = primaryColour
     }
     else {
         // Default Colour

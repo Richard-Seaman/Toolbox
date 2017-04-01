@@ -16,15 +16,19 @@ class Calculator: NSObject {
     
     // File path for plist to save all of the properties to
     let propertiesFileName = "savedProperties.plist"
+    let demandUnitsFileName = "demandUnits.plist"
     
     // This is initialised as the saved properties or the default values
     static private var properties:[Float] = [Float]()
+    static private var demandUnits:[[Float]] = [[Float]]()
     
     
     override init() {
         super.init()
         
         print("Initialising Calculator")
+        
+        // SAVED PROPERTIES
         
         // Create an array of the correct length to hold the saved properties
         Calculator.properties = [Float]()
@@ -45,6 +49,28 @@ class Calculator: NSObject {
         
         // Load the saved / default properties
         loadProperties()
+        
+        // SAVED DEMAND UNITS
+        
+        // Create an array of the correct length to hold the saved demand units
+        Calculator.demandUnits = [[Float]]()
+        
+        // Find out what the largest index is
+        maxIndex = 0
+        for outlet:Outlets in Outlets.all {
+            if outlet.savedIndex > maxIndex {
+                maxIndex = outlet.savedIndex
+            }
+        }
+        
+        // Create an array that's big enough
+        for _:Int in 0 ..< maxIndex + 1 {
+            // Add an empty [Float] - just filling up the array with empty values so indexes won't cause a crash
+            Calculator.demandUnits.append([Float]())
+        }
+        
+        // Load the saved / default properties
+        loadDemandUnits()
         
         print("Calculator ready to go!")
         
@@ -235,7 +261,7 @@ class Calculator: NSObject {
             case .HWS:
                 return UIColor(red: 255/255, green: 0/255, blue: 0/255, alpha: 1)
             case .MWS:
-                return UIColor(red: 0/255, green: 246/255, blue: 0/255, alpha: 1)
+                return UIColor(red: 0/255, green: 200/255, blue: 0/255, alpha: 1)
             case .RWS:
                 return UIColor(red: 0/255, green: 204/255, blue: 204/255, alpha: 1)
             case .Air:
@@ -397,6 +423,165 @@ class Calculator: NSObject {
         }
         
     }
+    
+    // MARK: Outlets
+    
+    enum Outlets {
+        
+        // A case for each combination of outlet and pipe arrangement
+        // Eg. a WC may be served by either cold or rain water
+        // Eg. A WHB may only be served by both hot and cold water
+        
+        // WC Options
+        case WC_C       // Cold only
+        case WC_R       // Rain only
+        // Urinal Options
+        case Urinal_C   // Cold only
+        case Urinal_R   // Rain only
+        // Wash Hand Basins Options
+        case WHB_CH     // Cold & Hot
+        // Sink Options
+        case Sink_C     // Cold Only
+        case Sink_CH    // Cold & Hot
+        case Sink_CHM   // Cold & Hot & Mains
+        // Shower Options
+        case Shower_CH  // Cold & Hot
+        // Bath Options
+        case Bath_CH    // Cold & Hot
+        // Tap Options
+        case Tap_C      // Cold only
+        case Tap_H      // Hot only
+        case Tap_M      // Mains only
+        case Tap_R      // Rain only
+        
+        // NB: If an outlet is added/removed this array must be updated!
+        static let all:[Outlets] = [.WC_C, .WC_R,
+                             .Urinal_C, Urinal_R,
+                             .WHB_CH,
+                             .Sink_C, .Sink_CH, .Sink_CHM,
+                             .Shower_CH,
+                             .Bath_CH,
+                             .Tap_C, .Tap_H, .Tap_M, .Tap_R]
+        
+        // The fluids in each pipe
+        // The index of which aligns with the demand unit indexes
+        static let fluids:[Calculator.Fluid] = [.CWS, .HWS, .MWS, .RWS]
+        
+        
+        var description: String {
+            switch self {
+            case .WC_C:
+                return "WC - CWS"
+            case .WC_R:
+                return "WC - RWS"
+            case .Urinal_C:
+                return "Urinal - CWS"
+            case .Urinal_R:
+                return "Urinal - RWS"
+            case .WHB_CH:
+                return "WHB - CWS & HWS"
+            case .Sink_C:
+                return "Sink - CWS"
+            case .Sink_CH:
+                return "Sink - CWS & HWS"
+            case .Sink_CHM:
+                return "Sink - CWS & HWS & MWS"
+            case .Shower_CH:
+                return "Shower - CWS & HWS"
+            case .Bath_CH:
+                return "Bath - CWS & HWS"
+            case .Tap_C:
+                return "Tap - CWS"
+            case .Tap_H:
+                return "Tap - HWS"
+            case .Tap_M:
+                return "Tap - MWS"
+            case .Tap_R:
+                return "Tap - RWS"
+            }
+        }
+        
+        var demandUnits:[Float] {
+            if (self.savedIndex < Calculator.demandUnits.count) {
+                return Calculator.demandUnits[self.savedIndex]
+            } else {
+                return self.defaultDemandUnits
+            }
+        }
+        
+        var defaultDemandUnits:[Float] {
+            switch self {
+            case .WC_C:
+                return [2,0,0,0]
+            case .WC_R:
+                return [0,0,0,2]
+            case .Urinal_C:
+                return [1,0,0,0]
+            case .Urinal_R:
+                return [0,0,0,1]
+            case .WHB_CH:
+                return [2,2,0,0]
+            case .Sink_C:
+                return [5,0,0,0]
+            case .Sink_CH:
+                return [5,5,0,0]
+            case .Sink_CHM:
+                return [5,5,5,0]
+            case .Shower_CH:
+                return [6,6,0,0]
+            case .Bath_CH:
+                return [10,10,0,0]
+            case .Tap_C:
+                return [5,0,0,0]
+            case .Tap_H:
+                return [0,5,0,0]
+            case .Tap_M:
+                return [0,0,5,0]
+            case .Tap_R:
+                return [0,0,0,5]
+            }
+        }
+        
+        // Must explicitly state the index of each case instead of using the index within the "all" array above
+        // This is required in case a new outlet is added in the middle of the all array
+        // If we used the all array indexes to save/load the values, the indexes would no longer be aligned
+        
+        // NB: when adding new outlets, make sure the index is larger than the previous largest one
+        var savedIndex:Int {
+            switch self {
+            case .WC_C:
+                return 0
+            case .WC_R:
+                return 1
+            case .Urinal_C:
+                return 2
+            case .Urinal_R:
+                return 3
+            case .WHB_CH:
+                return 4
+            case .Sink_C:
+                return 5
+            case .Sink_CH:
+                return 6
+            case .Sink_CHM:
+                return 7
+            case .Shower_CH:
+                return 8
+            case .Bath_CH:
+                return 9
+            case .Tap_C:
+                return 10
+            case .Tap_H:
+                return 11
+            case .Tap_M:
+                return 12
+            case .Tap_R:
+                return 13
+            }
+        }
+        
+    }
+    
     
     
     // MARK: Saved Properties
@@ -1044,6 +1229,7 @@ class Calculator: NSObject {
         print("Duct k values reset to default")
     }
     
+    
     // MARK: Write / Read Properties from file
     
     private func loadProperties() {
@@ -1053,46 +1239,57 @@ class Calculator: NSObject {
         // Grab the file path
         let pathForFile = filePath(fileName:propertiesFileName)
         
+        // Track if we need to use the defaults or not
+        var useDefault = true
+        
         // Load properties from saved file or create from defaults
         
         if (FileManager.default.fileExists(atPath: pathForFile)) {
             
-            let array = NSArray(contentsOfFile: pathForFile) as! [Float]
-            
-            // For each entry in the properties array
-            for i:Int in 0 ..< Calculator.properties.count {
+            if let array = NSArray(contentsOfFile: pathForFile) as? [Float] {
                 
-                var newPropertyDetected:Bool = false
+                // No need to use defaults as we successfully found a file and cast it to the expected array type
+                useDefault = false
                 
-                // Make sure there's a saved value before trying to cast it (there won't be if new properties have been added since the last save)
-                if i < array.count {
-                    // Use the saved value
-                    // Note: This assumes the indexes have not changed since the last save
-                    //       Therefore it's very important that new properties that are added are assigned indexes greater than the existing ones
-                    Calculator.properties[i] = array[i]
-                } else {
-                    // No saved value available, use the default value
-                    for property:SavedProperties in SavedProperties.all {
-                        if (property.index == i) {
-                            Calculator.properties[i] = property.defaultValue
-                            print("No saved value for \(property.description), default value used")
-                            newPropertyDetected = true
-                            break
+                // For each entry in the properties array
+                for i:Int in 0 ..< Calculator.properties.count {
+                    
+                    // Track if any new properties (unsaved) have been found
+                    var newPropertyDetected:Bool = false
+                    
+                    // Make sure there's a saved value before trying to cast it (there won't be if new properties have been added since the last save)
+                    if i < array.count {
+                        // Use the saved value
+                        // Note: This assumes the indexes have not changed since the last save
+                        //       Therefore it's very important that new properties that are added are assigned indexes greater than the existing ones
+                        Calculator.properties[i] = array[i]
+                    } else {
+                        // No saved value available, use the default value
+                        for property:SavedProperties in SavedProperties.all {
+                            if (property.index == i) {
+                                Calculator.properties[i] = property.defaultValue
+                                print("No saved value for \(property.description), default value used")
+                                newPropertyDetected = true
+                                break
+                            }
+                            // if it's not found it will just be an empty Float()
                         }
-                        // if it's not found it will just be an empty Float()
+                        
+                    }
+                    
+                    // If a new property was added (an a default value assigned to it), save it to file
+                    if (newPropertyDetected) {
+                        saveCurrentProperties()
                     }
                     
                 }
-                
-                // If a new property was added (an a default value assigned to it), save it to file
-                if (newPropertyDetected) {
-                    saveCurrentProperties()
-                }
-                
+                print("Saved Properties loaded from file")
             }
-            print("Saved Properties loaded from file")
+            
+            
         }
-        else {
+        
+        if (useDefault) {
             
             // Populate the properties with the default values
             // we know that the calculator.properties has sufficient indexes as we already checked for the max index above
@@ -1121,9 +1318,107 @@ class Calculator: NSObject {
             print("Saved Properties saved Successfully")
         }
         else {
-            print("\nSaved Properties could not be written to file\n")
+            print("\nERROR:\nSaved Properties could not be written to file\n")
         }
     }
+    
+    
+    // MARK: Write / Read Demand units from file
+    
+    private func loadDemandUnits() {
+        
+        // NB: this must be only be called after the properties array has been created (with the correct size)
+        
+        // Grab the file path
+        let pathForFile = filePath(fileName:demandUnitsFileName)
+        
+        // Track if we need to use the defaults or not
+        var useDefault = true
+        
+        // Load properties from saved file or create from defaults
+        
+        if (FileManager.default.fileExists(atPath: pathForFile)) {
+            
+            if let array = NSArray(contentsOfFile: pathForFile) as? [[Float]] {
+                
+                // No need to use defaults as we successfully found a file and cast it to the expected array type
+                useDefault = false
+                
+                // For each entry in the demand units array
+                for i:Int in 0 ..< Calculator.demandUnits.count {
+                    
+                    // Track if any new outlets (unsaved) have been found
+                    var newOutletDetected:Bool = false
+                    
+                    // Make sure there's a saved value before trying to cast it (there won't be if new outlets have been added since the last save)
+                    if i < array.count {
+                        // Use the saved value
+                        // Note: This assumes the indexes have not changed since the last save
+                        //       Therefore it's very important that new outlets that are added are assigned indexes greater than the existing ones
+                        Calculator.demandUnits[i] = array[i]
+                    } else {
+                        // No saved value available, use the default value
+                        for outlet:Outlets in Outlets.all {
+                            if (outlet.savedIndex == i) {
+                                Calculator.demandUnits[i] = outlet.defaultDemandUnits
+                                print("No saved demand units for \(outlet.description), default value used")
+                                newOutletDetected = true
+                                break
+                            }
+                            // if it's not found it will just be an empty [Float]() (from init method)
+                        }
+                        
+                    }
+                    
+                    // If a new outlet was added (and default demand units assigned to it), save it to file
+                    if (newOutletDetected) {
+                        saveCurrentDemandUnits()
+                    }
+                    
+                }
+                print("Saved Demand Units loaded from file")
+            }
+            else {
+                
+            }
+            
+            
+        }
+        
+        if (useDefault) {
+            
+            // Populate the demand units with the default values
+            // we know that the calculator.demandUnits has sufficient indexes as we already checked for the max index above (in init method)
+            for outlet:Outlets in Outlets.all {
+                Calculator.demandUnits[outlet.savedIndex] = outlet.defaultDemandUnits
+            }
+            
+            // Save the properties
+            saveCurrentDemandUnits()
+            
+            print("Default Demand Units used")
+        }
+        
+        
+    }
+    
+    private func saveCurrentDemandUnits() {
+        
+        // Save the current properties to file
+        
+        // Grab the file path
+        let pathForFile = filePath(fileName:demandUnitsFileName)
+        // Cast the array and write to file
+        let array = Calculator.demandUnits as NSArray
+        if (array.write(toFile: pathForFile, atomically: true)) {
+            print("Demand Units saved Successfully")
+        }
+        else {
+            print("\nERROR:\nDemand Units could not be written to file\n")
+        }
+    }
+    
+    // MARK: File Path (within Documents Directory)
     
     private func filePath(fileName:String) -> String {
         

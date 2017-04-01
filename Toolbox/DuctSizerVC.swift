@@ -181,7 +181,7 @@ class DuctSizerVC: UIViewController {
         let colouredViews:[UIView] = [self.achView, self.flowrateView, self.xHighlighterView, self.yHighlighterView, self.bottomAutoSizeView]
         for view in colouredViews {
             
-            view.backgroundColor = bdpColour
+            view.backgroundColor = primaryColour
             
         }
         

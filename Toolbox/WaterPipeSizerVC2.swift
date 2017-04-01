@@ -47,7 +47,6 @@ class WaterPipeSizerVC2: UIViewController {
 
     
     @IBOutlet weak var tableView: UITableView!
-    @IBOutlet var staticBackgroundViews: [UIControl]!
     @IBOutlet var outletPipeTypeButtons:[PipeTypeButton] = [PipeTypeButton(),PipeTypeButton(),PipeTypeButton(),PipeTypeButton(),PipeTypeButton(),PipeTypeButton(),PipeTypeButton()]
     
     
@@ -55,12 +54,16 @@ class WaterPipeSizerVC2: UIViewController {
     @IBOutlet var pipeViews:[UIControl]!
     @IBOutlet var pipeSizeLabels:[UILabel]!
     @IBOutlet var pipeFlowLabels:[UILabel]!
+    @IBOutlet var pipeVelocityLabels:[UILabel]!
+    @IBOutlet var pipePdLabels:[UILabel]!
     
     
     // Text Fields
     var outletTextFields:[UITextField] = [UITextField(), UITextField(), UITextField(), UITextField(), UITextField(), UITextField(), UITextField()]
     var flowTextFields:[UITextField] = [UITextField(), UITextField(), UITextField(), UITextField()]
     
+    // Fluids
+    var fluids:[Calculator.Fluid] = [.CWS,.HWS,.MWS,.RWS]
     
     // Calculation Variables
     var pipeFlows:[Float] = [0,0,0,0]
@@ -100,15 +103,21 @@ class WaterPipeSizerVC2: UIViewController {
         // Set up nav bar
         self.navigationItem.titleView = getNavImageView(UIApplication.shared.statusBarOrientation)
         
-        // Add tap background
-        for view in self.staticBackgroundViews {
-            view.addTarget(self, action: #selector(WaterPipeSizerVC2.backgroundTapped), for: UIControlEvents.touchUpInside)
-        }
-        
         // Set up flow views
         for view in self.pipeViews {
             view.layer.borderWidth = 0.5
             view.layer.borderColor = UIColor.darkGray.cgColor
+            // Add tap background
+            view.addTarget(self, action: #selector(WaterPipeSizerVC2.backgroundTapped), for: UIControlEvents.touchUpInside)
+        }
+        
+        // Set the background colour according to the fluid
+        for index:Int in 0..<self.pipeViews.count {
+            if (index < self.fluids.count) {
+                self.pipeViews[index].backgroundColor = self.fluids[index].colour
+            } else {
+                print("ERROR: Not fluids for number of pipe views")
+            }
         }
         
         // Apply the row height
@@ -152,6 +161,10 @@ class WaterPipeSizerVC2: UIViewController {
             
             let flowLabel:UILabel = self.pipeFlowLabels[index]
             let flow:Float = self.pipeFlows[index]
+            
+            let veloctyLabel:UILabel = self.pipeVelocityLabels[index]
+            
+            let pressureDropLabel:UILabel = self.pipePdLabels[index]
             
             // Set the size label and also the alpha value of the view
             if (self.errors[index] != nil) {
