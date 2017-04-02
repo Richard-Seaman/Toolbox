@@ -259,7 +259,7 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate  {
                 // Simultaneous Demand
                 titleLabel.text = "Simultaneous Demand"
                 detailLabel.text = "Calculate the simultaneous demand for a given collection of outlets and size the water services pipework required."
-                imageView.image = UIImage(named: "tap")!
+                imageView.image = UIImage(named: "SimDemand")!
             case self.daylightIndex:
                 // Daylight Calculator
                 titleLabel.text = "Daylight Calculator"

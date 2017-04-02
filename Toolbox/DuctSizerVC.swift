@@ -197,6 +197,8 @@ class DuctSizerVC: UIViewController {
         super.didReceiveMemoryWarning()
     }
     override func viewWillAppear(_ animated: Bool) {
+        // Refresh incase we're coming from settings and the properties changed
+        self.refresh()
         self.backgroundTapped(self)
     }
     

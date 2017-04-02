@@ -16,7 +16,7 @@ class DuctSizerSettingsVC: UIViewController {
     // Variable View (also used for method view)
     @IBOutlet var variableView: UIControl!
     @IBOutlet weak var tableView: UITableView!
-    var textFields: [UITextField] = [UITextField(),UITextField(),UITextField()]
+    var textFields: [UITextField] = [UITextField(),UITextField(),UITextField(),UITextField()]
     var sectionHeadingsVariables: [String] = ["Properties","Dimensions","Results"]
     var sectionHeadingsMethod: [String] = ["Methodology","Flowrate","Manual Sizing","Automatic Sizing"]
     
@@ -27,7 +27,6 @@ class DuctSizerSettingsVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         
         NotificationCenter.default.addObserver(self, selector: #selector(DuctSizerSettingsVC.keyboardNotification(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
         
@@ -54,24 +53,8 @@ class DuctSizerSettingsVC: UIViewController {
         
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        // In case coming from settings, need to recalculate
-        self.refresh()
-    }
     
     override func viewWillDisappear(_ animated: Bool) {
-        
-        // Save the values
-        let filePath = ductSizerPropertiesFilePath()
-        let array = ductSizerProperties as NSArray
-        if (array.write(toFile: filePath, atomically: true)) {
-            print("Duct Sizer Properties saved Successfully")
-            
-        }
-        else {
-            print("\nDuct Sizer Properties could not be written to file\n")
-            
-        }
         
         // Prevents keyboard issues
         self.backgroundTapped(self)
@@ -87,7 +70,6 @@ class DuctSizerSettingsVC: UIViewController {
     func refresh() {
         print("View refreshed")
         self.backgroundTapped(self)
-        loadDuctSizerProperties()
         self.tableView.reloadData()
         
     }
@@ -134,7 +116,8 @@ class DuctSizerSettingsVC: UIViewController {
     
     func resetDefaults() {
         print("resetDefaults")
-        resetDuctSizerPropertiesDefaults()
+        calculator.resetDefaultFluidProperties(fluid: .Air)
+        calculator.resetDefaultDuctProperties()
         self.refresh()
     }
     
@@ -155,7 +138,7 @@ class DuctSizerSettingsVC: UIViewController {
             switch section {
                 
             case 0: // Properties
-                return 4
+                return 5
             case 1: // Dimensions
                 return 4
             case 2: // Results
@@ -311,7 +294,7 @@ class DuctSizerSettingsVC: UIViewController {
             
         case 1: // Variables
             
-            if (indexPath.section == 0 && indexPath.row == 3) {
+            if (indexPath.section == 0 && indexPath.row == 4) {
                 
                 // Reset defaults button
                 cell = tableView.dequeueReusableCell(withIdentifier: "DuctSizerButtonCell") as UITableViewCell!
@@ -346,6 +329,9 @@ class DuctSizerSettingsVC: UIViewController {
                 let textField:UITextField = cell!.viewWithTag(3) as! UITextField
                 let contentView:UIControl = cell!.viewWithTag(4) as! UIControl
                 
+                // The property values to be displayed in the first four rows
+                let properties:[Float] = [Calculator.Fluid.Air.density, Calculator.Fluid.Air.visocity, Calculator.DuctMaterial.Rect.kValue, Calculator.DuctMaterial.Circ.kValue]
+                
                 // Set background tap
                 self.addBackgroundTap(contentView)
                 
@@ -354,7 +340,7 @@ class DuctSizerSettingsVC: UIViewController {
                     
                 case 0: // Only the properties section have editable values (in their textfields)
                     
-                    // Add textField to array (there's only three entries in the array, for the three rows in the properties section)
+                    // Add textField to array (there's only four entries in the array, for the four rows in the properties section)
                     self.textFields[indexPath.row] = textField
                     
                     // Set up the textfield
@@ -365,17 +351,17 @@ class DuctSizerSettingsVC: UIViewController {
                     self.setupTextFieldInputAccessoryView(textField)
                     
                     // Set the text field texts
-                    if (ductSizerProperties[indexPath.row] <= 0.009) {
+                    if (properties[indexPath.row] <= 0.009) {
                         
                         let formatter = NumberFormatter()
                         formatter.numberStyle = NumberFormatter.Style.scientific
                         formatter.usesSignificantDigits = false
                         formatter.maximumSignificantDigits = 3
                         formatter.minimumSignificantDigits = 3
-                        textField.text = formatter.string(from: NSNumber(value: ductSizerProperties[indexPath.row]))
+                        textField.text = formatter.string(from: NSNumber(value: properties[indexPath.row]))
                     }
                     else {
-                        textField.text = String(format: "%.2f", ductSizerProperties[indexPath.row])
+                        textField.text = String(format: "%.3f", properties[indexPath.row])
                     }
                     
                     
@@ -399,7 +385,10 @@ class DuctSizerSettingsVC: UIViewController {
                         descLabel.text = "Dynamic viscosity of air\n(kg/ms)"
                     case 2:
                         nameLabel.text = "k"
-                        descLabel.text = "Duct k value\n(k/mm)"
+                        descLabel.text = "Rectangular duct k value\n(k/mm)"
+                    case 3:
+                        nameLabel.text = "k"
+                        descLabel.text = "Circular duct k value\n(k/mm)"
                     default:
                         nameLabel.text = ""
                         descLabel.text = ""
@@ -477,31 +466,53 @@ class DuctSizerSettingsVC: UIViewController {
     
     // MARK: - Text Field Functions
     func textFieldEditingDidEnd(_ sender:UITextField) {
-        print("flowTextFieldEditingDidEnd")
         
         // Make the changes to the Property Record
         for index:Int in 0..<self.textFields.count {
+            
             // Find the right textField
             if (sender == self.textFields[index]) {
                 
                 // Check valid entry
                 if (sender.text != "" && sender.text!.floatValue >= 0.00000000001) { // dynamic viscoisty is 10^-5
-                    ductSizerProperties[index] = sender.text!.floatValue
+                    
+                    let newValue:Float = sender.text!.floatValue
+                    
+                    switch index {
+                    case 0:
+                        calculator.setDensity(fluid: .Air, density: newValue)
+                    case 1:
+                        calculator.setViscosity(fluid: .Air, visco: newValue)
+                    case 2:
+                        calculator.setKValue(duct: .Rect, kValue: newValue)
+                    case 3:
+                        calculator.setKValue(duct: .Circ, kValue: newValue)
+                    default:
+                        print("ERROR:\nCould not update value as this textfield doesn't correspond to a displayed property\nSee DuctSizerSettingsVC - textFieldEditingDidEnd\n")
+                    }
+                    
                 }
                 
-                // Reset the text so that stored value is actually displayed (this is need in case 2 decimal points are entered etc)
-                if (sender.text!.floatValue <= 0.009) {
+                // The property values to be displayed in the first four rows
+                let properties:[Float] = [Calculator.Fluid.Air.density, Calculator.Fluid.Air.visocity, Calculator.DuctMaterial.Rect.kValue, Calculator.DuctMaterial.Circ.kValue]
+                
+                if (index < properties.count) {
                     
-                    let formatter = NumberFormatter()
-                    formatter.numberStyle = NumberFormatter.Style.scientific
-                    formatter.usesSignificantDigits = false
-                    formatter.maximumSignificantDigits = 3
-                    formatter.minimumSignificantDigits = 3
-                    sender.text = formatter.string(from: NSNumber(value: ductSizerProperties[index]))
+                    // Reset the text so that stored value is actually displayed (this is need in case 2 decimal points are entered etc)
+                    if (properties[index] <= 0.009) {
+                        
+                        let formatter = NumberFormatter()
+                        formatter.numberStyle = NumberFormatter.Style.scientific
+                        formatter.usesSignificantDigits = false
+                        formatter.maximumSignificantDigits = 3
+                        formatter.minimumSignificantDigits = 3
+                        sender.text = formatter.string(from: NSNumber(value: properties[index]))
+                        
+                    }
+                    else {
+                        sender.text = String(format: "%.3f", properties[index])
+                    }
                     
-                }
-                else {
-                    sender.text = String(format: "%.2f", ductSizerProperties[index])
                 }
                 
             }

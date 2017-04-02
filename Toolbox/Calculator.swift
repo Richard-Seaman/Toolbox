@@ -501,6 +501,91 @@ class Calculator: NSObject {
             }
         }
         
+        var pipeImage: UIImage {
+            
+            let pipe_C:UIImage = UIImage(named: "C")!
+            let pipe_H:UIImage = UIImage(named: "H")!
+            let pipe_M:UIImage = UIImage(named: "M")!
+            let pipe_R:UIImage = UIImage(named: "R")!
+            let pipe_CH:UIImage = UIImage(named: "CH")!
+            let pipe_CHM:UIImage = UIImage(named: "CHM")!
+            
+            switch self {
+            case .WC_C:
+                return pipe_C
+            case .WC_R:
+                return pipe_R
+            case .Urinal_C:
+                return pipe_C
+            case .Urinal_R:
+                return pipe_R
+            case .WHB_CH:
+                return pipe_CH
+            case .Sink_C:
+                return pipe_C
+            case .Sink_CH:
+                return pipe_CH
+            case .Sink_CHM:
+                return pipe_CHM
+            case .Shower_CH:
+                return pipe_CH
+            case .Bath_CH:
+                return pipe_CH
+            case .Tap_C:
+                return pipe_C
+            case .Tap_H:
+                return pipe_H
+            case .Tap_M:
+                return pipe_M
+            case .Tap_R:
+                return pipe_R
+            }
+            
+        }
+        
+        var outletImage:UIImage {
+            
+            let WC:UIImage = UIImage(named: "Toilet")!
+            let urinal:UIImage = UIImage(named: "Urinal")!
+            let WHB:UIImage = UIImage(named: "WHB")!
+            let sink:UIImage = UIImage(named: "Sink")!
+            let shower:UIImage = UIImage(named: "Shower")!
+            let bath:UIImage = UIImage(named: "Bath")!
+            let tap:UIImage = UIImage(named: "tap")!
+            
+            switch self {
+            case .WC_C:
+                return WC
+            case .WC_R:
+                return WC
+            case .Urinal_C:
+                return urinal
+            case .Urinal_R:
+                return urinal
+            case .WHB_CH:
+                return WHB
+            case .Sink_C:
+                return sink
+            case .Sink_CH:
+                return sink
+            case .Sink_CHM:
+                return sink
+            case .Shower_CH:
+                return shower
+            case .Bath_CH:
+                return bath
+            case .Tap_C:
+                return tap
+            case .Tap_H:
+                return tap
+            case .Tap_M:
+                return tap
+            case .Tap_R:
+                return tap
+            }
+
+        }
+        
         var demandUnits:[Float] {
             if (self.savedIndex < Calculator.demandUnits.count) {
                 return Calculator.demandUnits[self.savedIndex]
@@ -578,6 +663,29 @@ class Calculator: NSObject {
             case .Tap_R:
                 return 13
             }
+        }
+        
+    }
+    
+    func setDemandUnits(outlet:Outlets, CWS_DU:Float, HWS_DU:Float, MWS_DU:Float, RWS_DU:Float) {
+        
+        // Check if there's an index for it
+        if outlet.savedIndex < Calculator.demandUnits.count {
+            
+            // Make sure saved demand units are positive
+            let cws:Float = CWS_DU >= 0 ? CWS_DU : 0
+            let hws:Float = HWS_DU >= 0 ? HWS_DU : 0
+            let mws:Float = MWS_DU >= 0 ? MWS_DU : 0
+            let rws:Float = RWS_DU >= 0 ? RWS_DU : 0
+            
+            // Update the corresponding DU's
+            Calculator.demandUnits[outlet.savedIndex] = [cws, hws, mws, rws]
+            
+            // Save the changes
+            saveCurrentDemandUnits()
+            
+        } else {
+            print("\nERROR:\nCould not update demand units for \(outlet.description) as it's saved index is out of range")
         }
         
     }
@@ -1433,7 +1541,87 @@ class Calculator: NSObject {
     }
     
     
+    // MARK: Simultaneous Demand Calculations
     
+    // Set up demand unit vs flowrate array (used to interpolate a flowrate from a number of demand units)
+    let demandUnitsLookUp:[Float] = [0, 3, 5, 10, 20, 30, 40, 50, 70, 100, 200, 800, 1000, 1500, 2000, 5000, 8000]
+    let flowRatesLookUp:[Float] = [0, 0.15, 0.2, 0.3, 0.42, 0.55, 0.7, 0.8, 1, 1.25, 2.2, 6, 7, 9, 15, 20, 30]
+    
+    func resultsForSimDemand(fluid:Fluid, demandUnits:Float, additionalMassFlowrate:Float, material:PipeMaterial) -> (result:(nomDia:Int, massFlowrate:Float, velocity:Float, pd:Float)?, error:Int?, errorDesc:String?) {
+        
+        // This function attempts to size a pipe based on demand units and the given parameters
+        // If an error occurs, the results returned are nil and an error code and description are also returned
+        
+        // Errors:
+        // 0 = DU's are out of range, could not convert ot MFR
+        // 1 = Could not size pipe for the given constraints
+        
+        var result: (nomDia:Int, massFlowrate:Float, velocity:Float, pd:Float)? = nil
+        var error: Int? = nil
+        var errorDesc: String? = nil
+        
+        // Convert the demand units to a mass flowrate
+        if let mfr:Float = self.convertDemandUnitToFlowrate(demandUnits: demandUnits) {
+            
+            // Remember to include the additional flowrate (if any)
+            // Make sure the additional flowrate is positive
+            let extraFlow:Float = additionalMassFlowrate >= 0 ? additionalMassFlowrate : 0
+            
+            // Size the pipe based on the default max pd and max v
+            // if there's no result it will still be nil
+            if let pipeResult = sizePipe(massFlowrate: mfr + extraFlow, material: material, fluid: fluid, maxPd: fluid.maxPdDefault, maxVelocity: fluid.maxVelocityDefault) {
+                
+                result = (nomDia:pipeResult.nomDia, massFlowrate:mfr + extraFlow, velocity:pipeResult.v, pd:pipeResult.pd)
+                
+            } else {
+                print("")
+                print("Pipe could not be sized based on the following parameters:")
+                print("MFR: \(mfr) kg/s")
+                print("maxpd: \(fluid.maxPdDefault) Pa/m")
+                print("maxV: \(fluid.maxVelocityDefault) m/s")
+                print("Material: \(material.material)")
+                print("Fluid: \(fluid.description)")
+                print("Setting resultsForSimDemand = nil")
+                print("")
+                error = 1
+                errorDesc = "Could not size pipe for the given constraints"
+            }
+            
+        } else {
+            error = 0
+            errorDesc = "DU's are out of range, could not convert ot MFR"
+        }
+        
+        return (result, error, errorDesc)
+    }
+    
+    func convertDemandUnitToFlowrate(demandUnits:Float) -> Float? {
+        
+        // Make sure demandunits used to interpolate are > 0
+        let du:Float = demandUnits > 0 ? demandUnits : 0
+        
+        // Interpolate the flowrate from the demand units
+        for index:Int in 0..<self.demandUnitsLookUp.count {
+            
+            if (du >= self.demandUnitsLookUp.last!) {
+                // If it's out of range
+                print("\nFlowrate out of range for given demand units, returning nil")
+                
+            }
+            else if (self.demandUnitsLookUp[index] <= du  && self.demandUnitsLookUp[index+1] > du ) {
+                
+                // The total demand lies between these two values, interpolate between them
+                return  ((du - self.demandUnitsLookUp[index]) / (self.demandUnitsLookUp[index+1] - self.demandUnitsLookUp[index]) ) * (self.flowRatesLookUp[index+1] - self.flowRatesLookUp[index]) + self.flowRatesLookUp[index]
+                
+            }
+            
+        }
+        
+        // If we get here, then the interpolation failed for some reason, so return nil
+        // Most likely because the du's are out of range
+        return  nil
+        
+    }
     
     // MARK: Duct Sizer Calculations
     

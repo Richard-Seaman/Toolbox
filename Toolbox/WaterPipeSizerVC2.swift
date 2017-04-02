@@ -56,18 +56,22 @@ class WaterPipeSizerVC2: UIViewController {
     @IBOutlet var pipeFlowLabels:[UILabel]!
     @IBOutlet var pipeVelocityLabels:[UILabel]!
     @IBOutlet var pipePdLabels:[UILabel]!
+    @IBOutlet var pipeViewsInner:[UIControl]!
     
     
     // Text Fields
     var outletTextFields:[UITextField] = [UITextField(), UITextField(), UITextField(), UITextField(), UITextField(), UITextField(), UITextField()]
     var flowTextFields:[UITextField] = [UITextField(), UITextField(), UITextField(), UITextField()]
     
-    // Fluids
+    // Fluids & Pipe Materials
     var fluids:[Calculator.Fluid] = [.CWS,.HWS,.MWS,.RWS]
+    var materials:[Calculator.PipeMaterial] = [.Copper, .Copper, .Plastic, .Copper]
     
     // Calculation Variables
     var pipeFlows:[Float] = [0,0,0,0]
     var pipeSizes:[Int?] = [nil,nil,nil,nil]
+    var pipeVelocities:[Float?] = [nil,nil,nil,nil]
+    var pipePressureDrops:[Float?] = [nil,nil,nil,nil]
     var errors:[String?] = [nil,nil,nil,nil]
     
     
@@ -79,7 +83,7 @@ class WaterPipeSizerVC2: UIViewController {
     var outletStrings:[String] = ["WC", "Urinal", "WHB", "Sink", "Shower", "Bath", "Tap"]
     var numberOfOutlets:[Int] = [0,0,0,0,0,0,0]
     var pipeTypeArray:[Int] = [0,0,1,2,1,1,0] // ["Cold","Cold & Hot","Cold & Hot & Main","Rain","Hot","Main"]
-    let maxNumberOfOutlets:Int = 50
+    let maxNumberOfOutlets:Int = 99
     
     let pipeStrings:[String] = ["Cold","Hot","Main","Rain"]
     var addFlows:[Float] = [0,0,0,0]
@@ -90,9 +94,7 @@ class WaterPipeSizerVC2: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        loadLoadingUnits()
-        
+                
         NotificationCenter.default.addObserver(self, selector: #selector(WaterPipeSizerVC2.keyboardNotification(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
         
         self.automaticallyAdjustsScrollViewInsets = false
@@ -112,11 +114,17 @@ class WaterPipeSizerVC2: UIViewController {
         }
         
         // Set the background colour according to the fluid
+        // And the borders (edge of pipes)
         for index:Int in 0..<self.pipeViews.count {
             if (index < self.fluids.count) {
-                self.pipeViews[index].backgroundColor = self.fluids[index].colour
+                self.pipeViewsInner[index].backgroundColor = self.fluids[index].colour
+                self.pipeViewsInner[index].layer.borderWidth = 1
+                self.pipeViewsInner[index].layer.borderColor = UIColor.darkGray.cgColor
+                self.pipeViews[index].layer.borderWidth = 1
+                self.pipeViews[index].layer.borderColor = UIColor.darkGray.cgColor
+                // Note: outter colour (pipe material colour) is set in refresh as this is dynamic
             } else {
-                print("ERROR: Not fluids for number of pipe views")
+                print("ERROR: Not enough fluids for number of pipe views")
             }
         }
         
@@ -149,6 +157,15 @@ class WaterPipeSizerVC2: UIViewController {
     
     func refresh() {
         
+        // Set the border colour according to the material selected for each fluid
+        for index:Int in 0..<self.pipeViews.count {
+            if (index < self.materials.count) {
+                self.pipeViews[index].backgroundColor = self.materials[index].colour
+            } else {
+                print("ERROR: Not enough fluids for number of pipe views")
+            }
+        }
+        
         self.determinePipeSizes()
         
         self.tableView.reloadData()
@@ -163,10 +180,14 @@ class WaterPipeSizerVC2: UIViewController {
             let flow:Float = self.pipeFlows[index]
             
             let veloctyLabel:UILabel = self.pipeVelocityLabels[index]
+            let velocity:Float? = self.pipeVelocities[index]
             
             let pressureDropLabel:UILabel = self.pipePdLabels[index]
+            let pd:Float? = self.pipePressureDrops[index]
             
             // Set the size label and also the alpha value of the view
+            let outOfRangeError:String = "Out Of Range"
+            
             if (self.errors[index] != nil) {
                 sizeLabel.text = "???"
                 self.pipeViews[index].alpha = 1
@@ -181,7 +202,7 @@ class WaterPipeSizerVC2: UIViewController {
             }
             
             if (self.errors[index] != nil) {
-                flowLabel.text = "Out Of Range"
+                flowLabel.text = outOfRangeError
             }
             else if (flow > 0) {
                 flowLabel.text = String(format: "%.2f kg/s", flow)
@@ -190,6 +211,25 @@ class WaterPipeSizerVC2: UIViewController {
                 flowLabel.text = "-- kg/s"
             }
             
+            if (self.errors[index] != nil) {
+                veloctyLabel.text = outOfRangeError
+            }
+            else if let actualVelocity = velocity {
+                veloctyLabel.text = String(format: "%.1f m/s", actualVelocity)
+            }
+            else {
+                veloctyLabel.text = "-- m/s"
+            }
+            
+            if (self.errors[index] != nil) {
+                pressureDropLabel.text = outOfRangeError
+            }
+            else if let actualPd = pd {
+                pressureDropLabel.text = String(format: "%.1f Pa/m", actualPd)
+            }
+            else {
+                pressureDropLabel.text = "-- Pa/m"
+            }
         }
         
     }
@@ -213,58 +253,57 @@ class WaterPipeSizerVC2: UIViewController {
         
         // WC loading units
         if (self.outletPipeTypeButtons[0].combination == 0) {
-            loadingUnitsApplied.append(loadingUnits[0]) // WC - cold
+            loadingUnitsApplied.append(Calculator.Outlets.WC_C.demandUnits) // WC - cold
         }
         else {
-            loadingUnitsApplied.append(loadingUnits[1]) // WC - rain
+            loadingUnitsApplied.append(Calculator.Outlets.WC_R.demandUnits) // WC - rain
         }
         
         // Urinal loading units
         if (self.outletPipeTypeButtons[1].combination == 0) {
-            loadingUnitsApplied.append(loadingUnits[2]) // Urinal - cold
+            loadingUnitsApplied.append(Calculator.Outlets.Urinal_C.demandUnits) // Urinal - cold
         }
         else {
-            loadingUnitsApplied.append(loadingUnits[3]) // Urinal - rain
+            loadingUnitsApplied.append(Calculator.Outlets.Urinal_R.demandUnits) // Urinal - rain
         }
         
         // WHB loading units
-        loadingUnitsApplied.append(loadingUnits[4])     // WHB - cold & hot
+        loadingUnitsApplied.append(Calculator.Outlets.WHB_CH.demandUnits)     // WHB - cold & hot
         
         // Sink loading units
         if (self.outletPipeTypeButtons[3].combination == 0) {
-            loadingUnitsApplied.append(loadingUnits[5]) // Sink - cold
+            loadingUnitsApplied.append(Calculator.Outlets.Sink_C.demandUnits) // Sink - cold
         }
         else if (self.outletPipeTypeButtons[3].combination == 1) {
-            loadingUnitsApplied.append(loadingUnits[6]) // Sink - cold & hot
+            loadingUnitsApplied.append(Calculator.Outlets.Sink_CH.demandUnits) // Sink - cold & hot
         }
         else {
-            loadingUnitsApplied.append(loadingUnits[7]) // Sink - cold & hot & mains
+            loadingUnitsApplied.append(Calculator.Outlets.Sink_CHM.demandUnits) // Sink - cold & hot & mains
         }
         
         // Shower loading units
-        loadingUnitsApplied.append(loadingUnits[8])     // WHB - cold & hot
+        loadingUnitsApplied.append(Calculator.Outlets.Shower_CH.demandUnits)     // Shower - cold & hot
         
         // Bath loading units
-        loadingUnitsApplied.append(loadingUnits[9])     // WHB - cold & hot
+        loadingUnitsApplied.append(Calculator.Outlets.Bath_CH.demandUnits)     // Bath - cold & hot
         
         // Tap loading units
         if (self.outletPipeTypeButtons[6].combination == 0) {
-            loadingUnitsApplied.append(loadingUnits[10]) // Tap - cold
+            loadingUnitsApplied.append(Calculator.Outlets.Tap_C.demandUnits) // Tap - cold
         }
         else if (self.outletPipeTypeButtons[6].combination == 4) {
-            loadingUnitsApplied.append(loadingUnits[11]) // Tap - hot
+            loadingUnitsApplied.append(Calculator.Outlets.Tap_H.demandUnits) // Tap - hot
         }
         else if (self.outletPipeTypeButtons[6].combination == 5) {
-            loadingUnitsApplied.append(loadingUnits[12]) // Tap - mains
+            loadingUnitsApplied.append(Calculator.Outlets.Tap_M.demandUnits) // Tap - mains
         }
         else {
-            loadingUnitsApplied.append(loadingUnits[13]) // Tap - rain
+            loadingUnitsApplied.append(Calculator.Outlets.Tap_R.demandUnits) // Tap - rain
         }
         
         // Determine Total Demand
         var totalLoadingUnits:[Float] = [0,0,0,0]
         
-        var index:Int = Int()
         // Cycle through each outlet type
         for index:Int in 0..<numberOfOutlets.count {
             
@@ -277,73 +316,47 @@ class WaterPipeSizerVC2: UIViewController {
         }
         
         
-        // Set up demand unit vs flowrate array
+        // NOTE: At this point the loading/demand units are known
         
-        var demandUnits:[Float] = [0, 3, 5, 10, 20, 30, 40, 50, 70, 100, 200, 800, 1000, 1500, 2000, 5000, 8000]
-        var flowRates:[Float] = [0, 0.15, 0.2, 0.3, 0.42, 0.55, 0.7, 0.8, 1, 1.25, 2.2, 6, 7, 9, 15, 20, 30]
-        
-        // Interpolate the flowrate for the calculated Total Demand
-        
-        for pipeIndex:Int in 0..<pipeFlows.count {
+        // Cycle through each of the pipes
+        for index:Int in 0..<self.pipeViews.count {
             
-            for index:Int in 0..<demandUnits.count {
+            // Try to size the pipe
+            let results = calculator.resultsForSimDemand(fluid: self.fluids[index], demandUnits: totalLoadingUnits[index], additionalMassFlowrate: self.addFlows[index], material: self.materials[index])
+            
+            // Add the errors (if there's none, it will be nil
+            self.errors[index] = results.errorDesc
+            
+            // Check that we got results
+            if let pipeResults = results.result {
                 
-                if (totalLoadingUnits[pipeIndex] >= demandUnits.last) {
-                    // If it's out of range
-                    self.pipeFlows[pipeIndex] = 999
-                    self.pipeSizes[pipeIndex] = nil
-                    self.errors[pipeIndex] = "Out of range, reduce flowrate"
+                // Add them to the corresponding arrays
+                self.pipeSizes[index] = pipeResults.nomDia
+                self.pipeFlows[index] = pipeResults.massFlowrate
+                self.pipeVelocities[index] = pipeResults.velocity
+                self.pipePressureDrops[index] = pipeResults.pd
+                
+                // If the flowrate was 0, manually set results to nil (so the pipeviews are shaded)
+                if (pipeResults.massFlowrate == 0) {
+                    self.pipeSizes[index] = nil
+                    self.pipeFlows[index] = 0
+                    self.pipeVelocities[index] = nil
+                    self.pipePressureDrops[index] = nil
                 }
-                else if (demandUnits[index] <= totalLoadingUnits[pipeIndex]  && demandUnits[index+1] > totalLoadingUnits[pipeIndex] ) {
-                    
-                    // The total demand lies between these two values, interpolate between them
-                    self.pipeFlows[pipeIndex] = ( (totalLoadingUnits[pipeIndex] - demandUnits[index]) / (demandUnits[index+1] - demandUnits[index]) ) * (flowRates[index+1] - flowRates[index]) + flowRates[index]
-                    
-                }
+                
+            } else {
+                
+                // If we didn't get results, set to nil
+                self.pipeSizes[index] = nil
+                self.pipeFlows[index] = 0
+                self.pipeVelocities[index] = nil
+                self.pipePressureDrops[index] = nil
                 
             }
-            
-            // Add the additional flowrates added by the user
-            self.pipeFlows[pipeIndex] = self.pipeFlows[pipeIndex] + self.addFlows[pipeIndex]
             
         }
         
-        
-        
-        // Determine the pipe size
-        var pipeSizes:[Int] = [12, 15, 22, 28, 35, 42, 54, 67]
-        var maxFlowRates:[Float] = [0.091, 0.143, 0.311, 0.527, 0.833, 1.18, 2.41, 4.8]
-        
-        for pipeIndex:Int in 0..<pipeFlows.count {
-            
-            for index:Int in 0..<pipeSizes.count {
-                
-                if (self.pipeFlows[pipeIndex] < maxFlowRates[index]) {
-                    self.pipeSizes[pipeIndex] = pipeSizes[index]
-                    break
-                }
-                else if (self.pipeFlows[pipeIndex] > maxFlowRates.last) {
-                    self.pipeSizes[pipeIndex] = nil
-                    self.errors[pipeIndex] = "Out of range, reduce flowrate"
-                }
-                
-            }
-        }
-        
-        for pipeIndex:Int in 0..<pipeFlows.count {
-            
-            // If the pipe size works out as 12, manually set it to 15
-            if (self.pipeSizes[pipeIndex] == 12) {
-                self.pipeSizes[pipeIndex] = 15
-            }
-            
-            // If there's no flowrate, set the pipe size to nil
-            if (self.pipeFlows[pipeIndex] <= 0.01) {
-                self.pipeSizes[pipeIndex] = nil
-            }
-        }
-        
-        print("\nDemand Units: \(totalLoadingUnits)\nAdditional Flowrates: \(self.addFlows)\nFlowrates: \(self.pipeFlows)\nSizes: \(self.pipeSizes)\nErrors: \(self.errors)\n")
+        print("\nDemand Units: \(totalLoadingUnits)\nAdditional Flowrates: \(self.addFlows)\nFlowrates: \(self.pipeFlows)\nSizes: \(self.pipeSizes)\nVelocities: \(self.pipeVelocities)\nPressureDrops: \(self.pipePressureDrops)\nErrors: \(self.errors)\n")
         
         
     }
