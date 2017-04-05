@@ -21,6 +21,7 @@
 		9B1285771E587DA4002B9CB7 /* Calculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B1285751E587DA4002B9CB7 /* Calculator.swift */; };
 		9B1B64081E8692810053E957 /* PipeSizerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B1B64071E8692810053E957 /* PipeSizerVC.swift */; };
 		9B1B640A1E8D9FA10053E957 /* HomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B1B64091E8D9FA10053E957 /* HomeVC.swift */; };
+		9B1B640C1E9445D40053E957 /* SegmentedControlWithRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B1B640B1E9445D40053E957 /* SegmentedControlWithRow.swift */; };
 		9B20DF7B1E81806400288283 /* CalculatorUnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B20DF7A1E81806400288283 /* CalculatorUnitTests.swift */; };
 		9B4AD64F1BB5DF1400AF9091 /* WaterPipeSizerVC2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4AD64E1BB5DF1400AF9091 /* WaterPipeSizerVC2.swift */; };
 		9B4AD6511BB5E31300AF9091 /* ButtonWithRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4AD6501BB5E31300AF9091 /* ButtonWithRow.swift */; };
@@ -67,6 +68,7 @@
 		9B1285751E587DA4002B9CB7 /* Calculator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Calculator.swift; sourceTree = "<group>"; };
 		9B1B64071E8692810053E957 /* PipeSizerVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PipeSizerVC.swift; sourceTree = "<group>"; };
 		9B1B64091E8D9FA10053E957 /* HomeVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeVC.swift; sourceTree = "<group>"; };
+		9B1B640B1E9445D40053E957 /* SegmentedControlWithRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentedControlWithRow.swift; sourceTree = "<group>"; };
 		9B20DF7A1E81806400288283 /* CalculatorUnitTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalculatorUnitTests.swift; sourceTree = "<group>"; };
 		9B4AD64E1BB5DF1400AF9091 /* WaterPipeSizerVC2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaterPipeSizerVC2.swift; sourceTree = "<group>"; };
 		9B4AD6501BB5E31300AF9091 /* ButtonWithRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ButtonWithRow.swift; sourceTree = "<group>"; };
@@ -204,6 +206,7 @@
 				9B4AD6501BB5E31300AF9091 /* ButtonWithRow.swift */,
 				9B4AD6531BB5E34500AF9091 /* TextFieldWithRow.swift */,
 				9B1285751E587DA4002B9CB7 /* Calculator.swift */,
+				9B1B640B1E9445D40053E957 /* SegmentedControlWithRow.swift */,
 			);
 			name = Objects;
 			sourceTree = "<group>";
@@ -349,6 +352,7 @@
 				9BD1CD5B1B5EF98100EEFB40 /* DemandUnitTF.swift in Sources */,
 				9BF7E3451B656DC400FF247E /* LoadInfoTF.swift in Sources */,
 				9BCE1F191C6E7A0500F417FE /* InfoVC.swift in Sources */,
+				9B1B640C1E9445D40053E957 /* SegmentedControlWithRow.swift in Sources */,
 				9B1B64081E8692810053E957 /* PipeSizerVC.swift in Sources */,
 				9B4AD64F1BB5DF1400AF9091 /* WaterPipeSizerVC2.swift in Sources */,
 				9B11A5F51B5BC24700695804 /* WaterPipeSizerSettingsVC.swift in Sources */,

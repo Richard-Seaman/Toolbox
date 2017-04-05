@@ -65,7 +65,6 @@ class WaterPipeSizerVC2: UIViewController {
     
     // Fluids & Pipe Materials
     var fluids:[Calculator.Fluid] = [.CWS,.HWS,.MWS,.RWS]
-    var materials:[Calculator.PipeMaterial] = [.Copper, .Copper, .Plastic, .Copper]
     
     // Calculation Variables
     var pipeFlows:[Float] = [0,0,0,0]
@@ -132,13 +131,15 @@ class WaterPipeSizerVC2: UIViewController {
         self.tableView.rowHeight = UITableViewAutomaticDimension;
         self.tableView.estimatedRowHeight = 64.0;
         
-        
-        self.refresh()
+        // Done in viewWillAppear instead
+        //self.refresh()
         
     }    
     
     override func viewWillAppear(_ animated: Bool) {
         self.backgroundTapped()
+        // Refresh eah time it appears in case parameters changed in settings view and we're returning to this one - need to recalculate
+        self.refresh()
     }
 
     override func didReceiveMemoryWarning() {
@@ -159,8 +160,8 @@ class WaterPipeSizerVC2: UIViewController {
         
         // Set the border colour according to the material selected for each fluid
         for index:Int in 0..<self.pipeViews.count {
-            if (index < self.materials.count) {
-                self.pipeViews[index].backgroundColor = self.materials[index].colour
+            if (index < self.fluids.count) {
+                self.pipeViews[index].backgroundColor = self.fluids[index].pipeMaterial.colour
             } else {
                 print("ERROR: Not enough fluids for number of pipe views")
             }
@@ -322,7 +323,7 @@ class WaterPipeSizerVC2: UIViewController {
         for index:Int in 0..<self.pipeViews.count {
             
             // Try to size the pipe
-            let results = calculator.resultsForSimDemand(fluid: self.fluids[index], demandUnits: totalLoadingUnits[index], additionalMassFlowrate: self.addFlows[index], material: self.materials[index])
+            let results = calculator.resultsForSimDemand(fluid: self.fluids[index], demandUnits: totalLoadingUnits[index], additionalMassFlowrate: self.addFlows[index], material: self.fluids[index].pipeMaterial)
             
             // Add the errors (if there's none, it will be nil
             self.errors[index] = results.errorDesc

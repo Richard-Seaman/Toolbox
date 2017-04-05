@@ -86,6 +86,13 @@ class PipeSizerVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSourc
             }
             
             self.configureFluidButton()
+            
+            // Change to the default pipe material
+            self.selectedMaterial = self.selectedFluid.pipeMaterial
+            // Update the selector
+            if (self.pipeMaterials.contains(self.selectedMaterial)) {
+                self.materialSelector.selectedSegmentIndex = self.pipeMaterials.index(of: self.selectedMaterial)!
+            }
         }
     }
     
@@ -134,7 +141,7 @@ class PipeSizerVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSourc
     let shaded:CGFloat = 0.4
     
     // Material
-    var pipeMaterials:[Calculator.PipeMaterial] = [.Steel,.Copper,.Plastic]
+    var pipeMaterials:[Calculator.PipeMaterial] = Calculator.PipeMaterial.all
     // set default in viewDidLoad
     var selectedMaterial:Calculator.PipeMaterial = .Steel
     
@@ -153,9 +160,8 @@ class PipeSizerVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSourc
         self.flowView.backgroundColor = primaryColour
         self.loadAndDtView.backgroundColor = primaryColour
         
-        // Set default Material and Fluid
+        // Set default Fluid
         self.selectedFluid = .LPHW
-        self.selectedMaterial = .Steel
         
         // Set default max constraints
         self.maxVelSwitch.isOn = false

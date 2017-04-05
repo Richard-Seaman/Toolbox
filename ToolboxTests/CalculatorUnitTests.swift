@@ -45,12 +45,12 @@ class CalculatorUnitTests: XCTestCase {
         
         // Duct k value (Plastic)
         newValue = 0.05
-        calculator.setKValue(pipe: Calculator.PipeMaterial.Plastic, kValue: newValue)
-        savedValue = Calculator.PipeMaterial.Plastic.kValue
+        calculator.setKValue(pipe: Calculator.PipeMaterial.UPVC, kValue: newValue)
+        savedValue = Calculator.PipeMaterial.UPVC.kValue
         XCTAssert(newValue == savedValue)
         newValue = -0.05
-        calculator.setKValue(pipe: Calculator.PipeMaterial.Plastic, kValue: newValue)
-        savedValue = Calculator.PipeMaterial.Plastic.kValue
+        calculator.setKValue(pipe: Calculator.PipeMaterial.UPVC, kValue: newValue)
+        savedValue = Calculator.PipeMaterial.UPVC.kValue
         XCTAssert(newValue != savedValue)
         
         // Fluid specific heat capacity (LPHW)
@@ -213,7 +213,7 @@ class CalculatorUnitTests: XCTestCase {
         
         // Save some new values
         calculator.setKValue(pipe: .Copper, kValue: 0.005)
-        calculator.setKValue(pipe: .Plastic, kValue: 0.005)
+        calculator.setKValue(pipe: .UPVC, kValue: 0.005)
         calculator.setKValue(pipe: .Steel, kValue: 0.005)
         
         // Reset them
@@ -222,7 +222,7 @@ class CalculatorUnitTests: XCTestCase {
         
         // Check they've been reset to the default values
         XCTAssert(Calculator.PipeMaterial.Copper.kValue == Calculator.SavedProperties.k_Copper.defaultValue)
-        XCTAssert(Calculator.PipeMaterial.Plastic.kValue == Calculator.SavedProperties.k_Plastic.defaultValue)
+        XCTAssert(Calculator.PipeMaterial.UPVC.kValue == Calculator.SavedProperties.k_Plastic.defaultValue)
         XCTAssert(Calculator.PipeMaterial.Steel.kValue == Calculator.SavedProperties.k_Steel.defaultValue)
         XCTAssert(Calculator.DuctMaterial.Rect.kValue == Calculator.SavedProperties.k_DuctRect.defaultValue)
         XCTAssert(Calculator.DuctMaterial.Circ.kValue == Calculator.SavedProperties.k_DuctCirc.defaultValue)

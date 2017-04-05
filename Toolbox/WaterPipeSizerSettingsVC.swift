@@ -24,11 +24,12 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
     @IBOutlet weak var variableView: UIControl!
     @IBOutlet weak var variableTableView: UITableView!
     
-    let numberOfRowsPerFluid:Int = 4
+    let numberOfRowsPerFluid:Int = 6
     
     let variableFluids:[Calculator.Fluid] = [.CWS, .HWS, .MWS, .RWS]
     let variableCellIdentifier:String = "WaterSizerVariableCell"
     let variableButtonCellIdentifier:String = "WaterSizerButtonCell"
+    let variableSelectorCellIdentifier:String = "WaterSizerSelectorCell"
     
     // Array of variable textfields just so they can be dismissed
     var textFields:[DemandUnitTF] = [DemandUnitTF]()
@@ -124,17 +125,19 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
             self.demandUnitsView.alpha = 0
             self.aboutView.alpha = 1
             self.variableView.alpha = 0
+            self.methodTableView.reloadData()
         case 1:
             self.demandUnitsView.alpha = 1
             self.aboutView.alpha = 0
             self.variableView.alpha = 0
+            self.demandUnitTableView.reloadData()
         default:
             self.demandUnitsView.alpha = 0
             self.aboutView.alpha = 0
             self.variableView.alpha = 1
+            self.variableTableView.reloadData()
         }
         
-        self.refresh()
     }
     
     func addBorderAndBackgroundTap(_ view:UIControl) {
@@ -151,6 +154,24 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
         view.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.backgroundTapped(_:)), for: UIControlEvents.touchUpInside)
         
     }
+    
+    
+    func resetFluid(button:ButtonWithRow) {
+        // The button tag corresponds to the fluid index
+        if button.row < self.variableFluids.count {
+            calculator.resetDefaultFluidProperties(fluid: self.variableFluids[button.row])
+            self.variableTableView.reloadData()
+        }
+        
+    }
+    
+    func setFluidPipe(selector:SegmentedControlWithRow) {
+        // The segmented control tag corresponds to the fluid index
+        if (selector.row < self.variableFluids.count) {
+            calculator.setPipeMaterial(fluid: self.variableFluids[selector.row], material: Calculator.PipeMaterial.all[selector.selectedSegmentIndex])
+        }
+    }
+    
     
     // MARK: - Tableview methods
     
@@ -258,11 +279,12 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
     }
     
     
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         // print("cellForRowAtIndexPath \(indexPath.section) - \(indexPath.row)")
         
-        var cell:UITableViewCell? = UITableViewCell()
+        var cell:UITableViewCell? = nil
         
         switch tableView {
             
@@ -277,65 +299,137 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
                 // Fluids
                 let fluid:Calculator.Fluid = self.variableFluids[indexPath.section]
                 
-                cell = tableView.dequeueReusableCell(withIdentifier: self.variableCellIdentifier) as UITableViewCell!
-                if (cell == nil) {
-                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: self.variableCellIdentifier)
-                }
-
-                // Grab the components
-                let nameLabel:UILabel = cell!.viewWithTag(1) as! UILabel
-                let descLabel:UILabel = cell!.viewWithTag(2) as! UILabel
-                let textField:DemandUnitTF = cell!.viewWithTag(3) as! DemandUnitTF
-                let contentView:UIControl = cell!.viewWithTag(4) as! UIControl
+                // Rows:
                 
-                // Set background tap
-                self.addBackgroundTap(contentView)
-                
-                // Set up the textfield
-                // Note: we use a demandUnitTextField just so we can track the indexPath (sow we can figure out which property to change when it's edited)
-                textField.minimumFontSize = 5
-                textField.adjustsFontSizeToFitWidth = true
-                textField.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.textFieldEditingDidEnd(variableTextField:)), for: UIControlEvents.editingDidEnd)
-                textField.indexPath = indexPath
-                textField.row = indexPath.row
-                textField.column = indexPath.section
-                self.setupTextFieldInputAccessoryView(textField)
-                self.textFields.append(textField)
-                
-                // The property values to be displayed in the first four rows
-                let properties:[Float] = [fluid.density, fluid.visocity, fluid.maxPdDefault, fluid.maxVelocityDefault]
-                
-                // Set the text field texts
-                if (properties[indexPath.row] <= 0.009) {
-                    
-                    let formatter = NumberFormatter()
-                    formatter.numberStyle = NumberFormatter.Style.scientific
-                    formatter.usesSignificantDigits = false
-                    formatter.maximumSignificantDigits = 3
-                    formatter.minimumSignificantDigits = 3
-                    textField.text = formatter.string(from: NSNumber(value: properties[indexPath.row]))
-                }
-                else {
-                    textField.text = String(format: "%.2f", properties[indexPath.row])
-                }
+                // Density
+                // Viscosity
+                // Max Pd
+                // Max Velocity
+                // Material Selector
+                // Reset Defaults
                 
                 switch indexPath.row {
                     
-                case 0:
-                    nameLabel.text = ""
-                    descLabel.text = "Density\n(kg/m3)"
-                case 1:
-                    nameLabel.text = ""
-                    descLabel.text = "Dynamic viscosity\n(kg/ms)"
-                case 2:
-                    nameLabel.text = ""
-                    descLabel.text = "Maximum pressure drop\n(Pa/m)"
-                case 3:
-                    nameLabel.text = ""
-                    descLabel.text = "Maximum velocity\n(m/s)"
+                case 4:
+                    
+                    // Selector Cell
+                    cell = tableView.dequeueReusableCell(withIdentifier: self.variableSelectorCellIdentifier) as UITableViewCell?
+                    if (cell == nil) {
+                        cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: self.variableSelectorCellIdentifier)
+                    }
+                    
+                    let selector:SegmentedControlWithRow = cell!.viewWithTag(1) as! SegmentedControlWithRow
+                    let contentView:UIControl = cell!.viewWithTag(2) as! UIControl
+                    
+                    // Set background tap
+                    self.addBackgroundTap(contentView)
+                    
+                    // Add an option for each Pipe Material
+                    selector.removeAllSegments()
+                    for index:Int in 0..<Calculator.PipeMaterial.all.count {
+                        selector.insertSegment(withTitle: Calculator.PipeMaterial.all[index].material, at: index, animated: false)
+                    }
+                    // Set the row of the selector to the section so we know what fluid it represents when its tapped
+                    selector.row = indexPath.section
+                    selector.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.setFluidPipe(selector:)), for: .valueChanged)
+                    selector.tintColor = UIColor.darkGray
+                    
+                    // Set currently selected material
+                    if let index = Calculator.PipeMaterial.all.index(of: fluid.pipeMaterial) {
+                        selector.selectedSegmentIndex = index
+                    }
+                    
+                    
+                case 5:
+                    
+                    // Reset Defaults
+                    cell = tableView.dequeueReusableCell(withIdentifier: self.variableButtonCellIdentifier) as UITableViewCell?
+                    if (cell == nil) {
+                        cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: self.variableButtonCellIdentifier)
+                    }
+                    
+                    let button:ButtonWithRow = cell!.viewWithTag(20) as! ButtonWithRow
+                    let contentView:UIControl = cell!.viewWithTag(2) as! UIControl
+                    
+                    // Set background tap
+                    self.addBackgroundTap(contentView)
+                    
+                    button.layer.borderColor = UIColor.darkGray.cgColor
+                    button.layer.borderWidth = 1.5
+                    button.layer.cornerRadius = 5
+                    button.layer.backgroundColor = UIColor.white.cgColor
+                    button.setTitle("    Reset Defaults    ", for: UIControlState())
+                    button.tintColor = UIColor.darkGray
+                    // Set the row of the button to the section so we know what fluid it represents when its tapped
+                    button.row = indexPath.section
+                    button.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.resetFluid(button:)), for: UIControlEvents.touchUpInside)
+                    
                 default:
-                    print("This row should not be here")                    
+                    
+                    // Text field edits
+                    
+                    cell = tableView.dequeueReusableCell(withIdentifier: self.variableCellIdentifier) as UITableViewCell?
+                    if (cell == nil) {
+                        cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: self.variableCellIdentifier)
+                    }
+                    
+                    // Grab the components
+                    let nameLabel:UILabel = cell!.viewWithTag(1) as! UILabel
+                    let descLabel:UILabel = cell!.viewWithTag(2) as! UILabel
+                    let textField:DemandUnitTF = cell!.viewWithTag(3) as! DemandUnitTF
+                    let contentView:UIControl = cell!.viewWithTag(4) as! UIControl
+                    
+                    // Set background tap
+                    self.addBackgroundTap(contentView)
+                    
+                    // Set up the textfield
+                    // Note: we use a demandUnitTextField just so we can track the indexPath (sow we can figure out which property to change when it's edited)
+                    textField.minimumFontSize = 5
+                    textField.adjustsFontSizeToFitWidth = true
+                    textField.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.textFieldEditingDidEnd(variableTextField:)), for: UIControlEvents.editingDidEnd)
+                    textField.indexPath = indexPath
+                    textField.row = indexPath.row
+                    textField.column = indexPath.section
+                    self.setupTextFieldInputAccessoryView(textField)
+                    self.textFields.append(textField)
+                    
+                    // The property values to be displayed in the first four rows
+                    let properties:[Float] = [fluid.density, fluid.visocity, fluid.maxPdDefault, fluid.maxVelocityDefault]
+                    
+                    // Set the text field texts
+                    if (properties[indexPath.row] <= 0.009) {
+                        
+                        let formatter = NumberFormatter()
+                        formatter.numberStyle = NumberFormatter.Style.scientific
+                        formatter.usesSignificantDigits = false
+                        formatter.maximumSignificantDigits = 3
+                        formatter.minimumSignificantDigits = 3
+                        textField.text = formatter.string(from: NSNumber(value: properties[indexPath.row]))
+                    }
+                    else {
+                        textField.text = String(format: "%.2f", properties[indexPath.row])
+                    }
+                    
+                    switch indexPath.row {
+                        
+                    case 0:
+                        nameLabel.text = ""
+                        descLabel.text = "Density\n(kg/m3)"
+                    case 1:
+                        nameLabel.text = ""
+                        descLabel.text = "Dynamic viscosity\n(kg/ms)"
+                    case 2:
+                        nameLabel.text = ""
+                        descLabel.text = "Maximum pressure drop\n(Pa/m)"
+                    case 3:
+                        nameLabel.text = ""
+                        descLabel.text = "Maximum velocity\n(m/s)"
+                    default:
+                        print("This row should not be here")                    
+                    }
+                    
                 }
+                
                 
             }
             
@@ -521,7 +615,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
         
         //println("Row: \(indexPath.row) Loading Units: \(loadingUnits[indexPath.row])")
         
-        
+        // print("\(cell!.reuseIdentifier)")
         return cell!
         
     }

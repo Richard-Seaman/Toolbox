@@ -118,7 +118,10 @@ class Calculator: NSObject {
         
         case Copper
         case Steel
-        case Plastic
+        case UPVC
+        case ABS
+        
+        static let all:[PipeMaterial] = [.Copper, .Steel, .UPVC, .ABS]
         
         var material: String {
             switch self {
@@ -126,8 +129,10 @@ class Calculator: NSObject {
                 return "Copper"
             case .Steel:
                 return "Steel"
-            case .Plastic:
-                return "Plastic"
+            case .UPVC:
+                return "UPVC"
+            case .ABS:
+                return "ABS"
             }
         }
         
@@ -137,7 +142,9 @@ class Calculator: NSObject {
                 return properties[SavedProperties.k_Copper.index]
             case .Steel:
                 return properties[SavedProperties.k_Steel.index]
-            case .Plastic:
+            case .UPVC:
+                return properties[SavedProperties.k_Plastic.index]
+            case .ABS:
                 return properties[SavedProperties.k_Plastic.index]
             }
         }
@@ -149,8 +156,10 @@ class Calculator: NSObject {
                 return UIColor(red: 204/255, green: 102/255, blue: 0/255, alpha: 1)
             case .Steel:
                 return UIColor(red: 153/255, green: 153/255, blue: 153/255, alpha: 1)
-            case .Plastic:
+            case .UPVC:
                 return UIColor.white
+            case .ABS:
+                return UIColor.black
             }
         }
         
@@ -163,7 +172,9 @@ class Calculator: NSObject {
                 return [15,22,28,35,42,54,67,76,108,133,159,219]
             case .Steel:
                 return [15,20,25,32,40,50,65,80,90,100,125,150,200]
-            case .Plastic:
+            case .UPVC:
+                return [16,20,25,32,40,50,63,75,90,110,125,140,160,180,200,225,250,280,315]
+            case .ABS:
                 return [16,20,25,32,40,50,63,75,90,110,125,140,160,200,225,250,315]
             }
         }
@@ -174,7 +185,9 @@ class Calculator: NSObject {
                 return [0.0136,0.0202,0.0262,0.033,0.04,0.052,0.0643,0.0731,0.105,0.13,0.155,0.21]
             case .Steel:
                 return [0.0161,0.0216,0.0274,0.036,0.0419,0.053,0.0687,0.0807,0.09315,0.1051,0.12995,0.1554,0.2191]
-            case .Plastic:
+            case .UPVC:
+                return [0.013,0.017,0.022,0.0288,0.0362,0.0455,0.0570,0.0678,0.0814,0.1016,0.1154,0.1292,0.1476,0.1662,0.1846,0.2078,0.2308,0.2586,0.2908]
+            case .ABS:
                 return [0.013,0.0168,0.0212,0.0278,0.0346,0.0432,0.0546,0.065,0.078,0.0954,0.1086,0.1214,0.139,0.1736,0.1954,0.2178,0.2734]
             }
         }
@@ -387,6 +400,30 @@ class Calculator: NSObject {
             case .Air:
                 return properties[SavedProperties.maxVelocity_Air.index]
             }
+        }
+        
+        var pipeMaterial: PipeMaterial {
+            
+            // The saved property is actually the index of where the Pipe Material occurs in it's all array (saved as a Float)
+            // We need to grab the saved property, convert it back to an Int and grab the associated PipeMaterial
+            
+            switch self {
+            case .LPHW:
+                return PipeMaterial.all[Int(properties[SavedProperties.pipeMaterialIndex_LPHW.index])]
+            case .CHW:
+                return PipeMaterial.all[Int(properties[SavedProperties.pipeMaterialIndex_CHW.index])]
+            case .CWS:
+                return PipeMaterial.all[Int(properties[SavedProperties.pipeMaterialIndex_CWS.index])]
+            case .HWS:
+                return PipeMaterial.all[Int(properties[SavedProperties.pipeMaterialIndex_HWS.index])]
+            case .MWS:
+                return PipeMaterial.all[Int(properties[SavedProperties.pipeMaterialIndex_MWS.index])]
+            case .RWS:
+                return PipeMaterial.all[Int(properties[SavedProperties.pipeMaterialIndex_RWS.index])]
+            case .Air:
+                return PipeMaterial.all[Int(properties[SavedProperties.pipeMaterialIndex_Air.index])]
+            }
+            
         }
         
     }
@@ -681,6 +718,13 @@ class Calculator: NSObject {
             // Update the corresponding DU's
             Calculator.demandUnits[outlet.savedIndex] = [cws, hws, mws, rws]
             
+            // Log it
+            print("Updating demand units for \(outlet.description) to:")
+            print("CWS - \(cws)")
+            print("HWS - \(hws)")
+            print("MWS - \(mws)")
+            print("RWS - \(rws)")
+            
             // Save the changes
             saveCurrentDemandUnits()
             
@@ -697,6 +741,8 @@ class Calculator: NSObject {
     enum SavedProperties {
         
         // NB: If you add another case to SavedProperties make sure you add it to the all array [SavedProperties]
+        
+        // All Float values
         
         case maxPd_LPHW
         case maxPd_CHW
@@ -740,6 +786,13 @@ class Calculator: NSObject {
         case maxVelocity_HWS
         case maxVelocity_RWS
         case maxVelocity_Air
+        case pipeMaterialIndex_LPHW
+        case pipeMaterialIndex_CHW
+        case pipeMaterialIndex_MWS
+        case pipeMaterialIndex_CWS
+        case pipeMaterialIndex_HWS
+        case pipeMaterialIndex_RWS
+        case pipeMaterialIndex_Air
         
         // Create an array with all the types available
         // This allows us to cycle through them all (no in built way of doing this)
@@ -750,7 +803,8 @@ class Calculator: NSObject {
             c_LPHW,c_CHW,c_MWS,c_CWS,c_HWS,c_RWS,c_Air,
             dt_LPHW,dt_CHW,visco_LPHW,visco_CHW,visco_MWS,visco_CWS,visco_HWS,visco_RWS,visco_Air,
             density_LPHW,density_CHW,density_MWS,density_CWS,density_HWS,density_RWS,density_Air,
-            maxVelocity_LPHW,maxVelocity_CHW,maxVelocity_HWS,maxVelocity_CWS,maxVelocity_HWS,maxVelocity_RWS,maxVelocity_Air]
+            maxVelocity_LPHW,maxVelocity_CHW,maxVelocity_HWS,maxVelocity_CWS,maxVelocity_HWS,maxVelocity_RWS,maxVelocity_Air,
+            pipeMaterialIndex_LPHW, pipeMaterialIndex_CHW, pipeMaterialIndex_MWS, pipeMaterialIndex_CWS, pipeMaterialIndex_HWS, pipeMaterialIndex_RWS, pipeMaterialIndex_Air]
         
         
         // NB: always add new properties to the end (later index) so existing saved files don't get confused
@@ -841,8 +895,21 @@ class Calculator: NSObject {
                 return 34
             case .maxVelocity_Air:
                 return 39
+            case .pipeMaterialIndex_LPHW:
+                return 42
+            case .pipeMaterialIndex_CHW:
+                return 43
+            case .pipeMaterialIndex_CWS:
+                return 44
+            case .pipeMaterialIndex_HWS:
+                return 45
+            case .pipeMaterialIndex_MWS:
+                return 46
+            case .pipeMaterialIndex_RWS:
+                return 47
+            case .pipeMaterialIndex_Air:
+                return 48
             }
-            
         }
         
         
@@ -932,7 +999,22 @@ class Calculator: NSObject {
                 return 1.1
             case .maxVelocity_Air:
                 return 2.5
+            case .pipeMaterialIndex_LPHW:
+                return Float(PipeMaterial.all.index(of: .Steel)!)       // Note only converting to FLoat so can use Saved Properties
+            case .pipeMaterialIndex_CHW:
+                return Float(PipeMaterial.all.index(of: .Steel)!)
+            case .pipeMaterialIndex_CWS:
+                return Float(PipeMaterial.all.index(of: .Copper)!)
+            case .pipeMaterialIndex_HWS:
+                return Float(PipeMaterial.all.index(of: .Copper)!)
+            case .pipeMaterialIndex_MWS:
+                return Float(PipeMaterial.all.index(of: .UPVC)!)
+            case .pipeMaterialIndex_RWS:
+                return Float(PipeMaterial.all.index(of: .Copper)!)
+            case .pipeMaterialIndex_Air:
+                return Float(PipeMaterial.all.index(of: .Copper)!)      // Doesn't matter, will return nil anyway
             }
+            
         }
         
         
@@ -1022,6 +1104,20 @@ class Calculator: NSObject {
                 return "RWS maximum velocity"
             case .maxVelocity_Air:
                 return "Air maximum velocity"
+            case .pipeMaterialIndex_LPHW:
+                return "The default pipe material for LPHW"
+            case .pipeMaterialIndex_CHW:
+                return "The default pipe material for CHW"
+            case .pipeMaterialIndex_CWS:
+                return "The default pipe material for CWS"
+            case .pipeMaterialIndex_HWS:
+                return "The default pipe material for HWS"
+            case .pipeMaterialIndex_MWS:
+                return "The default pipe material for MWS"
+            case .pipeMaterialIndex_RWS:
+                return "The default pipe material for RWS"
+            case .pipeMaterialIndex_Air:
+                return "The default pipe material for Air"
             }
         }
         
@@ -1029,6 +1125,42 @@ class Calculator: NSObject {
     
     
     // MARK: Update Saved Properties
+    
+    func setPipeMaterial(fluid:Fluid, material:PipeMaterial) {
+        
+        if let index = Calculator.PipeMaterial.all.index(of: material) {
+            
+            // Note: the saved property is the float value of the index of the material in the Pipe Material all array
+            
+            switch fluid {
+            case .LPHW:
+                Calculator.properties[SavedProperties.pipeMaterialIndex_LPHW.index] = Float(index)
+            case .CHW:
+                Calculator.properties[SavedProperties.pipeMaterialIndex_CHW.index] = Float(index)
+            case .MWS:
+                Calculator.properties[SavedProperties.pipeMaterialIndex_MWS.index] = Float(index)
+            case .CWS:
+                Calculator.properties[SavedProperties.pipeMaterialIndex_CWS.index] = Float(index)
+            case .HWS:
+                Calculator.properties[SavedProperties.pipeMaterialIndex_HWS.index] = Float(index)
+            case .RWS:
+                Calculator.properties[SavedProperties.pipeMaterialIndex_RWS.index] = Float(index)
+            case .Air:
+                Calculator.properties[SavedProperties.pipeMaterialIndex_Air.index] = Float(index)
+            }
+            
+            // Log it
+            print("Setting Pipe Material of \(fluid.abreviation) to: \(material.material)")
+            
+            // Save the change
+            saveCurrentProperties()
+            
+        } else {
+            print("Could not set pipe material for fluid, unknown pipe material enetered (make sure it's in the all array)")
+            
+        }
+        
+    }
     
     func setKValue(duct:DuctMaterial, kValue:Float) {
         
@@ -1057,13 +1189,16 @@ class Calculator: NSObject {
         if (kValue > 0) {
             
             switch pipe {
-            case .Plastic:
+            case .UPVC, .ABS:
                 Calculator.properties[SavedProperties.k_Plastic.index] = kValue
             case .Copper:
                 Calculator.properties[SavedProperties.k_Copper.index] = kValue
             case .Steel:
                 Calculator.properties[SavedProperties.k_Steel.index] = kValue
             }
+            
+            // Log it
+            print("Setting \(pipe.material) k value to: \(kValue)")
             
             // Save the change
             saveCurrentProperties()
@@ -1096,6 +1231,9 @@ class Calculator: NSObject {
                 Calculator.properties[SavedProperties.c_Air.index] = specificHeatCapacity
             }
             
+            // Log it
+            print("Setting Specific Heat Capacity of \(fluid.abreviation) to: \(specificHeatCapacity)")
+            
             // Save the change
             saveCurrentProperties()
             
@@ -1126,6 +1264,9 @@ class Calculator: NSObject {
             case .Air:
                 Calculator.properties[SavedProperties.density_Air.index] = density
             }
+            
+            // Log it
+            print("Setting Density of \(fluid.abreviation) to: \(density)")
             
             // Save the change
             saveCurrentProperties()
@@ -1158,6 +1299,9 @@ class Calculator: NSObject {
                 Calculator.properties[SavedProperties.visco_Air.index] = visco
             }
             
+            // Log it
+            print("Setting Viscosity of \(fluid.abreviation) to: \(visco)")
+            
             // Save the change
             saveCurrentProperties()
             
@@ -1186,6 +1330,10 @@ class Calculator: NSObject {
             
             // Save the change
             if (changeMade) {
+                
+                // Log it
+                print("Setting temperature differnce of \(fluid.abreviation) to: \(dt)")
+                
                 saveCurrentProperties()
             }
             
@@ -1216,6 +1364,9 @@ class Calculator: NSObject {
             case .Air:
                 Calculator.properties[SavedProperties.maxPd_Air.index] = maxPd
             }
+            
+            // Log it
+            print("Setting maximum pressure drop of \(fluid.abreviation) to: \(maxPd)")
             
             // Save the change
             saveCurrentProperties()
@@ -1248,6 +1399,9 @@ class Calculator: NSObject {
                 Calculator.properties[SavedProperties.maxVelocity_Air.index] = maxVelocity
             }
             
+            // Log it
+            print("Setting maximum velocity of \(fluid.abreviation) to: \(maxVelocity)")
+            
             // Save the change
             saveCurrentProperties()
             
@@ -1273,6 +1427,7 @@ class Calculator: NSObject {
             setMaxVelocity(fluid: fluid, maxVelocity: SavedProperties.maxVelocity_LPHW.defaultValue)
             setTemperatureDifference(fluid: fluid, dt: SavedProperties.dt_LPHW.defaultValue)
             setViscosity(fluid: fluid, visco: SavedProperties.visco_LPHW.defaultValue)
+            setPipeMaterial(fluid: fluid, material: PipeMaterial.all[Int(SavedProperties.pipeMaterialIndex_LPHW.defaultValue)])
         case .CHW:
             setSpecificHeatCapacity(fluid: fluid, specificHeatCapacity: SavedProperties.c_CHW.defaultValue)
             setDensity(fluid: fluid, density: SavedProperties.density_CHW.defaultValue)
@@ -1280,36 +1435,42 @@ class Calculator: NSObject {
             setMaxVelocity(fluid: fluid, maxVelocity: SavedProperties.maxVelocity_CHW.defaultValue)
             setTemperatureDifference(fluid: fluid, dt: SavedProperties.dt_CHW.defaultValue)
             setViscosity(fluid: fluid, visco: SavedProperties.visco_CHW.defaultValue)
+            setPipeMaterial(fluid: fluid, material: PipeMaterial.all[Int(SavedProperties.pipeMaterialIndex_CHW.defaultValue)])
         case .MWS:
             setSpecificHeatCapacity(fluid: fluid, specificHeatCapacity: SavedProperties.c_MWS.defaultValue)
             setDensity(fluid: fluid, density: SavedProperties.density_MWS.defaultValue)
             setMaxPd(fluid: fluid, maxPd: SavedProperties.maxPd_MWS.defaultValue)
             setMaxVelocity(fluid: fluid, maxVelocity: SavedProperties.maxVelocity_MWS.defaultValue)
             setViscosity(fluid: fluid, visco: SavedProperties.visco_MWS.defaultValue)
+            setPipeMaterial(fluid: fluid, material: PipeMaterial.all[Int(SavedProperties.pipeMaterialIndex_MWS.defaultValue)])
         case .CWS:
             setSpecificHeatCapacity(fluid: fluid, specificHeatCapacity: SavedProperties.c_CWS.defaultValue)
             setDensity(fluid: fluid, density: SavedProperties.density_CWS.defaultValue)
             setMaxPd(fluid: fluid, maxPd: SavedProperties.maxPd_CWS.defaultValue)
             setMaxVelocity(fluid: fluid, maxVelocity: SavedProperties.maxVelocity_CWS.defaultValue)
             setViscosity(fluid: fluid, visco: SavedProperties.visco_CWS.defaultValue)
+            setPipeMaterial(fluid: fluid, material: PipeMaterial.all[Int(SavedProperties.pipeMaterialIndex_CWS.defaultValue)])
         case .HWS:
             setSpecificHeatCapacity(fluid: fluid, specificHeatCapacity: SavedProperties.c_HWS.defaultValue)
             setDensity(fluid: fluid, density: SavedProperties.density_HWS.defaultValue)
             setMaxPd(fluid: fluid, maxPd: SavedProperties.maxPd_HWS.defaultValue)
             setMaxVelocity(fluid: fluid, maxVelocity: SavedProperties.maxVelocity_HWS.defaultValue)
             setViscosity(fluid: fluid, visco: SavedProperties.visco_HWS.defaultValue)
+            setPipeMaterial(fluid: fluid, material: PipeMaterial.all[Int(SavedProperties.pipeMaterialIndex_HWS.defaultValue)])
         case .RWS:
             setSpecificHeatCapacity(fluid: fluid, specificHeatCapacity: SavedProperties.c_RWS.defaultValue)
             setDensity(fluid: fluid, density: SavedProperties.density_RWS.defaultValue)
             setMaxPd(fluid: fluid, maxPd: SavedProperties.maxPd_RWS.defaultValue)
             setMaxVelocity(fluid: fluid, maxVelocity: SavedProperties.maxVelocity_RWS.defaultValue)
             setViscosity(fluid: fluid, visco: SavedProperties.visco_RWS.defaultValue)
+            setPipeMaterial(fluid: fluid, material: PipeMaterial.all[Int(SavedProperties.pipeMaterialIndex_RWS.defaultValue)])
         case .Air:
             setSpecificHeatCapacity(fluid: fluid, specificHeatCapacity: SavedProperties.c_Air.defaultValue)
             setDensity(fluid: fluid, density: SavedProperties.density_Air.defaultValue)
             setMaxPd(fluid: fluid, maxPd: SavedProperties.maxPd_Air.defaultValue)
             setMaxVelocity(fluid: fluid, maxVelocity: SavedProperties.maxVelocity_Air.defaultValue)
             setViscosity(fluid: fluid, visco: SavedProperties.visco_Air.defaultValue)
+            setPipeMaterial(fluid: fluid, material: PipeMaterial.all[Int(SavedProperties.pipeMaterialIndex_Air.defaultValue)])
         }
         
         print("Properties reset to default for \(fluid.description)")
@@ -1320,7 +1481,7 @@ class Calculator: NSObject {
         
         // Reset all of the pipe k values
         
-        setKValue(pipe: .Plastic, kValue: SavedProperties.k_Plastic.defaultValue)
+        setKValue(pipe: .UPVC, kValue: SavedProperties.k_Plastic.defaultValue)
         setKValue(pipe: .Copper, kValue: SavedProperties.k_Copper.defaultValue)
         setKValue(pipe: .Steel, kValue: SavedProperties.k_Steel.defaultValue)
         
