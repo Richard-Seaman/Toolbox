@@ -44,13 +44,13 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate  {
     let networkSizerIndex:Int = 2
     let simDemandIndex:Int = 3
     let daylightIndex:Int = 4
-    let settingsIndex:Int = 5
     // Other section
-    let rateUsIndex:Int = 1
-    let aboutIndex:Int = 0
-    let termsIndex:Int = 2
+    let settingsIndex:Int = 0
+    let aboutIndex:Int = 1
+    let rateUsIndex:Int = 2
+    let termsIndex:Int = 3
     
-    let numberOfRows = [6,3]
+    let numberOfRows = [5,4]
     
     // Table Variables
     var tableViewController = UITableViewController()
@@ -161,9 +161,9 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate  {
         
         switch section{
         case 1:
-            return "Other"
+            return "Settings & More"
         default:
-            return "Tools"
+            return "Get Started..."
         }
         
     }
@@ -185,8 +185,10 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate  {
         
         
         // Define the two height and width constraints of the image view
+        // Note that the image view container view remains the same width for all (and is set on the storyboard)
+        // This means that it's just the image sizes that changes, the texts are still aligned in each section
         let largeImageSize:CGFloat = 60
-        let standardImageSize:CGFloat = 60
+        let standardImageSize:CGFloat = 45
         
         let otherHeightConstraint:NSLayoutConstraint = NSLayoutConstraint(item: imageView, attribute: NSLayoutAttribute.height, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: standardImageSize)
         let otherWidthConstraint:NSLayoutConstraint = NSLayoutConstraint(item: imageView, attribute: NSLayoutAttribute.width, relatedBy: NSLayoutRelation.equal, toItem: nil, attribute: NSLayoutAttribute.notAnAttribute, multiplier: 1, constant: standardImageSize)
@@ -209,6 +211,11 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate  {
             
             switch indexPath.row {
                 
+            case self.settingsIndex:
+                // Settings
+                titleLabel.text = "Variables"
+                detailLabel.text = "Adjust the global variables that are used in the tools above."
+                imageView.image = UIImage(named: "SettingsColor")!
             case self.rateUsIndex:
                 // Rate
                 titleLabel.text = "Rate Us"
@@ -252,9 +259,9 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate  {
                 imageView.image = UIImage(named: "PipeSizer")!
             case self.networkSizerIndex:
                 // Network Sizer
-                titleLabel.text = "Network Pipe Sizer"
-                detailLabel.text = "Size the pipework for a given heating/cooling network."
-                imageView.image = UIImage(named: "PipeSizer")!
+                titleLabel.text = "Multiple Load Pipe Sizer"
+                detailLabel.text = "Size the pipework to serve a number of LPHW / CHW loads."
+                imageView.image = UIImage(named: "RadIcon")!
             case self.simDemandIndex:
                 // Simultaneous Demand
                 titleLabel.text = "Simultaneous Demand"
@@ -265,11 +272,6 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate  {
                 titleLabel.text = "Daylight Calculator"
                 detailLabel.text = "Calculate the average daylight factor for a standard room with given dimensions."
                 imageView.image = UIImage(named: "Daylight")!
-            case self.settingsIndex:
-                // Settings
-                titleLabel.text = "Variables"
-                detailLabel.text = "Adjust the global variables that are used in the tools above."
-                imageView.image = UIImage(named: "SettingsColor")!
                 
             default:
                 titleLabel.text = ""

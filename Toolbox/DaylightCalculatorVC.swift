@@ -124,7 +124,7 @@ class DaylightCalculatorVC: UIViewController {
         
         // Add update action to segmented control
         self.schoolSelector.addTarget(self, action: #selector(DaylightCalculatorVC.updateCalculation), for: UIControlEvents.valueChanged)
-        self.schoolSelector.tintColor = bdpColour
+        self.schoolSelector.tintColor = primaryColour
         
         // Update max window dimensions
         self.setMaxWindowSizes()

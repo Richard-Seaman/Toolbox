@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="15G1217" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -15,42 +16,45 @@
             <rect key="frame" x="0.0" y="0.0" width="480" height="480"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Jti-4G-T2i" userLabel="CopyRightView">
-                    <rect key="frame" x="0.0" y="440" width="480" height="40"/>
-                    <subviews>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="© 2017 Richard Seaman. All rights reserved." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="tIB-Ti-xCI" userLabel="© 2016 Richard Seaman. All rights reserved.">
-                            <rect key="frame" x="116" y="13" width="249.5" height="15"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                            <nil key="highlightedColor"/>
-                        </label>
-                    </subviews>
-                    <color key="backgroundColor" red="0.33333333333333331" green="0.33333333333333331" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LaunchIScreenImage" translatesAutoresizingMaskIntoConstraints="NO" id="mfn-8k-Agn">
+                    <rect key="frame" x="140" y="140" width="200" height="200"/>
                     <constraints>
-                        <constraint firstItem="tIB-Ti-xCI" firstAttribute="centerX" secondItem="Jti-4G-T2i" secondAttribute="centerX" id="Kkm-hi-TcT"/>
-                        <constraint firstItem="tIB-Ti-xCI" firstAttribute="centerY" secondItem="Jti-4G-T2i" secondAttribute="centerY" id="Vch-5E-FPb"/>
-                        <constraint firstAttribute="height" constant="40" id="Ytf-FU-uoN"/>
-                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="40" id="smD-rH-wgR"/>
+                        <constraint firstAttribute="height" constant="200" id="0EH-Ai-06q"/>
+                        <constraint firstAttribute="width" constant="200" id="drJ-cS-XH2"/>
                     </constraints>
-                </view>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Neatly arranging tools..." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vq8-v2-9Fe">
-                    <rect key="frame" x="173" y="233" width="136" height="15"/>
-                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                    <color key="textColor" red="0.33333333333333331" green="0.33333333333333331" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="by Richard Seaman" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6az-KJ-GfZ">
+                    <rect key="frame" x="8" y="356" width="464" height="14.5"/>
+                    <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tPv-3z-9kr">
+                    <rect key="frame" x="8" y="56.5" width="464" height="67.5"/>
+                    <string key="text">Building Services 
+Toolbox</string>
+                    <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                    <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
             </subviews>
             <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
-                <constraint firstItem="vq8-v2-9Fe" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="5Ra-hm-SLp"/>
-                <constraint firstItem="Jti-4G-T2i" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="5bc-AL-UGK"/>
-                <constraint firstItem="vq8-v2-9Fe" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="JsW-JO-ik4"/>
-                <constraint firstAttribute="trailing" secondItem="Jti-4G-T2i" secondAttribute="trailing" id="KZV-6G-MCM"/>
-                <constraint firstAttribute="bottom" secondItem="Jti-4G-T2i" secondAttribute="bottom" id="iAh-NH-S5k"/>
+                <constraint firstItem="6az-KJ-GfZ" firstAttribute="top" secondItem="mfn-8k-Agn" secondAttribute="bottom" constant="16" id="3yj-Iw-zPj"/>
+                <constraint firstItem="mfn-8k-Agn" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="4Nb-Y3-dLK"/>
+                <constraint firstItem="mfn-8k-Agn" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="4g0-dn-6xH"/>
+                <constraint firstAttribute="trailingMargin" secondItem="tPv-3z-9kr" secondAttribute="trailing" id="AWn-II-bvh"/>
+                <constraint firstItem="6az-KJ-GfZ" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="BZS-QN-ehR"/>
+                <constraint firstItem="tPv-3z-9kr" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="EXE-fe-8Fb"/>
+                <constraint firstAttribute="trailingMargin" secondItem="6az-KJ-GfZ" secondAttribute="trailing" id="Pjj-Yy-j7z"/>
+                <constraint firstItem="mfn-8k-Agn" firstAttribute="top" secondItem="tPv-3z-9kr" secondAttribute="bottom" constant="16" id="w0R-EH-1L1"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <point key="canvasLocation" x="548" y="455"/>
         </view>
     </objects>
+    <resources>
+        <image name="LaunchIScreenImage" width="133" height="133"/>
+    </resources>
 </document>
