@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MessageUI
 
 // FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
 // Consider refactoring the code to use the non-optional operators.
@@ -33,7 +34,7 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
 }
 
 
-class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate  {
+class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMailComposeViewControllerDelegate  {
 
     @IBOutlet weak var tableView: UITableView!
     
@@ -48,9 +49,10 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate  {
     let settingsIndex:Int = 0
     let aboutIndex:Int = 1
     let rateUsIndex:Int = 2
-    let termsIndex:Int = 3
+    let mailIndex:Int = 3
+    let termsIndex:Int = 4
     
-    let numberOfRows = [5,4]
+    let numberOfRows = [5,5]
     
     // Table Variables
     var tableViewController = UITableViewController()
@@ -166,9 +168,12 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate  {
             return "Get Started..."
         }
         
+    }    
+    
+    // Make sure the header size is what we want
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return defaultHeaderSizae
     }
-    
-    
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
@@ -218,8 +223,8 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate  {
                 imageView.image = UIImage(named: "SettingsColor")!
             case self.rateUsIndex:
                 // Rate
-                titleLabel.text = "Rate Us"
-                detailLabel.text = "If you find The Building Services Toolbox useful, I'd really appreciate if you Rate it on the App Store!\nBut If you don't, I'd prefer if you didn't..."
+                titleLabel.text = "Rate"
+                detailLabel.text = "If you find The Building Services Toolbox useful, I'd really appreciate if you Rate it on the App Store! But If you don't, I'd prefer if you didn't..."
                 imageView.image = UIImage(named: "RateStar")!
             case self.aboutIndex:
                 // About
@@ -231,6 +236,11 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate  {
                 titleLabel.text = "Terms & Conditions"
                 detailLabel.text = "Review the terms and conditions of use."
                 imageView.image = UIImage(named: "CheckBox")!
+            case self.mailIndex:
+                // Email
+                titleLabel.text = "Send Email"
+                detailLabel.text = "Provide some feedback on the Building Services Engineering Toolbox."
+                imageView.image = UIImage(named: "Mail")!
                 
             default:
                 titleLabel.text = ""
@@ -321,6 +331,9 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate  {
                 // Terms & Conditions
                 print("Not implemented yet")
             //self.performSegue(withIdentifier: "toTerms", sender: self)
+            case self.mailIndex:
+                // Send an email
+                self.sendMail()
                 
             default:
                 print("No action for this cell")
@@ -363,7 +376,38 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate  {
         
     }
 
+    // MARK - mail
     
+    func sendMail() {
+        
+        if !MFMailComposeViewController.canSendMail() {
+            print("Mail services are not available")
+            // Display error
+            let alertController = UIAlertController(title: "Error", message:
+                "Email doesn't appear to be available on this device", preferredStyle: UIAlertControllerStyle.alert)
+            alertController.addAction(UIAlertAction(title: "Okay", style: UIAlertActionStyle.default,handler: nil))
+            
+            self.present(alertController, animated: true, completion: nil)
+            
+            return
+        }
+        
+        let composeVC = MFMailComposeViewController()
+        composeVC.mailComposeDelegate = self
+        // Configure the fields of the interface.
+        composeVC.setToRecipients(["rdgseaman@gmail.com"])
+        composeVC.setSubject("BSE Toolbox")
+        composeVC.setMessageBody("", isHTML: false)
+        // Present the view controller modally.
+        self.present(composeVC, animated: true, completion: nil)
+        
+    }
+    
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        // Check the result or perform other tasks.
+        // Dismiss the mail compose view controller.
+        controller.dismiss(animated: true, completion: nil)
+    }
 
 
 }

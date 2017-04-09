@@ -193,7 +193,7 @@ class InfoVC: UIViewController {
                 let label = cell.viewWithTag(1) as! UILabel
                 
                 // Set the elements
-                label.text = "\"I developed M&E Toolbox so that I could quickly check things while out of the office. The tools provided are not intended to replace detailed calculations and can only be used for quick checks. I tried to make each tool as transparent as possible so that you know exactly what's happening behind the scenes.\n\nIf you wish to get in contact with me, you can use the button below to open my LinkedIn page in Safari.\n\nIf you spot a bug, notice any strange results or just wish to pass along some suggestions or feedback, I'd be delighted to hear from you.\"\n\n- Richard Seaman\n"
+                label.text = "\"I developed M&E Toolbox so that I could quickly check things while out of the office. The tools provided are not intended to replace detailed calculations and can only be used for quick checks. I tried to make each tool as transparent as possible so that you know exactly what's happening behind the scenes.\n\nIf you wish to get in contact with me, you can use the email option on the main screen or the button below to open my LinkedIn page.\n\nIf you spot a bug, notice any strange results or just wish to pass along some suggestions or feedback, I'd be delighted to hear from you.\"\n\n- Richard Seaman\n"
                 
                 cell.isUserInteractionEnabled = false
                 cell.selectionStyle = UITableViewCellSelectionStyle.none
@@ -207,7 +207,7 @@ class InfoVC: UIViewController {
                 
                 // Set the elements
                 button.addTarget(self, action: #selector(InfoVC.contactRichardTapped), for: UIControlEvents.touchUpInside)
-                button.setTitle("Contact Richard", for: UIControlState())
+                button.setTitle("View LinkedIn Page", for: UIControlState())
                 
                 button.layer.backgroundColor = primaryColour.cgColor
                 button.layer.cornerRadius = 2.5

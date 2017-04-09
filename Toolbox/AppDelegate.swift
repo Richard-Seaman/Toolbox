@@ -23,6 +23,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Initialise the calculator
         calculator = Calculator()
+        
+        // If it's the first time launching on an iPad, reset the MWS defaults 
+        // (not sure why but MWS max velocity is 0 on iPads when first launched)
+        if UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiom.pad {
+            
+            var needsToReset:Bool = true
+            
+            let key:String = "hasResetMWS"
+            let userDefaults = UserDefaults.standard
+            if let hasAlreadyReset:Bool = userDefaults.bool(forKey: key) {
+                if hasAlreadyReset {
+                    needsToReset = false
+                }
+            }
+            
+            if needsToReset {
+                print("First time launching on iPad, resetting MWS due to known bug")
+                calculator.resetDefaultFluidProperties(fluid: .MWS)
+                userDefaults.set(true, forKey: key)
+                userDefaults.synchronize()
+            }
+            
+        }
                 
         // Set up the navigation controller visuals
         UINavigationBar.appearance().barStyle = UIBarStyle.blackTranslucent

@@ -70,6 +70,7 @@ class HeatPipeSizerVC: UIViewController {
     var flows:[Float?] = [Float?]()
     var quantities:[Int?] = [Int?]()
     var pds:[Float?] = [Float?]()
+    var velocities:[Float?] = [Float?]()
     var loadLabels:[UILabel] = [UILabel]()
     var pipeSizeLabels:[UILabel] = [UILabel]()
     var pdLabels:[UILabel] = [UILabel]()
@@ -77,31 +78,37 @@ class HeatPipeSizerVC: UIViewController {
     var errorViews:[UIControl] = [UIControl]()
     
     // Calculation
-    var steelSelected:Bool = Bool()
-    var lphwSelected:Bool = Bool()
-    let steelNomDiamters:[Int] = [15,20,25,32,40,50,65,80,90,100,125,150,200]
-    let steelIntDiameters:[Float] = [0.0161,0.0216,0.0274,0.036,0.0419,0.053,0.0687,0.0807,0.09315,0.1051,0.12995,0.1554,0.2191]
-    let copperNomDiamters:[Int] = [15,22,28,35,42,54,67,76,108,133,159,219]
-    let copperIntDiameters:[Float] = [0.0136,0.0202,0.0262,0.033,0.04,0.052,0.0643,0.0731,0.105,0.13,0.155,0.21]
-    
-    var lphwProperties:[Float] = [Float(),Float(),Float()]   // [C, rho, vis]
-    var chwProperties:[Float] = [Float(),Float(),Float()]    // [C, rho, vis]
-    
-    var kSteel:Float = Float()
-    var kCooper:Float = Float()
-    
-    var lphwDt:Float = Float()
-    var chwDt:Float = Float()
-    
-    let pi:Float = Float(M_PI)
-    
     var maxPd:Float = Float()
+    
+    var fluids:[Calculator.Fluid] = [.LPHW, .CHW]
+    var selectedFluid:Calculator.Fluid = .LPHW {
+        didSet {
+            self.fluidButton.layer.backgroundColor = self.selectedFluid.colour.cgColor
+            self.fluidButton.setTitle(self.selectedFluid.abreviation, for: .normal)
+            self.fluidButton.tintColor = UIColor.white
+            self.maxPd = self.selectedFluid.maxPdDefault
+        }
+    }
+    
+    var materials:[Calculator.PipeMaterial] = Calculator.PipeMaterial.all
+    var selectedMaterial:Calculator.PipeMaterial = .Steel {
+        didSet {
+            self.materialButton.layer.backgroundColor = self.selectedMaterial.colour.cgColor
+            self.materialButton.setTitle(self.selectedMaterial.material, for: .normal)
+            self.materialButton.tintColor = UIColor.white
+            // UPVC is white so need to change text colour so you can see it
+            if (self.selectedMaterial == .UPVC) {
+                self.materialButton.tintColor = UIColor.darkGray
+            }
+        }
+    }
     
     // Results
     var totalPipeSize:Int? = Int()
     var totalLoad:Float? = Float()
     var totalFlow:Float? = Float()
     var totalPd:Float? = Float()
+    var totalVelocity:Float? = Float()
     var totalPipeSizeError:String? = String()
     
 
@@ -109,9 +116,6 @@ class HeatPipeSizerVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Load in the pipe sizer properties
-        self.loadProperties()
         
         // Listen for keyboard changes
         NotificationCenter.default.addObserver(self, selector: #selector(HeatPipeSizerVC.keyboardNotification(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
@@ -130,16 +134,17 @@ class HeatPipeSizerVC: UIViewController {
         // Set up nav bar
         self.navigationItem.titleView = getNavImageView(UIApplication.shared.statusBarOrientation)
         
-        // self.tableView.separatorColor = UIColor.darkGrayColor() // Does work but the inset is still white so doesnlt look great
+        // Set up material and fluid buttons
+        self.setUpButtons()
+        self.selectedFluid = .LPHW          // will call didSet
+        self.selectedMaterial = .Steel      // will call didSet
         
         // Apply the background tap function to the backgrounds
         for view in self.backGroundControlViews {
             self.addBackgroundTap(view)
         }
         
-        
         self.setInitialValues()
-        self.setUpButtons()
         self.setUpErrorView(self.errorView)
         
         // Add keyboard methods to textfiedls
@@ -166,19 +171,6 @@ class HeatPipeSizerVC: UIViewController {
         
     }
     
-    func loadProperties() {
-        
-        loadPipeSizerProperties()
-        self.maxPd = pipeSizerProperties[0]
-        self.kSteel = pipeSizerProperties[1]
-        self.kCooper = pipeSizerProperties[2]
-        self.lphwProperties = [pipeSizerProperties[3],pipeSizerProperties[4],pipeSizerProperties[5]]
-        self.lphwDt = pipeSizerProperties[6]
-        self.chwProperties = [pipeSizerProperties[7],pipeSizerProperties[8],pipeSizerProperties[9]]
-        self.chwDt = pipeSizerProperties[10]
-        
-    }
-    
     
     
     // MARK: - Set Up
@@ -186,9 +178,6 @@ class HeatPipeSizerVC: UIViewController {
     func setInitialValues() {
         
         print("setInitialValues")
-        
-        self.steelSelected = true
-        self.lphwSelected = true
         
         // Empty variables
         self.textFields = [[LoadInfoTF]]()
@@ -199,6 +188,7 @@ class HeatPipeSizerVC: UIViewController {
         self.flows = [Float?]()
         self.quantities = [Int?]()
         self.pds = [Float?]()
+        self.velocities = [Float?]()
         self.pipeSizeLabels = [UILabel]()
         self.loadLabels = [UILabel]()
         self.pipeSizeErrors = [String?]()
@@ -226,6 +216,7 @@ class HeatPipeSizerVC: UIViewController {
             self.flows.append(nil)
             self.quantities.append(nil)
             self.pds.append(nil)
+            self.velocities.append(nil)
         }
         
         self.totalPipeSizeError = nil
@@ -242,16 +233,14 @@ class HeatPipeSizerVC: UIViewController {
         self.materialButton.addTarget(self, action: #selector(HeatPipeSizerVC.materialButtonTapped(_:)), for: UIControlEvents.touchUpInside)
         self.fluidButton.addTarget(self, action: #selector(HeatPipeSizerVC.fluidButtonTapped(_:)), for: UIControlEvents.touchUpInside)
         
-        // Material Button Appearance - temporarily change to copper, then tap the button so it changes to steel and sets appearance
-        self.steelSelected = false
-        self.materialButtonTapped(self.materialButton)
+        // Material Button Appearance
+        self.materialButton.layer.borderColor = UIColor.darkGray.cgColor
         self.materialButton.layer.borderWidth = 2.5
         self.materialButton.layer.cornerRadius = 8
         self.materialButton.clipsToBounds = true
         
-        // Fluid Button Appearance - temporarily change to copper, then tap the button so it changes to steel and sets appearance
-        self.lphwSelected = false
-        self.fluidButtonTapped(self.fluidButton)
+        // Fluid Button Appearance
+        self.fluidButton.layer.borderColor = UIColor.darkGray.cgColor
         self.fluidButton.layer.borderWidth = 2.5
         self.fluidButton.layer.cornerRadius = 8
         self.fluidButton.clipsToBounds = true
@@ -276,8 +265,6 @@ class HeatPipeSizerVC: UIViewController {
         
         print("refresh")
         
-        self.loadProperties()
-        
         // Recalculate
         self.calculate()
         
@@ -285,16 +272,6 @@ class HeatPipeSizerVC: UIViewController {
         
         // Update the textfield and label texts
         self.updateTextsAndLabels()
-        
-        print("  LoadSet  : \(self.loadSet)")
-        print("  Loads    : \(self.loads)")
-        print("  Quantity : \(self.quantities)")
-        print("  PipeSizes: \(self.pipeSizes)")
-        print("  Pds      : \(self.pds)")
-        print("")
-        print(" Total Flow: \(self.totalFlow)")
-        print(" Total Size: \(self.totalPipeSize)")
-        print(" Total Pd  : \(self.totalPd)")
         
     }
     
@@ -406,8 +383,16 @@ class HeatPipeSizerVC: UIViewController {
             if let qty = self.quantities[row] {
                 
                 let combinedFlow:Float = flow * Float(qty)
-                self.pipeSizes[row] = self.sizeFromFlow(combinedFlow).size
-                self.pds[row] = self.sizeFromFlow(combinedFlow).pd
+                
+                if let result = calculator.sizePipe(massFlowrate: combinedFlow, material: self.selectedMaterial, fluid: self.selectedFluid, maxPd: self.maxPd, maxVelocity: nil) {
+                    self.pipeSizes[row] = result.nomDia
+                    self.pds[row] = result.pd
+                    self.velocities[row] = result.v
+                } else {
+                    self.pipeSizes[row] = nil
+                    self.pds[row] = nil
+                    self.velocities[row] = nil
+                }
                 
                 if (self.pipeSizes[row] == nil) {
                     self.pipeSizeErrors[row] = "Flow too Large"
@@ -416,6 +401,7 @@ class HeatPipeSizerVC: UIViewController {
                     self.pipeSizeErrors[row] = nil
                 }
             }
+            
         }
         else {
             self.pipeSizes[row] = nil
@@ -541,27 +527,11 @@ class HeatPipeSizerVC: UIViewController {
     }
     
     func flowFromLoad(_ load:Float) -> Float {
-        
-        if (self.lphwSelected) {
-            return load / (self.lphwProperties[0] * self.lphwDt)
-        }
-        else {
-            return load / (self.chwProperties[0]  * self.chwDt)
-        }
-        
-        
-        
+        return calculator.massFlowrate(load: load, specificHeatCapacity: self.selectedFluid.specificHeatCapacity, temperatureDifference: self.selectedFluid.temperatureDifference!)
     }
     
     func loadFromFlow(_ flow:Float) -> Float {
-        if (self.lphwSelected) {
-            return flow * self.lphwProperties[0] * self.lphwDt
-        }
-        else {
-            return flow * self.chwProperties[0] * self.chwDt
-        }
-        
-        
+        return calculator.load(massFlowrate: flow, specificHeatCapacity: self.selectedFluid.specificHeatCapacity, temperatureDifference: self.selectedFluid.temperatureDifference!)
     }
     
     func updateFlowAfterFluidChange() {
@@ -632,21 +602,21 @@ class HeatPipeSizerVC: UIViewController {
         
         if (self.totalFlow != nil) {
             
-            if (self.sizeFromFlow(self.totalFlow!).size == nil) {
+            if let result = calculator.sizePipe(massFlowrate: self.totalFlow!, material: self.selectedMaterial, fluid: self.selectedFluid, maxPd: self.maxPd, maxVelocity: nil) {
+                
+                // Successfully sized pipe
+                self.totalPipeSizeError = nil
+                self.totalPipeSize = result.nomDia
+                self.totalPd = result.pd
+                self.totalVelocity = result.v
+                
+            } else {
                 
                 // Flow too large, big enough pipe size not available for flow and max Pd
                 self.totalPipeSizeError = "Flow too large"
                 self.totalPipeSize = nil
                 self.totalPd = nil
-                
-            }
-            else {
-                
-                // Successfully sized pipe
-                self.totalPipeSizeError = nil
-                self.totalPipeSize = self.sizeFromFlow(self.totalFlow!).size
-                self.totalPd = self.sizeFromFlow(self.totalFlow!).pd
-                
+                self.totalVelocity = nil
             }
             
         }
@@ -655,97 +625,9 @@ class HeatPipeSizerVC: UIViewController {
             self.totalPipeSizeError = nil
             self.totalPipeSize = nil
             self.totalPd = nil
-
+            self.totalVelocity = nil
         }
         
-        
-    }
-    
-    func sizeFromFlow(_ flow:Float) -> (size:Int?, pd:Float?) {
-        
-        var diametersToUse:[Float] = [Float]()
-        var nomDiametersToUse:[Int] = [Int]()
-        
-        if (self.steelSelected) {
-            diametersToUse = self.steelIntDiameters
-            nomDiametersToUse = self.steelNomDiamters
-        }
-        else {
-            diametersToUse = self.copperIntDiameters
-            nomDiametersToUse = self.copperNomDiamters
-        }
-        
-        var rho:Float = Float()
-        var visco:Float = Float()
-        var k:Float = Float()
-        
-        if (self.lphwSelected) {
-            rho = self.lphwProperties[1]
-            visco = self.lphwProperties[2]
-        }
-        else {
-            rho = self.chwProperties[1]
-            visco = self.chwProperties[2]
-        }
-        
-        if (self.steelSelected) {
-            k = self.kSteel
-        }
-        else {
-            k = self.kCooper
-        }
-        
-        var size:Int? = nil
-        var pdToReturn:Float? = nil
-        
-        for index:Int in 0..<diametersToUse.count {
-        
-            let d:Float = diametersToUse[index]
-            let m:Float = flow          // kg/s
-            let q:Float = m / rho       // m3/s
-            let v:Float  = (q * 4) / (d * d * pi)  // m/s
-            
-            // Pd sub variables (formula is quite long)
-            
-            // Circ
-            let a:Float = (6.9 * visco) / ( v * d) + powf((k/1000) / (3.71 * d), 1.11)
-            
-            let b:Float = -1.8 * log10(a)
-            
-            let c:Float = (0.5 * rho * v * v) / d
-            
-            
-            
-            // Pressure drop
-            let pd = powf(1/b, 2) * c    // Pa/m
-            
-            if (pd <= self.maxPd) {
-                size = nomDiametersToUse[index]
-                pdToReturn = pd
-                
-                print("Properties used")
-                print("k = \(k)")
-                print("rho = \(rho)")
-                print("visco = \(visco)")
-                
-                print("Variables used to size pipe")
-                print("int. d = \(d)")
-                print("nom. d = \(size)")
-                print("m = \(m)")
-                print("q = \(q)")
-                print("v = \(v)")
-                print("a = \(a)")
-                print("b = \(b)")
-                print("c = \(c)")
-                print("pd = \(pd)")
-                break
-            }
-            
-        }
-        
-        // If a large enough size isn't found, nil will be returned
-        return (size, pdToReturn)
-    
     }
     
     
@@ -818,35 +700,13 @@ class HeatPipeSizerVC: UIViewController {
         
         print("materialButtonTapped")
         
-        if (self.steelSelected) {
+        if let currentIndex:Int = self.materials.index(of: self.selectedMaterial) {
             
-            // Change to copper
-            self.steelSelected = false
-            self.materialButton.setTitle("Copper", for: UIControlState())
-            /*
-            self.materialButton.tintColor = copperColour
-            self.materialButton.layer.backgroundColor = UIColor.whiteColor().CGColor
-            self.materialButton.layer.borderColor = copperColour.CGColor
-            */
-            self.materialButton.tintColor = UIColor.white
-            self.materialButton.layer.backgroundColor = copperColour.cgColor
-            self.materialButton.layer.borderColor = UIColor.darkGray.cgColor
-            
-        }
-        else {
-            
-            // Change to steel
-            self.steelSelected = true
-            self.materialButton.setTitle("Steel", for: UIControlState())
-            /*
-            self.materialButton.tintColor = UIColor.darkGrayColor()
-            self.materialButton.layer.backgroundColor = UIColor.whiteColor().CGColor
-            self.materialButton.layer.borderColor = UIColor.darkGrayColor().CGColor
-            */
-            self.materialButton.tintColor = UIColor.white
-            self.materialButton.layer.backgroundColor = steelColour.cgColor
-            self.materialButton.layer.borderColor = UIColor.darkGray.cgColor
-
+            if currentIndex < self.materials.count - 1 {
+                self.selectedMaterial = self.materials[currentIndex + 1]
+            } else {
+                self.selectedMaterial = self.materials[0]
+            }
         }
         
         self.refresh()
@@ -857,36 +717,14 @@ class HeatPipeSizerVC: UIViewController {
         
         print("fluidButtonTapped")
         
-        if (self.lphwSelected) {
+        if let currentIndex:Int = self.fluids.index(of: self.selectedFluid) {
             
-            // Change to CHW
-            self.lphwSelected = false
-            self.fluidButton.setTitle("CHW", for: UIControlState())
-            /*
-            self.fluidButton.tintColor = chwColour
-            self.fluidButton.layer.backgroundColor = UIColor.whiteColor().CGColor
-            self.fluidButton.layer.borderColor = chwColour.CGColor
-            */
-            self.fluidButton.tintColor = UIColor.white
-            self.fluidButton.layer.backgroundColor = chwColour.cgColor
-            self.fluidButton.layer.borderColor = UIColor.darkGray.cgColor
-            
+            if currentIndex < self.fluids.count - 1 {
+                self.selectedFluid = self.fluids[currentIndex + 1]
+            } else {
+                self.selectedFluid = self.fluids[0]
+            }
         }
-        else {
-            
-            // Change to LPHW
-            self.lphwSelected = true
-            self.fluidButton.setTitle("LPHW", for: UIControlState())
-            /*
-            self.fluidButton.tintColor = lphwColour
-            self.fluidButton.layer.backgroundColor = UIColor.whiteColor().CGColor
-            self.fluidButton.layer.borderColor = lphwColour.CGColor
-            */
-            self.fluidButton.tintColor = UIColor.white
-            self.fluidButton.layer.backgroundColor = lphwColour.cgColor
-            self.fluidButton.layer.borderColor = UIColor.darkGray.cgColor
-        }
-        
         
         self.updateFlowAfterFluidChange()
         self.refresh()
@@ -943,12 +781,8 @@ class HeatPipeSizerVC: UIViewController {
     // Set properties of section header
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         
-        if (self.lphwSelected) {
-            returnHeader(view, colourOption:1)
-        }
-        else {
-            returnHeader(view, colourOption:2)
-        }
+        returnHeader(view)
+        
     }
     
     // Assign Section Header Text

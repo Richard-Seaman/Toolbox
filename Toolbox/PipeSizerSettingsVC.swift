@@ -1,71 +1,59 @@
 //
-//  WaterPipeSizerSettingsVC.swift
+//  PipeSizerSettingsVC.swift
 //  Toolbox
 //
-//  Created by Richard Seaman on 19/07/2015.
-//  Copyright (c) 2015 RichApps. All rights reserved.
+//  Created by Richard Seaman on 09/04/2017.
+//  Copyright © 2017 RichApps. All rights reserved.
 //
 
 import UIKit
 
-class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class PipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITableViewDelegate  {
+    
+    
+    @IBOutlet weak var selector: UISegmentedControl!
     
     // Method View
     @IBOutlet weak var methodView: UIControl!
     @IBOutlet weak var methodTableView: UITableView!
     
-    let methodSectionHeadings:[String] = ["Pipe Types","Methodology","Demand Units", "Pipe Sizing"]
-    
-    let unitColumn:[String] = ["Demand Units","0","3","5","10","20","30","40","50","70","100","200","400","800","1000","1500","2000","5000","8000"]
-    let flowColumn:[String] = ["Flowrate (kg/s)","0.00","0.15","0.20","0.30","0.42","0.55","0.70","0.80","1.00","1.25","2.20","3.50","6.00","7.00","9.00","15.0","20.0","30.0"]
+    let methodSectionHeadings:[String] = ["Overview","Inputs","Pipe Sizing"]
     
     
     // Variable View
     @IBOutlet weak var variableView: UIControl!
     @IBOutlet weak var variableTableView: UITableView!
     
-    let numberOfRowsPerFluid:Int = 6
+    let numberOfRowsPerFluid:Int = 5
     
-    let variableFluids:[Calculator.Fluid] = [.CWS, .HWS, .MWS, .RWS]
-    let variableCellIdentifier:String = "WaterSizerVariableCell"
-    let variableButtonCellIdentifier:String = "WaterSizerButtonCell"
-    let variableSelectorCellIdentifier:String = "WaterSizerSelectorCell"
+    let variableFluids:[Calculator.Fluid] = [.LPHW, .CHW, .CWS, .HWS, .MWS, .RWS]
+    let variableCellIdentifier:String = "variableCell"
+    let variableButtonCellIdentifier:String = "buttonCell"
+    let variableSelectorCellIdentifier:String = "selectorCell"
     
     // Array of variable textfields just so they can be dismissed
     var textFields:[DemandUnitTF] = [DemandUnitTF]()
-    
-    
-    // Loading Unit View
-    @IBOutlet weak var selector: UISegmentedControl!
-    @IBOutlet weak var aboutView: UIControl!
-    @IBOutlet weak var demandUnitsView: UIControl!
-    @IBOutlet weak var demandUnitTableView: UITableView!
-    
-    @IBOutlet var headerViews: [UIControl]!
-    
+
+    // Keyboard height
     @IBOutlet weak var keyboardHeightLayoutConstraint: NSLayoutConstraint!
     
-    var textFieldArrays:[[DemandUnitTF]] = [[DemandUnitTF](),[DemandUnitTF](),[DemandUnitTF](),[DemandUnitTF](),[DemandUnitTF](),[DemandUnitTF](),[DemandUnitTF](),[DemandUnitTF](),[DemandUnitTF](),[DemandUnitTF](),[DemandUnitTF](),[DemandUnitTF](),[DemandUnitTF](),[DemandUnitTF]()]
+    
+    // MARK: System
 
     override func viewDidLoad() {
-        print("viewDidLoad")
         super.viewDidLoad()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(WaterPipeSizerSettingsVC.keyboardNotification(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(PipeSizerSettingsVC.keyboardNotification(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
         
         self.automaticallyAdjustsScrollViewInsets = false
         
-        self.selector.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.selectorDidChange), for: UIControlEvents.valueChanged)
+        self.selector.addTarget(self, action: #selector(PipeSizerSettingsVC.selectorDidChange), for: UIControlEvents.valueChanged)
         self.selector.tintColor = UIColor.darkGray
-        
-        self.setUpUI()
+        self.selector.selectedSegmentIndex = 0
         
         // Apply the row height
         self.methodTableView.rowHeight = UITableViewAutomaticDimension;
         self.methodTableView.estimatedRowHeight = 64.0;
-        
-        self.demandUnitTableView.rowHeight = UITableViewAutomaticDimension;
-        self.demandUnitTableView.estimatedRowHeight = 64.0;
         
         self.variableTableView.rowHeight = UITableViewAutomaticDimension;
         self.variableTableView.estimatedRowHeight = 64.0;
@@ -78,16 +66,12 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
         
         // Also includes refresh method
         self.selectorDidChange()
-        
-        
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         print("viewWillDisappear")
-        
         // Prevents keyboard issues
         self.backgroundTapped(self)
-        
         
     }
 
@@ -96,24 +80,13 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
         // Dispose of any resources that can be recreated.
     }
     
+    // MARK: UI
     
     func refresh() {
         print("View refreshed")
-        
-        self.demandUnitTableView.reloadData()
         self.methodTableView.reloadData()
         self.variableTableView.reloadData()
         
-    }
-    
-    func setUpUI() {
-        print("setUpUI")
-        
-        // Set borders & background tap
-        for view in self.headerViews {
-            self.addBorderAndBackgroundTap(view)
-        }
-                
     }
     
     func selectorDidChange() {
@@ -121,40 +94,20 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
         
         switch self.selector.selectedSegmentIndex {
             
-        case 0:
-            self.demandUnitsView.alpha = 0
-            self.aboutView.alpha = 1
-            self.variableView.alpha = 0
-            self.methodTableView.reloadData()
         case 1:
-            self.demandUnitsView.alpha = 1
-            self.aboutView.alpha = 0
-            self.variableView.alpha = 0
-            self.demandUnitTableView.reloadData()
-        default:
-            self.demandUnitsView.alpha = 0
-            self.aboutView.alpha = 0
+            self.methodView.alpha = 0
             self.variableView.alpha = 1
             self.variableTableView.reloadData()
+        default:
+            self.methodView.alpha = 1
+            self.variableView.alpha = 0
+            self.methodTableView.reloadData()
         }
         
     }
     
-    func addBorderAndBackgroundTap(_ view:UIControl) {
-        
-        self.addBackgroundTap(view)
-        
-        view.layer.borderWidth = 0.5
-        view.layer.borderColor = UIColor.darkGray.cgColor
-        
-    }
     
-    func addBackgroundTap(_ view:UIControl) {
-        
-        view.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.backgroundTapped(_:)), for: UIControlEvents.touchUpInside)
-        
-    }
-    
+    // MARK: - Reset Variables
     
     func resetFluid(button:ButtonWithRow) {
         // The button tag corresponds to the fluid index
@@ -163,13 +116,6 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
             self.variableTableView.reloadData()
         }
         
-    }
-    
-    func setFluidPipe(selector:SegmentedControlWithRow) {
-        // The segmented control tag corresponds to the fluid index
-        if (selector.row < self.variableFluids.count) {
-            calculator.setPipeMaterial(fluid: self.variableFluids[selector.row], material: Calculator.PipeMaterial.all[selector.selectedSegmentIndex])
-        }
     }
     
     func resetPipeMaterials() {
@@ -189,25 +135,9 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
         
         switch tableView {
             
-        case self.demandUnitTableView:
-            return Calculator.Outlets.all.count
-            
         case self.methodTableView:
             
-            switch section {
-                
-            case 0: // Pipe Type
-                return 1
-            case 1: // Methodology
-                return 1
-            case 2: // Step 1
-                return self.unitColumn.count + 2
-            case 3: // Step 2
-                return 1
-            default:
-                print("Error: This should not occur")
-                return 0
-            }
+            return 1
             
         case self.variableTableView:
             
@@ -237,14 +167,11 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
         
         switch tableView {
             
-        case self.demandUnitTableView:
-            return 1
-            
         case self.methodTableView:
-            return 4
+            return self.methodSectionHeadings.count
             
         case self.variableTableView:
-            // All fluids plues pipe materials
+            // All fluids plus pipe materials
             return self.variableFluids.count + 1
             
         default:
@@ -274,17 +201,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
     
     // Make sure the header size is what we want
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        
-        switch tableView {
-            
-        case self.methodTableView, self.variableTableView:            
-            return defaultHeaderSizae
-            
-        default:
-            return 0
-            
-        }
-        
+        return defaultHeaderSizae
     }
     
     // Assign Section Header Text
@@ -360,7 +277,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
                     button.tintColor = UIColor.darkGray
                     // Don't need to set the section for this as the target function doesn't need to know what called it
                     // button.row = indexPath.section
-                    button.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.resetPipeMaterials), for: UIControlEvents.touchUpInside)
+                    button.addTarget(self, action: #selector(PipeSizerSettingsVC.resetPipeMaterials), for: UIControlEvents.touchUpInside)
                     
                 default:
                     
@@ -384,7 +301,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
                     // Note: we use a demandUnitTextField just so we can track the indexPath (so we can figure out which property to change when it's edited)
                     textField.minimumFontSize = 5
                     textField.adjustsFontSizeToFitWidth = true
-                    textField.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.textFieldEditingDidEnd(variableTextField:)), for: UIControlEvents.editingDidEnd)
+                    textField.addTarget(self, action: #selector(PipeSizerSettingsVC.textFieldEditingDidEnd(variableTextField:)), for: UIControlEvents.editingDidEnd)
                     textField.indexPath = indexPath
                     textField.row = indexPath.row
                     textField.column = indexPath.section
@@ -393,7 +310,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
                     
                     // The property values to be displayed in the first four rows
                     let material:Calculator.PipeMaterial = Calculator.PipeMaterial.all[indexPath.row]
-                                        
+                    
                     // Set the text field texts
                     if (material.kValue <= 0.0009) {
                         
@@ -405,7 +322,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
                         textField.text = formatter.string(from: NSNumber(value: material.kValue))
                     }
                     else {
-                        textField.text = String(format: "%.3f", material.kValue)
+                        textField.text = String(format: "%.4f", material.kValue)
                     }
                     
                     nameLabel.text = ""
@@ -426,42 +343,11 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
                 // Viscosity
                 // Max Pd
                 // Max Velocity
-                // Material Selector
                 // Reset Defaults
                 
                 switch indexPath.row {
                     
                 case 4:
-                    
-                    // Selector Cell
-                    cell = tableView.dequeueReusableCell(withIdentifier: self.variableSelectorCellIdentifier) as UITableViewCell?
-                    if (cell == nil) {
-                        cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: self.variableSelectorCellIdentifier)
-                    }
-                    
-                    let selector:SegmentedControlWithRow = cell!.viewWithTag(1) as! SegmentedControlWithRow
-                    let contentView:UIControl = cell!.viewWithTag(2) as! UIControl
-                    
-                    // Set background tap
-                    self.addBackgroundTap(contentView)
-                    
-                    // Add an option for each Pipe Material
-                    selector.removeAllSegments()
-                    for index:Int in 0..<Calculator.PipeMaterial.all.count {
-                        selector.insertSegment(withTitle: Calculator.PipeMaterial.all[index].material, at: index, animated: false)
-                    }
-                    // Set the row of the selector to the section so we know what fluid it represents when its tapped
-                    selector.row = indexPath.section
-                    selector.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.setFluidPipe(selector:)), for: .valueChanged)
-                    selector.tintColor = UIColor.darkGray
-                    
-                    // Set currently selected material
-                    if let index = Calculator.PipeMaterial.all.index(of: fluid.pipeMaterial) {
-                        selector.selectedSegmentIndex = index
-                    }
-                    
-                    
-                case 5:
                     
                     // Reset Defaults
                     cell = tableView.dequeueReusableCell(withIdentifier: self.variableButtonCellIdentifier) as UITableViewCell?
@@ -483,7 +369,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
                     button.tintColor = UIColor.darkGray
                     // Set the row of the button to the section so we know what fluid it represents when its tapped
                     button.row = indexPath.section
-                    button.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.resetFluid(button:)), for: UIControlEvents.touchUpInside)
+                    button.addTarget(self, action: #selector(PipeSizerSettingsVC.resetFluid(button:)), for: UIControlEvents.touchUpInside)
                     
                 default:
                     
@@ -507,7 +393,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
                     // Note: we use a demandUnitTextField just so we can track the indexPath (sow we can figure out which property to change when it's edited)
                     textField.minimumFontSize = 5
                     textField.adjustsFontSizeToFitWidth = true
-                    textField.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.textFieldEditingDidEnd(variableTextField:)), for: UIControlEvents.editingDidEnd)
+                    textField.addTarget(self, action: #selector(PipeSizerSettingsVC.textFieldEditingDidEnd(variableTextField:)), for: UIControlEvents.editingDidEnd)
                     textField.indexPath = indexPath
                     textField.row = indexPath.row
                     textField.column = indexPath.section
@@ -541,12 +427,12 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
                         descLabel.text = "Dynamic viscosity\n(kg/ms)"
                     case 2:
                         nameLabel.text = ""
-                        descLabel.text = "Maximum pressure drop\n(Pa/m)"
+                        descLabel.text = "Default maximum pressure drop\n(Pa/m)"
                     case 3:
                         nameLabel.text = ""
-                        descLabel.text = "Maximum velocity\n(m/s)"
+                        descLabel.text = "Default maximum velocity\n(m/s)"
                     default:
-                        print("This row should not be here")                    
+                        print("This row should not be here")
                     }
                     
                 }
@@ -554,172 +440,45 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
                 
             }
             
-        case self.demandUnitTableView:
-            
-            cell = tableView.dequeueReusableCell(withIdentifier: "DemandUnitCell") as UITableViewCell!
-            if (cell == nil) {
-                print("new cell used")
-                cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "DemandUnitCell")
-            }
-            
-            let row:Int = indexPath.row
-            
-            // Set up the cell components
-            let pipeImageView:UIImageView = cell!.viewWithTag(1) as! UIImageView
-            let outletImageView:UIImageView = cell!.viewWithTag(2) as! UIImageView
-            
-            var textFields:[DemandUnitTF] = [DemandUnitTF(),DemandUnitTF(),DemandUnitTF(),DemandUnitTF()]
-            textFields[0] = cell!.viewWithTag(3) as! DemandUnitTF
-            textFields[1] = cell!.viewWithTag(4) as! DemandUnitTF
-            textFields[2] = cell!.viewWithTag(5) as! DemandUnitTF
-            textFields[3] = cell!.viewWithTag(6) as! DemandUnitTF
-            
-            var columnsViews:[UIControl] = [UIControl]()
-            columnsViews.append(cell!.viewWithTag(7) as! UIControl)
-            columnsViews.append(cell!.viewWithTag(8) as! UIControl)
-            columnsViews.append(cell!.viewWithTag(9) as! UIControl)
-            columnsViews.append(cell!.viewWithTag(10) as! UIControl)
-            columnsViews.append(cell!.viewWithTag(11) as! UIControl)
-            columnsViews.append(cell!.viewWithTag(12) as! UIControl)
-            
-            // Set borders & background tap
-            for view in columnsViews {
-                self.addBorderAndBackgroundTap(view)
-            }
-            
-            // Set Pipe image
-            let outlet:Calculator.Outlets = Calculator.Outlets.all[row]
-            
-            pipeImageView.image = outlet.pipeImage
-            outletImageView.image = outlet.outletImage
-            
-            
-            // Set up the textfields
-            var currentColumn:Int = 0
-            for textField in textFields {
-                textField.minimumFontSize = 5
-                textField.adjustsFontSizeToFitWidth = true
-                textField.addTarget(self, action: #selector(WaterPipeSizerSettingsVC.textFieldEditingDidEnd(_:)), for: UIControlEvents.editingDidEnd)
-                textField.indexPath = indexPath
-                textField.row = indexPath.row
-                textField.column = currentColumn
-                self.setupTextFieldInputAccessoryView(textField)
-                currentColumn += 1
-            }
-            
-            // Hide the non-applicable text fields in each row
-            // The demand units array [CWS_DU's, HWS_DU's, MWS_DU's, RWS_DU's]
-            // The textfield array for each row corresponds to these DU's
-            // Default to hidden
-            textFields[0].alpha = 0
-            textFields[1].alpha = 0
-            textFields[2].alpha = 0
-            textFields[3].alpha = 0
-            // show if there's a demand unit
-            for index:Int in 0..<4 {
-                if (outlet.defaultDemandUnits[index] > 0) {
-                    textFields[index].alpha = 1
-                }
-            }
-            
-            
-            // Set the text field texts
-            
-            for index:Int in 0..<textFields.count  {
-                
-                if (outlet.demandUnits[index] != 0) {
-                    textFields[index].text = String(format: "%.1f", outlet.demandUnits[index])
-                }
-                else {
-                    textFields[index].text = ""
-                }
-                
-            }
-            
-            // Add the textfields to the array of text field arrays
-            self.textFieldArrays[indexPath.row] = textFields
+        
             
         case self.methodTableView:
             
             switch indexPath.section {
                 
-            case 0: // Pipe Type
-                
-                cell = tableView.dequeueReusableCell(withIdentifier: "PipeTypeCell") as UITableViewCell!
-                if (cell == nil) {
-                    print("new cell used")
-                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "PipeTypeCell")
-                }
-                
-                
-            case 1: // Methodology
+            case 0: // Overview
                 
                 cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                 if (cell == nil) {
-                    print("new cell used")
                     cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                 }
                 
                 // Set up the cell components
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
-                label.text = "This calculation allows the Cold, Hot, Mains and Rain water pipe sizes to be determined for a given number of outlets.\n\nThe number of outlets are entered by using the plus and minus buttons or by typing in the number required. Any additional flowrates required may also be entered by using the text fields provided at the bottom of the screen.\n\nSome outlets have a number of piping arrangements. For example, a toilet may be fed by cold water or rain water. The arrangements may be toggled between by tapping on the pipe type indicator to the left of each outlet.\n\nOnce the data has been entered, the pipe sizes are determined by two simple steps."
+                label.text = "This calculation allows you to size pipework for a given flowrate/load, fluid and material."
                 
-            case 2: // Step 1
                 
-                switch indexPath.row {
-                    
-                case 0: // Explanation
-                    
-                    cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
-                    if (cell == nil) {
-                        print("new cell used")
-                        cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
-                    }
-                    
-                    // Set up the cell components
-                    let label:UILabel = cell!.viewWithTag(1) as! UILabel
-                    label.text = "The first step is to determine the number of demand units.\n\nThere are demand units associated with each outlet type and for each associated pipework arrangment. These demand units may be altered by selecting the 'Demand Units' tab at the top of this screen and editing the corresponding text fields.\n\nThe total number of demand units for each pipe is calculated by summing the product of the number of outlets and the corresponding demand units for each pipe type.\n\nOnce the total number of demand units has been determined for each pipe, the flowrate is interpolated from the following table"
-                    
-                case self.unitColumn.count + 1: // Source
-                    
-                    cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
-                    if (cell == nil) {
-                        print("new cell used")
-                        cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
-                    }
-                    
-                    // Set up the cell components
-                    let label:UILabel = cell!.viewWithTag(1) as! UILabel
-                    label.text = "These values were taken from 'Plumbing Engineering Services Design Guide, Graph 3: Pipe Sizing Chart - Copper and Stainless Steel'"
-                    
-                    
-                default:    // Data Row
-                    
-                    cell = tableView.dequeueReusableCell(withIdentifier: "DataCell") as UITableViewCell!
-                    if (cell == nil) {
-                        print("new cell used")
-                        cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "DataCell")
-                    }
-                    
-                    // Set up the cell components
-                    let leftLabel:UILabel = cell!.viewWithTag(1) as! UILabel
-                    let rightLabel:UILabel = cell!.viewWithTag(2) as! UILabel
-                    leftLabel.text = self.unitColumn[indexPath.row-1]
-                    rightLabel.text = self.flowColumn[indexPath.row-1]
-                    
-                }
-                
-            case 3: // Step 2
+            case 1: // Inputs
                 
                 cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
                 if (cell == nil) {
-                    print("new cell used")
                     cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
                 }
                 
                 // Set up the cell components
                 let label:UILabel = cell!.viewWithTag(1) as! UILabel
-                label.text = "Once the flowrates have been determined from the demand units for each service, the pipes can be sized. Any additional flowrates entered are added to the calculated flowrates before sizing the pipes.\n\nEach of the pipes are sized based on a maximum pressure drop, a maximum velocity and the selected pipework material. These variables may be edited from the 'Variables' tab at the top right of this screen.\n\nIf a water service is required to serve the combination of outlets selected, its pipe size, flowrate, velocity and pressure drop will be displayed at the top of the main screen. The pipe material is also indicated by the surrounding colour.\n\nIf the given constraints cannot be satisifed by the largest pipe size of the given material, an 'Out of Range' error will occur. In this case, you'll have to size the pipe yourself!"
+                label.text = "To begin, you need to enter a flowrate at the top of the screen. Alternatively, a load and temperature difference can be provided and the flowrate will be calculated automatically.\n\nNext, the fluid used must be selected. This is done by tapping on the fluid button at the top of the screen and selecting the relevant fluid from the list provided.\n\nFinally, the pipework material is chosen by tapping on the selector at the top of the screen."
+                
+            case 2: // Pipe Sizing
+                
+                cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
+                if (cell == nil) {
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
+                }
+                
+                // Set up the cell components
+                let label:UILabel = cell!.viewWithTag(1) as! UILabel
+                label.text = "Once all of the inputs have been provided, the pipework is automatically sized and the resulting nominal pipe size, pressure drop and velocity are displayed.\n\nThe automatic sizing is based on maximum pressure drop and maximum velocity constraints, which are provided by default. These values may be edited by tapping on the textfields and entering a new value.\n\nIf you wish to view the results for different pipework sizes, you can use the up and down buttons provided to cycle through the nominal pipe sizes for the selected material. Each time the size is changed, the results are recalculated."
                 
                 
             default:
@@ -742,6 +501,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
     }
     
     
+    
     // MARK: - Text Field Functions
     
     func textFieldEditingDidEnd(variableTextField:DemandUnitTF) {
@@ -754,7 +514,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
             
             // It's the pipe material section
             let material:Calculator.PipeMaterial = Calculator.PipeMaterial.all[indexPath.row]
-        
+            
             // Check valid entry
             if (variableTextField.text != "" && variableTextField.text!.floatValue >= 0.00000000001) {
                 let newValue:Float = variableTextField.text!.floatValue
@@ -773,7 +533,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
                 
             }
             else {
-                variableTextField.text = String(format: "%.3f", material.kValue)
+                variableTextField.text = String(format: "%.4f", material.kValue)
             }
             
         default:
@@ -823,44 +583,6 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
         }
         
     }
-    
-    func textFieldEditingDidEnd(_ sender:DemandUnitTF) {
-        print("flowTextFieldEditingDidEnd")
-        
-        if (sender.text != "") {
-            
-            // Make the changes to the loading Unit Record
-            
-            let loadingUnit = sender.text!.floatValue
-            let outlet = Calculator.Outlets.all[sender.row]
-            
-            var demandUnits = outlet.demandUnits
-            demandUnits[sender.column] = loadingUnit
-            
-            calculator.setDemandUnits(outlet: outlet, CWS_DU: demandUnits[0], HWS_DU: demandUnits[1], MWS_DU: demandUnits[2], RWS_DU: demandUnits[3])            
-            
-        }        
-        
-        // Update the texts
-        self.setTextFieldText(sender)
-        
-    }
-    
-    
-    func setTextFieldText(_ sender:DemandUnitTF) {
-        print("setTextFieldText")
-        
-        let outlet = Calculator.Outlets.all[sender.row]
-        
-        if (outlet.demandUnits[sender.column] != 0) {
-            sender.text = String(format: "%.1f", outlet.demandUnits[sender.column])
-        }
-        else {
-            sender.text = ""
-        }
-    }
-    
-    
 
     
     // MARK: - Keyboard Related
@@ -875,23 +597,20 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
             let animationCurve:UIViewAnimationOptions = UIViewAnimationOptions(rawValue: animationCurveRaw)
             self.keyboardHeightLayoutConstraint?.constant = endFrame?.size.height ?? 0.0
             UIView.animate(withDuration: duration,
-                delay: TimeInterval(0),
-                options: animationCurve,
-                animations: { self.view.layoutIfNeeded() },
-                completion: nil)
+                           delay: TimeInterval(0),
+                           options: animationCurve,
+                           animations: { self.view.layoutIfNeeded() },
+                           completion: nil)
         }
     }
     
+    func addBackgroundTap(_ view:UIControl) {
+        view.addTarget(self, action: #selector(PipeSizerSettingsVC.backgroundTapped(_:)), for: UIControlEvents.touchUpInside)
+    }
+    
+    
     func backgroundTapped(_ sender:AnyObject) {
         print("backgroundTapped")
-        
-        for array in self.textFieldArrays {
-            
-            for textField in array {
-                textField.resignFirstResponder()
-            }
-            
-        }
         
         for tf in self.textFields {
             tf.resignFirstResponder()
@@ -906,7 +625,7 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
         doneToolbar.barStyle = UIBarStyle.blackTranslucent
         
         let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.flexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.done, target: self, action: #selector(WaterPipeSizerSettingsVC.applyButtonAction))
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Apply", style: UIBarButtonItemStyle.done, target: self, action: #selector(PipeSizerSettingsVC.applyButtonAction))
         done.tintColor = UIColor.white
         
         var items = [UIBarButtonItem]()
@@ -924,5 +643,6 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
     {
         self.backgroundTapped(self)
     }
-    
+
+
 }

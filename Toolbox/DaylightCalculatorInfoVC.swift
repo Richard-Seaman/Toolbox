@@ -37,7 +37,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var tableView: UITableView!
     var tableViewController = UITableViewController()
     
-    let sectionHeadings:[String] = ["Description", "Room Properties", "Window Properties"]
+    let sectionHeadings:[String] = ["Overview", "Room Properties", "Window Properties"]
     
     @IBOutlet weak var keyboardHeightLayoutConstraint: NSLayoutConstraint!
     
@@ -126,6 +126,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
     
     // MARK: - Tableview methods
     
+    
     // Determine Number of sections
     func numberOfSectionsInTableView(_ tableView: UITableView) -> Int{
         
@@ -151,7 +152,6 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
     }
     
     
-    
     // Set properties of section header
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         
@@ -166,6 +166,10 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
         
     }
     
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        // Make sure the header size is what we want
+        return defaultHeaderSizae
+    }
     
     func tableView(_ tableView: UITableView, cellForRowAtIndexPath indexPath: IndexPath) -> UITableViewCell {
         
@@ -186,7 +190,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
             let label:UILabel = cell!.viewWithTag(1) as! UILabel
             label.numberOfLines = 0
             
-            label.text = "This calculation tool is provided as a quick reference guide and should not replace a formal daylight factor calculation.\n\nThe calculation method used is based on rectangular rooms and is capable of handling basic obstructions. The results should not be used for rooms with overhangs, rooms within recesses, or rooms subjected to significant overshadowing. The acceptable daylight factors for schools are used as a reference point.\n\nThe target daylight factor for:\nPrimary School Classrooms = 4.5%\nPost Post School Classrooms = 4.2%"
+            label.text = "This calculation provides a quick indication of the daylight factor in a room. This tool is provided as a quick reference guide and should not replace a formal daylight factor calculation.\n\nThe calculation method used is based on rectangular rooms and is capable of handling basic obstructions. The results should not be used for rooms with overhangs, rooms within recesses, or rooms subjected to significant overshadowing. The acceptable daylight factors for schools are used as a reference point.\n\nThe target daylight factor for:\nPrimary School Classrooms = 4.5%\nPost Post School Classrooms = 4.2%"
             
         case 1: // Room Properties
             
@@ -321,7 +325,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 button.layer.borderWidth = 1.5
                 button.layer.cornerRadius = 5
                 button.layer.backgroundColor = UIColor.white.cgColor
-                button.setTitle("Reset", for: UIControlState())
+                button.setTitle("    Reset Defaults    ", for: UIControlState())
                 button.tintColor = UIColor.darkGray
                 
             default:
@@ -455,7 +459,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 button.layer.borderWidth = 1.5
                 button.layer.cornerRadius = 5
                 button.layer.backgroundColor = UIColor.white.cgColor
-                button.setTitle("Reset", for: UIControlState())
+                button.setTitle("    Reset Defaults    ", for: UIControlState())
                 button.tintColor = UIColor.darkGray
                 
             default:

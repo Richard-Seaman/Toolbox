@@ -80,173 +80,6 @@ func dataFilePath() -> String {
 }
 
 
-// MARK: - Water Pipe Sizer
-
-// Loading units
-var loadingUnits:[[Float]] = [[Float](),[Float](),[Float](),[Float](),[Float](),[Float](),[Float](),[Float](),[Float](),[Float](),[Float](),[Float](),[Float](),[Float]()]
-
-// Reset the defaults to the built in defaults
-func resetLoadingUnitDefaults() {
-    
-    // Order of loading units within array as follows:
-    // [CWS, HWS, MWS, RWS]
-    
-    loadingUnits = [[Float]]()
-    loadingUnits.append([2,0,0,0])     // WC - Cold
-    loadingUnits.append([0,0,0,2])     // WC - Rain
-    loadingUnits.append([1,0,0,0])     // Urinal - Cold
-    loadingUnits.append([0,0,0,1])     // Urinal - Rain
-    loadingUnits.append([2,2,0,0])     // WHB - Cold & Hot
-    loadingUnits.append([5,0,0,0])     // Sink - Cold
-    loadingUnits.append([5,5,0,0])     // Sink - Cold & Hot
-    loadingUnits.append([5,5,5,0])     // Sink - Cold & Hot & main
-    loadingUnits.append([6,6,0,0])     // Shower - Cold & Hot
-    loadingUnits.append([10,10,0,0])   // Bath - Cold & Hot
-    loadingUnits.append([5,0,0,0])     // Tap - Cold
-    loadingUnits.append([0,5,0,0])     // Tap - Hot
-    loadingUnits.append([0,0,5,0])     // Tap - Mains
-    loadingUnits.append([0,0,0,5])     // Tap - Rain
-    
-}
-
-// Attempt to load the user specified loading Units, else load the built in defaults
-func loadLoadingUnits() {
-    
-    let filePath = loadingUnitsFilePath()
-    if (FileManager.default.fileExists(atPath: filePath)) {
-        let array = NSArray(contentsOfFile: filePath) as! [[Float]]
-        for i:Int in 0 ..< array.count {
-            loadingUnits[i] = array[i]
-        }
-        print("Loading Units loaded from file")
-    }
-    else {
-        resetLoadingUnitDefaults()
-        print("Default Loading Units used")
-    }
-}
-
-
-// Get the path to the defaults file
-func loadingUnitsFilePath() -> String {
-    let paths = NSSearchPathForDirectoriesInDomains(
-        FileManager.SearchPathDirectory.documentDirectory,
-        FileManager.SearchPathDomainMask.userDomainMask, true)
-    let documentsDirectory = paths[0] as NSString
-    return documentsDirectory.appendingPathComponent("loadingUnits.plist") as String
-}
-
-
-
-// MARK: - Duct Sizer
-
-// Properties
-var ductSizerProperties:[Float] = [Float(),Float(),Float()] // [rho, visco, k]
-
-// Reset the defaults to the built in defaults
-func resetDuctSizerPropertiesDefaults() {
-    
-    let visco:Float = 1.8178 * pow(10, -5)
-    
-    ductSizerProperties = [1.2041,visco, 0.075]
-    
-}
-
-// Attempt to load the user specified properties, else load the built in defaults
-func loadDuctSizerProperties() {
-    
-    let filePath = ductSizerPropertiesFilePath()
-    if (FileManager.default.fileExists(atPath: filePath)) {
-        let array = NSArray(contentsOfFile: filePath) as! [Float]
-        for i:Int in 0 ..< array.count {
-            ductSizerProperties[i] = array[i]
-        }
-        print("Duct Sizer Properties loaded from file")
-    }
-    else {
-        resetDuctSizerPropertiesDefaults()
-        print("Default Duct Sizer Properties used")
-    }
-}
-
-
-// Get the path to the defaults file
-func ductSizerPropertiesFilePath() -> String {
-    let paths = NSSearchPathForDirectoriesInDomains(
-        FileManager.SearchPathDirectory.documentDirectory,
-        FileManager.SearchPathDomainMask.userDomainMask, true)
-    let documentsDirectory = paths[0] as NSString
-    return documentsDirectory.appendingPathComponent("ductSizerProperties.plist") as String
-}
-
-
-
-
-// MARK: - Pipe Sizer
-
-// Properties (see defaults for each what each index represents)
-var pipeSizerProperties:[Float] = [Float(),Float(),Float(),Float(),Float(),Float(),Float(),Float(),Float(),Float(),Float()]
-
-// Reset the defaults to the built in defaults
-func resetPipeSizerPropertiesDefaults() {
-    
-    // [max pa/m, k_steel, k_copper, C_lthw, rho_lthw, vis_lthw, dT_lthw, C_chw, rho_chw, vis_chw, dT_chw]
-    resetMiscPipeDefaults()
-    resetLPHWPipeDefaults()
-    resetCHWPipeDefaults()
-    
-}
-
-func resetMiscPipeDefaults() {
-    pipeSizerProperties[0] = 250
-    pipeSizerProperties[1] = 0.046
-    pipeSizerProperties[2] = 0.0015
-}
-
-func resetLPHWPipeDefaults() {
-    pipeSizerProperties[3] = 4.189
-    pipeSizerProperties[4] = 977.8
-    pipeSizerProperties[5] = 0.4091 * powf(10, -6)
-    pipeSizerProperties[6] = 20
-}
-
-func resetCHWPipeDefaults() {
-    pipeSizerProperties[7] = 3.8
-    pipeSizerProperties[8] = 1000
-    pipeSizerProperties[9] = 1.3004 * powf(10, -6)
-    pipeSizerProperties[10] = 6
-}
-
-// Attempt to load the user specified properties, else load the built in defaults
-func loadPipeSizerProperties() {
-    
-    let filePath = pipeSizerPropertiesFilePath()
-    if (FileManager.default.fileExists(atPath: filePath)) {
-        let array = NSArray(contentsOfFile: filePath) as! [Float]
-        for i:Int in 0 ..< array.count {
-            pipeSizerProperties[i] = array[i]
-        }
-        print("Pipe Sizer Properties loaded from file")
-    }
-    else {
-        resetPipeSizerPropertiesDefaults()
-        print("Default Pipe Sizer Properties used")
-    }
-}
-
-
-// Get the path to the defaults file
-func pipeSizerPropertiesFilePath() -> String {
-    let paths = NSSearchPathForDirectoriesInDomains(
-        FileManager.SearchPathDirectory.documentDirectory,
-        FileManager.SearchPathDomainMask.userDomainMask, true)
-    let documentsDirectory = paths[0] as NSString
-    return documentsDirectory.appendingPathComponent("pipeSizerProperties.plist") as String
-}
-
-
-
-
 
 // MARK: - Misc.
 
@@ -292,6 +125,7 @@ func returnHeader(_ sender:UIView, colourOption option:Int = 0) -> UITableViewHe
     header.textLabel!.textColor = UIColor.white //make the text white
     
     header.alpha = 0.8 //make the header transparent
+    /*
     if (option == 1) {
         // LPHW Colour
         header.contentView.backgroundColor = lphwColour
@@ -311,20 +145,16 @@ func returnHeader(_ sender:UIView, colourOption option:Int = 0) -> UITableViewHe
     else {
         // Default Colour
         header.contentView.backgroundColor = primaryColour
-    }
-    
+    }*/
+    header.contentView.backgroundColor = primaryColour
     return header
 }
+
+let defaultHeaderSizae:CGFloat = 28
 
 
 // MARK: - Colours
 let bdpColour = UIColor(red: 205/255, green: 28/255, blue: 1/255, alpha: 1)
-let colour = UIColor(red: 0/255, green: 153/255, blue: 204/255, alpha: 1.0)
-let copperColour:UIColor = UIColor(red: 204/255, green: 102/255, blue: 0/255, alpha: 1)
-let steelColour:UIColor = UIColor(red: 153/255, green: 153/255, blue: 153/255, alpha: 1)
-//let chwColour:UIColor = UIColor(red: 0/255, green: 153/255, blue: 255/255, alpha: 1)
-let chwColour:UIColor = UIColor(red: 0/255, green: 51/255, blue: 204/255, alpha: 1)
-let lphwColour:UIColor = UIColor(red: 251/255, green: 38/255, blue: 50/255, alpha: 1)
 
 let primaryColour:UIColor = UIColor(red: 255/255, green: 93/255, blue: 83/255, alpha: 1)
 

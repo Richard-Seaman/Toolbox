@@ -194,7 +194,6 @@ class PipeSizerVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSourc
         self.fluidButton.layer.cornerRadius = 8
         self.fluidButton.clipsToBounds = true
         self.fluidButton.tintColor = UIColor.white
-        self.fluidButton.layer.backgroundColor = lphwColour.cgColor
         self.fluidButton.layer.borderColor = UIColor.darkGray.cgColor
         
         // Up/down size buttons

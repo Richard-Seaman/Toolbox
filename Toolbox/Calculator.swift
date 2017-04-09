@@ -143,9 +143,9 @@ class Calculator: NSObject {
             case .Steel:
                 return properties[SavedProperties.k_Steel.index]
             case .UPVC:
-                return properties[SavedProperties.k_Plastic.index]
+                return properties[SavedProperties.k_UPVC.index]
             case .ABS:
-                return properties[SavedProperties.k_Plastic.index]
+                return properties[SavedProperties.k_ABS.index]
             }
         }
         
@@ -753,7 +753,8 @@ class Calculator: NSObject {
         case maxPd_Air
         case k_Steel
         case k_Copper
-        case k_Plastic
+        case k_UPVC
+        case k_ABS
         case k_DuctRect
         case k_DuctCirc
         case c_LPHW
@@ -799,7 +800,7 @@ class Calculator: NSObject {
         
         static let all:[SavedProperties] = [
             maxPd_LPHW,maxPd_CHW,maxPd_MWS,maxPd_CWS,maxPd_HWS,maxPd_RWS,maxPd_Air,
-            k_Steel,k_Copper,k_Plastic,k_DuctRect,k_DuctCirc,
+            k_Steel,k_Copper,k_UPVC,k_ABS,k_DuctRect,k_DuctCirc,
             c_LPHW,c_CHW,c_MWS,c_CWS,c_HWS,c_RWS,c_Air,
             dt_LPHW,dt_CHW,visco_LPHW,visco_CHW,visco_MWS,visco_CWS,visco_HWS,visco_RWS,visco_Air,
             density_LPHW,density_CHW,density_MWS,density_CWS,density_HWS,density_RWS,density_Air,
@@ -808,6 +809,7 @@ class Calculator: NSObject {
         
         
         // NB: always add new properties to the end (later index) so existing saved files don't get confused
+        // next free is 50 (double check to be sure)
         
         var index: Int {
             switch self {
@@ -829,8 +831,10 @@ class Calculator: NSObject {
                 return 6
             case .k_Copper:
                 return 7
-            case .k_Plastic:
+            case .k_UPVC:
                 return 8
+            case .k_ABS:
+                return 49
             case .k_DuctRect:
                 return 40
             case .k_DuctCirc:
@@ -933,7 +937,9 @@ class Calculator: NSObject {
                 return 0.046
             case .k_Copper:
                 return 0.0015
-            case .k_Plastic:
+            case .k_UPVC:
+                return 0.007
+            case .k_ABS:
                 return 0.007
             case .k_DuctRect:
                 return 0.075    // based on galvanised steel
@@ -1038,8 +1044,10 @@ class Calculator: NSObject {
                 return "k value for steel"
             case .k_Copper:
                 return "k value for copper"
-            case .k_Plastic:
-                return "k value for plastic"
+            case .k_UPVC:
+                return "k value for UPVC"
+            case .k_ABS:
+                return "k value for ABS"
             case .k_DuctRect:
                 return "k value for rectangular ductwork"
             case .k_DuctCirc:
@@ -1189,8 +1197,10 @@ class Calculator: NSObject {
         if (kValue > 0) {
             
             switch pipe {
-            case .UPVC, .ABS:
-                Calculator.properties[SavedProperties.k_Plastic.index] = kValue
+            case .UPVC:
+                Calculator.properties[SavedProperties.k_UPVC.index] = kValue
+            case .ABS:
+                Calculator.properties[SavedProperties.k_ABS.index] = kValue
             case .Copper:
                 Calculator.properties[SavedProperties.k_Copper.index] = kValue
             case .Steel:
@@ -1481,7 +1491,8 @@ class Calculator: NSObject {
         
         // Reset all of the pipe k values
         
-        setKValue(pipe: .UPVC, kValue: SavedProperties.k_Plastic.defaultValue)
+        setKValue(pipe: .UPVC, kValue: SavedProperties.k_UPVC.defaultValue)
+        setKValue(pipe: .ABS, kValue: SavedProperties.k_ABS.defaultValue)
         setKValue(pipe: .Copper, kValue: SavedProperties.k_Copper.defaultValue)
         setKValue(pipe: .Steel, kValue: SavedProperties.k_Steel.defaultValue)
         

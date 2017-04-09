@@ -222,7 +222,7 @@ class CalculatorUnitTests: XCTestCase {
         
         // Check they've been reset to the default values
         XCTAssert(Calculator.PipeMaterial.Copper.kValue == Calculator.SavedProperties.k_Copper.defaultValue)
-        XCTAssert(Calculator.PipeMaterial.UPVC.kValue == Calculator.SavedProperties.k_Plastic.defaultValue)
+        XCTAssert(Calculator.PipeMaterial.UPVC.kValue == Calculator.SavedProperties.k_UPVC.defaultValue)
         XCTAssert(Calculator.PipeMaterial.Steel.kValue == Calculator.SavedProperties.k_Steel.defaultValue)
         XCTAssert(Calculator.DuctMaterial.Rect.kValue == Calculator.SavedProperties.k_DuctRect.defaultValue)
         XCTAssert(Calculator.DuctMaterial.Circ.kValue == Calculator.SavedProperties.k_DuctCirc.defaultValue)

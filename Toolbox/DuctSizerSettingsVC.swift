@@ -17,12 +17,8 @@ class DuctSizerSettingsVC: UIViewController {
     @IBOutlet var variableView: UIControl!
     @IBOutlet weak var tableView: UITableView!
     var textFields: [UITextField] = [UITextField(),UITextField(),UITextField(),UITextField()]
-    var sectionHeadingsVariables: [String] = ["Properties","Dimensions","Results"]
-    var sectionHeadingsMethod: [String] = ["Methodology","Flowrate","Manual Sizing","Automatic Sizing"]
-    
-    // Formulae View
-    @IBOutlet var formulaeView: UIControl!
-    @IBOutlet weak var webview: UIWebView!
+    var sectionHeadingsVariables: [String] = ["Air & Duct Properties"]
+    var sectionHeadingsMethod: [String] = ["Overview","Flowrate","Manual Sizing","Automatic Sizing"]
     
 
     override func viewDidLoad() {
@@ -78,16 +74,11 @@ class DuctSizerSettingsVC: UIViewController {
         
         // Set background tap
         
-        let views:[UIControl] = [self.formulaeView, self.variableView]
+        let views:[UIControl] = [self.variableView]
         
         for view in views {
             self.addBackgroundTap(view)
         }
-        
-        let formulaePath:URL = URL(fileURLWithPath: Bundle.main.path(forResource: "DuctSizerFormulae", ofType: "pdf")!)
-        
-        // Load the formulae into the web view
-        self.webview.loadRequest(URLRequest(url: formulaePath))
         
     }
     
@@ -99,19 +90,9 @@ class DuctSizerSettingsVC: UIViewController {
     
     func selectorDidChange() {
         
-        // Method - Variables - Formulae
-        
-        switch self.selector.selectedSegmentIndex {
-            
-        case 2:
-            self.formulaeView.alpha = 1
-            self.variableView.alpha = 0
-        default:
-            self.formulaeView.alpha = 0
-            self.variableView.alpha = 1
-        }
-        
+        // Method - Variables
         self.refresh()
+        
     }
     
     func resetDefaults() {
@@ -139,15 +120,11 @@ class DuctSizerSettingsVC: UIViewController {
                 
             case 0: // Properties
                 return 5
-            case 1: // Dimensions
-                return 4
-            case 2: // Results
-                return 4
             default:
                 return 0
             }
             
-        default: // Formulae
+        default:
             return 0
             
         }
@@ -200,22 +177,25 @@ class DuctSizerSettingsVC: UIViewController {
             
             return self.sectionHeadingsVariables[section]
             
-        default: // Formulae
+        default:
             
             return ""
             
         }
         
-        
     }
     
+    // Make sure the header size is what we want
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return defaultHeaderSizae
+    }
     
     func tableView(_ tableView: UITableView, cellForRowAtIndexPath indexPath: IndexPath) -> UITableViewCell {
         
         //println("cellForRowAtIndexPath \(indexPath.row)")
         var cell:UITableViewCell? = UITableViewCell()
         
-        // Method - Variables - Formulae
+        // Method - Variables
         
         switch self.selector.selectedSegmentIndex {
           
@@ -378,63 +358,22 @@ class DuctSizerSettingsVC: UIViewController {
                     switch indexPath.row {
                         
                     case 0:
-                        nameLabel.text = "rho"
+                        nameLabel.text = ""
                         descLabel.text = "Density of air\n(kg/m3)"
                     case 1:
-                        nameLabel.text = "vis"
+                        nameLabel.text = ""
                         descLabel.text = "Dynamic viscosity of air\n(kg/ms)"
                     case 2:
-                        nameLabel.text = "k"
-                        descLabel.text = "Rectangular duct k value\n(k/mm)"
+                        nameLabel.text = ""
+                        descLabel.text = "Rectangular duct k value\n(/mm)"
                     case 3:
-                        nameLabel.text = "k"
-                        descLabel.text = "Circular duct k value\n(k/mm)"
+                        nameLabel.text = ""
+                        descLabel.text = "Circular duct k value\n(/mm)"
                     default:
                         nameLabel.text = ""
                         descLabel.text = ""
                     }
                     
-                case 1: // Dimensions
-                    
-                    switch indexPath.row {
-                        
-                    case 0:
-                        nameLabel.text = "x"
-                        descLabel.text = "Duct width\n(m)"
-                    case 1:
-                        nameLabel.text = "y"
-                        descLabel.text = "Duct height\n(m)"
-                    case 2:
-                        nameLabel.text = "d"
-                        descLabel.text = "Duct diameter\n(m)"
-                    case 3:
-                        nameLabel.text = "dh"
-                        descLabel.text = "Hydraulic diameter\n(m)"
-                    default:
-                        nameLabel.text = ""
-                        descLabel.text = ""
-                    }
-                    
-                case 2: // Results
-                    
-                    switch indexPath.row {
-                        
-                    case 0:
-                        nameLabel.text = "Vr"
-                        descLabel.text = "Rectangular velocity\n(m/s)"
-                    case 1:
-                        nameLabel.text = "Vc"
-                        descLabel.text = "Circular velocity\n(m/s)"
-                    case 2:
-                        nameLabel.text = "Pdr"
-                        descLabel.text = "Rectangular pressure drop\n(Pa/m)"
-                    case 3:
-                        nameLabel.text = "Pdc"
-                        descLabel.text = "Circular pressure drop\n(Pa/m)"
-                    default:
-                        nameLabel.text = ""
-                        descLabel.text = ""
-                    }
                     
                 default:
                     nameLabel.text = ""
