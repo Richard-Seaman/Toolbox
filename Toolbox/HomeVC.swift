@@ -329,7 +329,7 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMa
                 self.performSegue(withIdentifier: "toInfo", sender: self)
             case self.termsIndex:
                 // Terms & Conditions
-                print("Not implemented yet")
+                self.performSegue(withIdentifier: "toTerms", sender: self)
             //self.performSegue(withIdentifier: "toTerms", sender: self)
             case self.mailIndex:
                 // Send an email

@@ -85,8 +85,6 @@ class InfoVC: UIViewController {
             return 1
         case 1: // Contact
             return 3
-        case 2: // Disclaimer
-            return 1
         default:
             print("This section should not be here")
             return 0
@@ -98,7 +96,7 @@ class InfoVC: UIViewController {
     // Determine Number of sections
     func numberOfSectionsInTableView(_ tableView: UITableView) -> Int{
         
-        return 3
+        return 2
         
     }
     
@@ -112,10 +110,15 @@ class InfoVC: UIViewController {
     // Assign Section Header Text
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String?{
         
-        let headings:[String] = ["About","Author's Note","Disclaimer"]
+        let headings:[String] = ["About","Author's Note"]
         
         return headings[section]
         
+    }
+    
+    // Make sure the header size is what we want
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return defaultHeaderSizae
     }
     
     func tableView(_ tableView: UITableView, cellForRowAtIndexPath indexPath: IndexPath) -> UITableViewCell {
@@ -223,28 +226,7 @@ class InfoVC: UIViewController {
                 print("This indexPath should not be here section:\(indexPath.section) row:\(indexPath.row)")
             }
             
-        case 2:
-            
-            //  Disclaimer
-            switch indexPath.row {
-                
-            case 0:
-                // Text Row
-                cell = tableView.dequeueReusableCell(withIdentifier: "LeftTextCell") as UITableViewCell!
-                
-                // Grab the elements using the tag
-                let label = cell.viewWithTag(1) as! UILabel
-                
-                // Set the elements
-                label.text = "This application provides a number of tools. The author of this app takes no responsibility for the accuracy of the tools and this application is used entirely at the user's risk. The author of this app reserves the right not to update or service the application at their discretion.\n\nThe author of this app takes no responsibility for any damage caused to the hardware that it is installed on or any responsibility for any loss of data or software that occurs as a result of its use.\n\nThis application is licensed as freeware and may be used without charge. The application and the concepts used are the intellectual property of its author."
-                
-                cell.selectionStyle = UITableViewCellSelectionStyle.none
-                cell.isUserInteractionEnabled = false
-                
-            default:
-                print("This indexPath should not be here section:\(indexPath.section) row:\(indexPath.row)")
-            }
-            
+        
             
         default:
             print("This section should not be here section:\(indexPath.section)")
@@ -259,8 +241,7 @@ class InfoVC: UIViewController {
     func tableView(_ tableView: UITableView, didSelectRowAtIndexPath indexPath: IndexPath) {
         
         // Animate de-selection regardless of cell...
-        tableView.deselectRow(at: indexPath, animated: true)
-        
+        tableView.deselectRow(at: indexPath, animated: true)        
         
     }
     
