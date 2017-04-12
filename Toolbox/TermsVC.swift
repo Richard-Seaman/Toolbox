@@ -188,7 +188,7 @@ class TermsVC: UIViewController {
         
         self.terms.append("I reserve the right to not update and/or to terminate the services provided by this application without cause or notice.")
         
-        self.terms.append("I reserve the right to add, amend or vary the terms of conditions of this agreement by publishing notice of such changes on its website and the continued use of this application will signify your acceptance of the changes.")
+        self.terms.append("I reserve the right to add, amend or vary the terms of conditions of this agreement and the continued use of this application will signify your acceptance of the changes. It is therefore recommended that you periodically check these Terms and Conditions which can be accessed from the Home page.")
         
         self.terms.append("This application uses Google Analytics to collect and analyse usage data as well as information on your device properties. Based on this data, I can provide better services as well as analyse and further develop the application. This data is treated as non-personal data. By using this application you're consenting to the collecting and processing of your information as described above.")
     }

@@ -55,6 +55,7 @@ class HeatPipeSizerVC: UIViewController {
     @IBOutlet weak var totalLoadLabel: UILabel!
     @IBOutlet weak var totalFlowLabel: UILabel!
     @IBOutlet weak var totalPdLabel: UILabel!
+    @IBOutlet weak var totalVelocityLabel: UILabel!
     @IBOutlet weak var materialButton: UIButton!
     @IBOutlet weak var fluidButton: UIButton!
     @IBOutlet weak var maxPdTextfield: LoadInfoTF!
@@ -74,6 +75,7 @@ class HeatPipeSizerVC: UIViewController {
     var loadLabels:[UILabel] = [UILabel]()
     var pipeSizeLabels:[UILabel] = [UILabel]()
     var pdLabels:[UILabel] = [UILabel]()
+    var velocityLabels:[UILabel] = [UILabel]()
     var errorLabels:[UILabel] = [UILabel]()
     var errorViews:[UIControl] = [UIControl]()
     
@@ -173,6 +175,7 @@ class HeatPipeSizerVC: UIViewController {
     
     
     
+    
     // MARK: - Set Up
     
     func setInitialValues() {
@@ -193,6 +196,7 @@ class HeatPipeSizerVC: UIViewController {
         self.loadLabels = [UILabel]()
         self.pipeSizeErrors = [String?]()
         self.pdLabels = [UILabel]()
+        self.velocityLabels = [UILabel]()
         
         // Make the arrays the correct size
         
@@ -206,6 +210,7 @@ class HeatPipeSizerVC: UIViewController {
             self.loadLabels.append(UILabel())
             self.pipeSizeErrors.append(nil)
             self.pdLabels.append(UILabel())
+            self.velocityLabels.append(UILabel())
             self.errorLabels.append(UILabel())
             self.errorViews.append(UIControl())
             
@@ -324,6 +329,14 @@ class HeatPipeSizerVC: UIViewController {
             self.totalPdLabel.text = "-- Pa/m"
         }
         
+        // Set total velocity text
+        if let velocity = self.totalVelocity {
+            self.totalVelocityLabel.text = String(format: "%.2f m/s", velocity)
+        }
+        else {
+            self.totalVelocityLabel.text = "-- m/s"
+        }
+        
         self.maxPdTextfield.text = String(format: "%.0f", self.maxPd)
                 
     }
@@ -429,6 +442,17 @@ class HeatPipeSizerVC: UIViewController {
         }
         else {
             self.pdLabels[row].text = "-- Pa/m"
+            //println("  Pd: nil")
+        }
+        // Set velocity text
+        if (self.velocities[row] != nil && self.quantities[row] != nil) {
+            
+            let velocity = self.velocities[row]!
+            self.velocityLabels[row].text = String(format: "%.2f m/s", velocity)
+            //print("  Pd: \(pd)")
+        }
+        else {
+            self.velocityLabels[row].text = "-- m/s"
             //println("  Pd: nil")
         }
         
@@ -765,31 +789,23 @@ class HeatPipeSizerVC: UIViewController {
     
     // Assign the rows per section
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
         return self.numberOfLoads
-        
     }
     
     // Determine Number of sections
     func numberOfSectionsInTableView(_ tableView: UITableView) -> Int{
-        
         return 1
-        
     }
     
     
     // Set properties of section header
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        
         returnHeader(view)
-        
     }
     
     // Assign Section Header Text
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String?{
-        
         return "Configure Loads"
-        
     }
     
     
@@ -813,6 +829,9 @@ class HeatPipeSizerVC: UIViewController {
         
         let pdLabel:UILabel = cell!.viewWithTag(7) as! UILabel
         self.pdLabels[indexPath.row] = pdLabel
+        
+        let velocityLabel:UILabel = cell!.viewWithTag(51) as! UILabel
+        self.velocityLabels[indexPath.row] = velocityLabel
         
         // Text fields = [kW, kg/s, Qty]
         var loadTextFields:[LoadInfoTF] = [cell!.viewWithTag(1) as! LoadInfoTF, cell!.viewWithTag(2) as! LoadInfoTF, cell!.viewWithTag(3) as! LoadInfoTF]
@@ -937,9 +956,7 @@ class HeatPipeSizerVC: UIViewController {
 
     
     func addBackgroundTap(_ view:UIControl) {
-        
-        view.addTarget(self, action: #selector(HeatPipeSizerVC.backgroundTapped(_:)), for: UIControlEvents.touchUpInside)
-        
+        view.addTarget(self, action: #selector(HeatPipeSizerVC.backgroundTapped(_:)), for: UIControlEvents.touchUpInside)        
     }
     
 

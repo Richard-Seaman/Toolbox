@@ -190,7 +190,7 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
             let label:UILabel = cell!.viewWithTag(1) as! UILabel
             label.numberOfLines = 0
             
-            label.text = "This calculation provides a quick indication of the daylight factor in a room. This tool is provided as a quick reference guide and should not replace a formal daylight factor calculation.\n\nThe calculation method used is based on rectangular rooms and is capable of handling basic obstructions. The results should not be used for rooms with overhangs, rooms within recesses, or rooms subjected to significant overshadowing. The acceptable daylight factors for schools are used as a reference point.\n\nThe target daylight factor for:\nPrimary School Classrooms = 4.5%\nPost Post School Classrooms = 4.2%"
+            label.text = "This calculation provides a quick indication of the daylight factor in a room.\n\nThe calculation method used is based on rectangular rooms and is capable of handling basic obstructions. The results should not be used for rooms with overhangs, rooms within recesses, or rooms subjected to significant overshadowing. The acceptable daylight factors for schools are used as a reference point.\n\nThe target daylight factor for:\nPrimary School Classrooms = 4.5%\nPost Post School Classrooms = 4.2%"
             
         case 1: // Room Properties
             

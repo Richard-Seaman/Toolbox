@@ -18,6 +18,40 @@ extension String {
     }
 }
 
+extension UIView {
+    
+    // Allows view border to be set in Storyboard
+    // http://stackoverflow.com/questions/28854469/change-uibutton-bordercolor-in-storyboard
+    
+    @IBInspectable var cornerRadius: CGFloat {
+        get {
+            return layer.cornerRadius
+        }
+        set {
+            layer.cornerRadius = newValue
+            layer.masksToBounds = newValue > 0
+        }
+    }
+    
+    @IBInspectable var borderWidth: CGFloat {
+        get {
+            return layer.borderWidth
+        }
+        set {
+            layer.borderWidth = newValue
+        }
+    }
+    
+    @IBInspectable var borderColor: UIColor? {
+        get {
+            return UIColor(cgColor: layer.borderColor!)
+        }
+        set {
+            layer.borderColor = newValue?.cgColor
+        }
+    }
+}
+
 // The global calculator used for all tools
 // must be initialised in App Delegate so that it loads on launch
 var calculator:Calculator!

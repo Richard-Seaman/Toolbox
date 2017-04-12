@@ -14,10 +14,13 @@ import UIKit
 
 class LaunchVC: UIViewController {
     
+    @IBOutlet var background: UIView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        // Set the background colour to the primary colour in case it flashes up for a split second
+        self.background.backgroundColor = primaryColour
         
     }
     
