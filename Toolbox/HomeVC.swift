@@ -45,14 +45,14 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMa
     let networkSizerIndex:Int = 2
     let simDemandIndex:Int = 3
     let daylightIndex:Int = 4
+    let parametersIndex:Int = 5
     // Other section
-    let settingsIndex:Int = 0
-    let aboutIndex:Int = 1
-    let rateUsIndex:Int = 2
-    let mailIndex:Int = 3
-    let termsIndex:Int = 4
+    let aboutIndex:Int = 0
+    let rateUsIndex:Int = 1
+    let mailIndex:Int = 2
+    let termsIndex:Int = 3
     
-    let numberOfRows = [5,5]
+    let numberOfRows = [6,4]
     
     // Table Variables
     var tableViewController = UITableViewController()
@@ -163,7 +163,7 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMa
         
         switch section{
         case 1:
-            return "Settings & More"
+            return "More"
         default:
             return "Get Started..."
         }
@@ -216,11 +216,6 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMa
             
             switch indexPath.row {
                 
-            case self.settingsIndex:
-                // Settings
-                titleLabel.text = "Variables"
-                detailLabel.text = "Adjust the global variables that are used in the tools above."
-                imageView.image = UIImage(named: "SettingsColor")!
             case self.rateUsIndex:
                 // Rate
                 titleLabel.text = "Rate"
@@ -282,6 +277,11 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMa
                 titleLabel.text = "Daylight Calculator"
                 detailLabel.text = "Calculate the average daylight factor for a standard room with given dimensions."
                 imageView.image = UIImage(named: "Daylight")!
+            case self.parametersIndex:
+                // Settings
+                titleLabel.text = "Pipe Data"
+                detailLabel.text = "View the nominal and internal pipe diameters used in this app."
+                imageView.image = UIImage(named: "PipeDia")!
                 
             default:
                 titleLabel.text = ""
@@ -360,10 +360,9 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMa
             case self.daylightIndex:
                 // Daylioght Calculator
                 self.performSegue(withIdentifier: "toDaylight", sender: self)
-            case self.settingsIndex:
+            case self.parametersIndex:
                 // Settings
-                print("Not implemented yet")
-                //self.performSegue(withIdentifier: "toSettings", sender: self)
+                self.performSegue(withIdentifier: "toPipeSizeParameters", sender: self)
                 
             default:
                 print("No action for this cell")
