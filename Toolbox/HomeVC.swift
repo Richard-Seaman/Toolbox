@@ -46,13 +46,14 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMa
     let simDemandIndex:Int = 3
     let daylightIndex:Int = 4
     let parametersIndex:Int = 5
+    let formulaeIndex:Int = 6
     // Other section
     let aboutIndex:Int = 0
     let rateUsIndex:Int = 1
     let mailIndex:Int = 2
     let termsIndex:Int = 3
     
-    let numberOfRows = [6,4]
+    let numberOfRows = [7,4]
     
     // Table Variables
     var tableViewController = UITableViewController()
@@ -278,10 +279,15 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMa
                 detailLabel.text = "Calculate the average daylight factor for a standard room with given dimensions."
                 imageView.image = UIImage(named: "Daylight")!
             case self.parametersIndex:
-                // Settings
-                titleLabel.text = "Pipe Data"
+                // Pipe Diameters
+                titleLabel.text = "Pipe Diameters"
                 detailLabel.text = "View the nominal and internal pipe diameters used in this app."
                 imageView.image = UIImage(named: "PipeDia")!
+            case self.formulaeIndex:
+                // Formulae
+                titleLabel.text = "Formulae"
+                detailLabel.text = "Don't trust the results? See for yourself the formulae used in this app."
+                imageView.image = UIImage(named: "Formulae")!
                 
             default:
                 titleLabel.text = ""
@@ -360,8 +366,11 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMa
                 // Daylioght Calculator
                 self.performSegue(withIdentifier: "toDaylight", sender: self)
             case self.parametersIndex:
-                // Settings
+                // Pipe Diameters
                 self.performSegue(withIdentifier: "toPipeSizeParameters", sender: self)
+            case self.formulaeIndex:
+                // Formulae
+                self.performSegue(withIdentifier: "toFormulae", sender: self)
                 
             default:
                 print("No action for this cell")
