@@ -35,7 +35,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         if needsToReset {
-            print("First time launching on iPad, resetting MWS due to known bug")
+            print("First time launching, resetting MWS due to known bug")
             calculator.resetDefaultFluidProperties(fluid: .MWS)
             userDefaults.set(true, forKey: key)
             userDefaults.synchronize()
@@ -55,10 +55,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Optional: configure GAI options.
         guard let gai = GAI.sharedInstance() else {
             assert(false, "Google Analytics not configured correctly")
+            return true
         }
         gai.trackUncaughtExceptions = true  // report uncaught exceptions
         // TODO: remove before release
-        gai.logger.logLevel = GAILogLevel.verbose  // remove before app release
+        // gai.logger.logLevel = GAILogLevel.verbose  // remove before app release
         
         return true
     }

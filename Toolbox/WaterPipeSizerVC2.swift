@@ -82,7 +82,7 @@ class WaterPipeSizerVC2: UIViewController {
     var outletStrings:[String] = ["WC", "Urinal", "WHB", "Sink", "Shower", "Bath", "Tap"]
     var numberOfOutlets:[Int] = [0,0,0,0,0,0,0]
     var pipeTypeArray:[Int] = [0,0,1,2,1,1,0] // ["Cold","Cold & Hot","Cold & Hot & Main","Rain","Hot","Main"]
-    let maxNumberOfOutlets:Int = 99
+    let maxNumberOfOutlets:Int = 999
     
     let pipeStrings:[String] = ["Cold","Hot","Main","Rain"]
     var addFlows:[Float] = [0,0,0,0]
