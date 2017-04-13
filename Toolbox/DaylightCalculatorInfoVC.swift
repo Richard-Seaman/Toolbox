@@ -97,6 +97,14 @@ class DaylightCalculatorInfoVC: UIViewController, UITextFieldDelegate {
                 self.navigationItem.titleView = getNavImageView(UIApplication.shared.statusBarOrientation)
             }
         }
+        
+        // Google Analytics
+        let name = "Daylight Calculator Settings"
+        guard let tracker = GAI.sharedInstance().defaultTracker else { return }
+        tracker.set(kGAIScreenName, value: name)
+        
+        guard let builder = GAIDictionaryBuilder.createScreenView() else { return }
+        tracker.send(builder.build() as [NSObject : AnyObject])
     }
     
     

@@ -37,6 +37,15 @@ class AcceptTermsVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         setNeedsStatusBarAppearanceUpdate()
+        
+        // Google Analytics
+        let name = "Accept Terms"
+        guard let tracker = GAI.sharedInstance().defaultTracker else { return }
+        tracker.set(kGAIScreenName, value: name)
+        
+        guard let builder = GAIDictionaryBuilder.createScreenView() else { return }
+        tracker.send(builder.build() as [NSObject : AnyObject])
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -84,6 +93,7 @@ class AcceptTermsVC: UIViewController {
         
         // Do any additional setup after loading the view.
     }
+    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

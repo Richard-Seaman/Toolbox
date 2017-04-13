@@ -58,6 +58,17 @@ class InfoVC: UIViewController {
         
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        
+        // Google Analytics
+        let name = "About"
+        guard let tracker = GAI.sharedInstance().defaultTracker else { return }
+        tracker.set(kGAIScreenName, value: name)
+        
+        guard let builder = GAIDictionaryBuilder.createScreenView() else { return }
+        tracker.send(builder.build() as [NSObject : AnyObject])
+    }
+    
     
     // MARK: - Setup
     
@@ -66,6 +77,11 @@ class InfoVC: UIViewController {
     
     func contactRichardTapped() {
         print("Called: contactRichardTapped")
+        
+        // Google Analytics
+        if let tracker = GAI.sharedInstance().defaultTracker {
+            tracker.send(GAIDictionaryBuilder.createEvent(withCategory: "Feedback", action: "Viewed LinkedIn", label: nil, value: nil).build()  as [NSObject : AnyObject])
+        }
         
         UIApplication.shared.openURL(URL(string: "https://ie.linkedin.com/pub/richard-seaman/60/b11/9b4")!)
         

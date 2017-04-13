@@ -33,15 +33,14 @@ class TermsVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         setNeedsStatusBarAppearanceUpdate()
         
-        // Google Analytics
-        /*
+        // Google Analytics        
         let name = "View Terms"
         guard let tracker = GAI.sharedInstance().defaultTracker else { return }
         tracker.set(kGAIScreenName, value: name)
         
         guard let builder = GAIDictionaryBuilder.createScreenView() else { return }
         tracker.send(builder.build() as [NSObject : AnyObject])
-        */
+        
         
     }
     

@@ -313,10 +313,9 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMa
             case self.rateUsIndex:
                 
                 // Google Analytics
-                /*
-                 if let tracker = GAI.sharedInstance().defaultTracker {
-                 tracker.send(GAIDictionaryBuilder.createEvent(withCategory: "Ratings", action: "Rated", label: "From Homepage", value: nil).build()  as [NSObject : AnyObject])
-                 }*/
+                if let tracker = GAI.sharedInstance().defaultTracker {
+                    tracker.send(GAIDictionaryBuilder.createEvent(withCategory: "Ratings", action: "Rated", label: "From Homepage", value: nil).build()  as [NSObject : AnyObject])
+                }
                 
                 // Rate
                 // Go to app store to rate
@@ -378,6 +377,11 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMa
     // MARK - mail
     
     func sendMail() {
+        
+        // Google Analytics
+        if let tracker = GAI.sharedInstance().defaultTracker {
+            tracker.send(GAIDictionaryBuilder.createEvent(withCategory: "Feedback", action: "Send Mail Tapped", label: nil, value: nil).build()  as [NSObject : AnyObject])
+        }
         
         if !MFMailComposeViewController.canSendMail() {
             print("Mail services are not available")

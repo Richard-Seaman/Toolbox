@@ -4141,7 +4141,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2Ps-By-Bhl" userLabel="ImageContainer">
-                                                    <rect key="frame" x="0.0" y="0.0" width="90" height="54"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="90" height="53"/>
                                                     <subviews>
                                                         <imageView userInteractionEnabled="NO" tag="3" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cwh-6I-P6e">
                                                             <rect key="frame" x="20" y="23" width="40" height="40"/>
@@ -4162,7 +4162,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" tag="2" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xOc-LW-aX1">
-                                                    <rect key="frame" x="90" y="37" width="222" height="1"/>
+                                                    <rect key="frame" x="90" y="37" width="222" height="0.0"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                     <nil key="highlightedColor"/>
@@ -4855,7 +4855,7 @@
                                                 </connections>
                                             </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="252" text="Welcome" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QYu-ne-Ocj">
-                                                <rect key="frame" x="18" y="18" width="304" height="19.5"/>
+                                                <rect key="frame" x="18" y="18" width="294" height="20"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <nil key="highlightedColor"/>
@@ -4873,6 +4873,7 @@
                                             <constraint firstItem="Mzr-dJ-yOp" firstAttribute="leading" secondItem="dOJ-ed-c4j" secondAttribute="leadingMargin" constant="20" id="2Tc-vI-adr"/>
                                             <constraint firstItem="QYu-ne-Ocj" firstAttribute="top" secondItem="dOJ-ed-c4j" secondAttribute="topMargin" constant="10" id="3cB-v4-R82"/>
                                             <constraint firstItem="QYu-ne-Ocj" firstAttribute="leading" secondItem="dOJ-ed-c4j" secondAttribute="leadingMargin" constant="10" id="ESI-PX-p4j"/>
+                                            <constraint firstItem="Vmb-1D-sxi" firstAttribute="trailing" secondItem="QYu-ne-Ocj" secondAttribute="trailing" id="K1g-sQ-nXF"/>
                                             <constraint firstItem="Mzr-dJ-yOp" firstAttribute="top" secondItem="4tu-0N-HBU" secondAttribute="bottom" constant="30" id="KoA-Bk-uL5"/>
                                             <constraint firstAttribute="bottomMargin" secondItem="Mzr-dJ-yOp" secondAttribute="bottom" id="Mza-0L-VoH"/>
                                             <constraint firstItem="4tu-0N-HBU" firstAttribute="top" secondItem="QTg-Bs-ePG" secondAttribute="bottom" constant="15" id="N9S-7y-MG9"/>
@@ -4885,7 +4886,6 @@
                                             <constraint firstAttribute="trailingMargin" secondItem="Vmb-1D-sxi" secondAttribute="trailing" id="ku1-n6-bVs"/>
                                             <constraint firstAttribute="trailingMargin" secondItem="Mzr-dJ-yOp" secondAttribute="trailing" constant="20" id="sg0-1R-s62"/>
                                             <constraint firstItem="QTg-Bs-ePG" firstAttribute="top" secondItem="Vmb-1D-sxi" secondAttribute="bottom" constant="15" id="umS-BN-fMy"/>
-                                            <constraint firstItem="QYu-ne-Ocj" firstAttribute="trailing" secondItem="dOJ-ed-c4j" secondAttribute="trailingMargin" constant="10" id="z69-MZ-DUf"/>
                                         </constraints>
                                     </view>
                                 </subviews>
@@ -4920,7 +4920,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9Nd-Fh-YJN" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-343" y="-220"/>
+            <point key="canvasLocation" x="-343.125" y="-220.77464788732394"/>
         </scene>
         <!--TermsVC-->
         <scene sceneID="CaW-of-uvg">
@@ -5043,6 +5043,6 @@
         <image name="X" width="33" height="33"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="2RU-Me-0yt"/>
+        <segue reference="Kdt-Yc-pVW"/>
     </inferredMetricsTieBreakers>
 </document>

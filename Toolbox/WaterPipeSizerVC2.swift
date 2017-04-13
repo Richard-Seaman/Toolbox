@@ -140,6 +140,14 @@ class WaterPipeSizerVC2: UIViewController {
         self.backgroundTapped()
         // Refresh eah time it appears in case parameters changed in settings view and we're returning to this one - need to recalculate
         self.refresh()
+        
+        // Google Analytics
+        let name = "Simultaneous Demand"
+        guard let tracker = GAI.sharedInstance().defaultTracker else { return }
+        tracker.set(kGAIScreenName, value: name)
+        
+        guard let builder = GAIDictionaryBuilder.createScreenView() else { return }
+        tracker.send(builder.build() as [NSObject : AnyObject])
     }
 
     override func didReceiveMemoryWarning() {

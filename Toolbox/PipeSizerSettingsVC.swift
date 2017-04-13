@@ -74,6 +74,17 @@ class PipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITableViewD
         self.backgroundTapped(self)
         
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        
+        // Google Analytics
+        let name = "Pipe Sizer Settings"
+        guard let tracker = GAI.sharedInstance().defaultTracker else { return }
+        tracker.set(kGAIScreenName, value: name)
+        
+        guard let builder = GAIDictionaryBuilder.createScreenView() else { return }
+        tracker.send(builder.build() as [NSObject : AnyObject])
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

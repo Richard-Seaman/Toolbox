@@ -35,6 +35,16 @@ class PipeSizeParametersVC: UIViewController, UITableViewDataSource, UITableView
         
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        
+        // Google Analytics
+        let name = "Pipe Diameters"
+        guard let tracker = GAI.sharedInstance().defaultTracker else { return }
+        tracker.set(kGAIScreenName, value: name)
+        
+        guard let builder = GAIDictionaryBuilder.createScreenView() else { return }
+        tracker.send(builder.build() as [NSObject : AnyObject])
+    }
     
     override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
         // Make sure the nav bar image fits within the new orientation

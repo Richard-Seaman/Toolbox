@@ -165,6 +165,14 @@ class HeatPipeSizerVC: UIViewController {
         self.refresh()
         
         self.backgroundTapped(self)
+        
+        // Google Analytics
+        let name = "Multiple Load Pipe Sizer"
+        guard let tracker = GAI.sharedInstance().defaultTracker else { return }
+        tracker.set(kGAIScreenName, value: name)
+        
+        guard let builder = GAIDictionaryBuilder.createScreenView() else { return }
+        tracker.send(builder.build() as [NSObject : AnyObject])
     }
     override func viewWillDisappear(_ animated: Bool) {
         

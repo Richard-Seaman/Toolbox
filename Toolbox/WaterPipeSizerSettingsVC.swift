@@ -88,7 +88,17 @@ class WaterPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITable
         // Prevents keyboard issues
         self.backgroundTapped(self)
         
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
         
+        // Google Analytics
+        let name = "Simultaneous Demand Settings"
+        guard let tracker = GAI.sharedInstance().defaultTracker else { return }
+        tracker.set(kGAIScreenName, value: name)
+        
+        guard let builder = GAIDictionaryBuilder.createScreenView() else { return }
+        tracker.send(builder.build() as [NSObject : AnyObject])
     }
 
     override func didReceiveMemoryWarning() {

@@ -200,6 +200,14 @@ class DuctSizerVC: UIViewController {
         // Refresh incase we're coming from settings and the properties changed
         self.refresh()
         self.backgroundTapped(self)
+        
+        // Google Analytics
+        let name = "Duct Sizer"
+        guard let tracker = GAI.sharedInstance().defaultTracker else { return }
+        tracker.set(kGAIScreenName, value: name)
+        
+        guard let builder = GAIDictionaryBuilder.createScreenView() else { return }
+        tracker.send(builder.build() as [NSObject : AnyObject])
     }
     
     

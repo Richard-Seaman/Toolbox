@@ -75,6 +75,17 @@ class HeatPipeSizerSettingsVC: UIViewController, UITableViewDataSource, UITableV
         
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        
+        // Google Analytics
+        let name = "Multiple Load Pipe Sizer Settings"
+        guard let tracker = GAI.sharedInstance().defaultTracker else { return }
+        tracker.set(kGAIScreenName, value: name)
+        
+        guard let builder = GAIDictionaryBuilder.createScreenView() else { return }
+        tracker.send(builder.build() as [NSObject : AnyObject])
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
