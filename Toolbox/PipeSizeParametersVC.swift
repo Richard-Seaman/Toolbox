@@ -131,10 +131,10 @@ class PipeSizeParametersVC: UIViewController, UITableViewDataSource, UITableView
             rightLabel.text = "Internal Diameter\n(mm)"
         } else {
             let nomDiameter:Int = Calculator.PipeMaterial.all[indexPath.section].nominalDiameters[indexPath.row - 1]
-            let intDiameter:Int = Int(Calculator.PipeMaterial.all[indexPath.section].internalDiameters[indexPath.row - 1] * 1000)
+            let intDiameter:Float = Calculator.PipeMaterial.all[indexPath.section].internalDiameters[indexPath.row - 1] * 1000
             
             leftLabel.text = String(format: "%i", nomDiameter)
-            rightLabel.text = String(format: "%i", intDiameter)
+            rightLabel.text = String(format: "%.1f", intDiameter)
         }
         
         cell?.isUserInteractionEnabled = false

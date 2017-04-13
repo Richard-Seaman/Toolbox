@@ -16,6 +16,7 @@ class DuctSizerSettingsVC: UIViewController {
     // Variable View (also used for method view)
     @IBOutlet var variableView: UIControl!
     @IBOutlet weak var tableView: UITableView!
+    var tableViewController = UITableViewController()
     var textFields: [UITextField] = [UITextField(),UITextField(),UITextField(),UITextField()]
     var sectionHeadingsVariables: [String] = ["Air & Duct Properties"]
     var sectionHeadingsMethod: [String] = ["Overview","Flowrate","Manual Sizing","Automatic Sizing"]
@@ -33,6 +34,9 @@ class DuctSizerSettingsVC: UIViewController {
         
         self.setUpUI()
         
+        // Apply tableview to Table View Controller (needed to get rid of blank space)
+        self.tableViewController.tableView = tableView
+        
         // Apply the row height
         self.tableView.rowHeight = UITableViewAutomaticDimension;
         self.tableView.estimatedRowHeight = 64.0;
@@ -46,15 +50,12 @@ class DuctSizerSettingsVC: UIViewController {
         // Also includes refresh method
         self.selectorDidChange()
         
-        
     }
     
     
     override func viewWillDisappear(_ animated: Bool) {
-        
         // Prevents keyboard issues
         self.backgroundTapped(self)
-        
     }
     
     override func didReceiveMemoryWarning() {
@@ -66,8 +67,7 @@ class DuctSizerSettingsVC: UIViewController {
     func refresh() {
         print("View refreshed")
         self.backgroundTapped(self)
-        self.tableView.reloadData()
-        
+        self.tableView.reloadData()        
     }
     
     func setUpUI() {
