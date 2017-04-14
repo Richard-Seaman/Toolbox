@@ -30,6 +30,7 @@ class PipeSizerVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSourc
     @IBOutlet weak var upSizeButton: UIButton!
     @IBOutlet weak var downSizeButton: UIButton!
     
+    @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var contentView: UIControl!     // main background
     @IBOutlet weak var flowView: UIControl!
     @IBOutlet weak var loadAndDtView: UIControl!
@@ -149,7 +150,8 @@ class PipeSizerVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSourc
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        // Prevent space at top of scrollview
+        self.automaticallyAdjustsScrollViewInsets = false
         
         // Apply the background tap function to the backgrounds
         for view in self.backgroundControls {
@@ -246,6 +248,7 @@ class PipeSizerVC: UIViewController, UIPickerViewDelegate, UIPickerViewDataSourc
         
         guard let builder = GAIDictionaryBuilder.createScreenView() else { return }
         tracker.send(builder.build() as [NSObject : AnyObject])
+                
     }
 
     override func didReceiveMemoryWarning() {
