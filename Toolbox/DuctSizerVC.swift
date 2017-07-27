@@ -25,6 +25,8 @@ class DuctSizerVC: UIViewController {
     
     
     // Duct outlets
+    @IBOutlet weak var freeAreaTextField: UITextField!
+    
     @IBOutlet weak var ductButton: UIButton!
     
     @IBOutlet weak var ductShapeView: UIView!
@@ -91,6 +93,20 @@ class DuctSizerVC: UIViewController {
     var yDimension:Float = Float()      // mm
     var diameter:Float = Float()        // mm
     var aspect:Float = Float()          // -
+    
+    var freeArea:Float = Float()        // -   (0 to 1)
+    {
+        didSet{
+            
+            // Max is 1, Min is 0
+            if self.freeArea > 1 {
+                self.freeArea = 1
+            } else if self.freeArea < 0 {
+                self.freeArea = 0
+            }
+            
+        }
+    }
     
     
     var autosizeVelocity:[Float?] = [nil,1.5,3.5,6]   // m/s
@@ -240,6 +256,8 @@ class DuctSizerVC: UIViewController {
             let xPosition:Float = self.diameter / (self.maxDim - self.minDim)
             self.xSlider.value = xPosition
         }
+        
+        self.freeArea = 1
         
     }
     
@@ -445,6 +463,19 @@ class DuctSizerVC: UIViewController {
             self.aspectTextField.text = ""
         }
         
+        
+        // FREE AREA
+        
+        // If using a free area, the pd calc won't work correctly (it still assumes full diameter), so hide it.
+        // Also, change the text of the textfield accordingly
+        if self.freeArea == 1 {
+            self.pdLabel.alpha = 1
+            self.freeAreaTextField.text = ""
+        } else {
+            self.pdLabel.alpha = 0
+            self.freeAreaTextField.text = String(format: "%.0f%@", self.freeArea * 100, "%")
+        }
+        
     }
     
     
@@ -460,8 +491,8 @@ class DuctSizerVC: UIViewController {
             let y:Float = self.yDimension / 1000    // m
             let d:Float = self.diameter / 1000      // m
             
-            self.resultsRect = calculator.resultsForDuct(length: x, width: y, volumeFlowrate: flowrate, duct: .Rect, maxPd: nil, maxVelocity: nil, aspect: nil)
-            self.resultsCirc = calculator.resultsForDuct(diameter: d, volumeFlowrate: flowrate, duct: .Circ, maxPd: nil, maxVelocity: nil)
+            self.resultsRect = calculator.resultsForDuct(length: x, width: y, freeArea: self.freeArea, volumeFlowrate: flowrate, duct: .Rect, maxPd: nil, maxVelocity: nil, aspect: nil)
+            self.resultsCirc = calculator.resultsForDuct(diameter: d, freeArea: self.freeArea, volumeFlowrate: flowrate, duct: .Circ, maxPd: nil, maxVelocity: nil)
             
         }
         
@@ -499,8 +530,8 @@ class DuctSizerVC: UIViewController {
         
         if let flowrate = self.flowrateToUse {
             
-            self.resultsRect = calculator.resultsForDuct(length: x, width: y, volumeFlowrate: flowrate, duct: .Rect, maxPd: nil, maxVelocity: velocity, aspect: aspect)
-            self.resultsCirc = calculator.resultsForDuct(diameter: nil, volumeFlowrate: flowrate, duct: .Circ, maxPd: nil, maxVelocity: velocity)
+            self.resultsRect = calculator.resultsForDuct(length: x, width: y, freeArea: self.freeArea, volumeFlowrate: flowrate, duct: .Rect, maxPd: nil, maxVelocity: velocity, aspect: aspect)
+            self.resultsCirc = calculator.resultsForDuct(diameter: nil, freeArea: self.freeArea, volumeFlowrate: flowrate, duct: .Circ, maxPd: nil, maxVelocity: velocity)
             
             if let result = self.resultsRect {
                 self.xDimension = result.length * 1000
@@ -587,6 +618,16 @@ class DuctSizerVC: UIViewController {
                 if (self.autosizeVelocity[self.velocitySelector.selectedSegmentIndex] != nil && self.flowrateToUse != nil) {
                     self.autosizeButtonTapped()
                 }
+            case self.freeAreaTextField:
+                // Convert the percentage to a decimal and assign to freeArea
+                // Note that the didSet function checks for max and min
+                
+                if (sender.text!.floatValue == 0) {
+                    self.freeArea = 1
+                } else {
+                    self.freeArea = sender.text!.floatValue / 100
+                }
+                
             default:
                 print("Could not find matching Text Field to update value")
             }

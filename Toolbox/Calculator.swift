@@ -1802,21 +1802,22 @@ class Calculator: NSObject {
     // Rectangular
     // Two options for VFR or MFR
     
-    func resultsForDuct(length:Float?, width:Float?, volumeFlowrate:Float, duct:DuctMaterial, maxPd:Float?, maxVelocity:Float?, aspect:Float?) -> (length:Float, width:Float, aspect:Float, pd:Float, v:Float)? {
+    func resultsForDuct(length:Float?, width:Float?, freeArea:Float?, volumeFlowrate:Float, duct:DuctMaterial, maxPd:Float?, maxVelocity:Float?, aspect:Float?) -> (length:Float, width:Float, aspect:Float, pd:Float, v:Float)? {
         
         // NB: be careful with units
         // volumeFlowrate           m3/s
         // See below for remainder
         
         let mfr:Float = massFlowrate(volumeFlowrate: volumeFlowrate, density: Fluid.Air.density)
-        return resultsForDuct(length: length, width: width, massFlowrate: mfr, duct: duct, maxPd: maxPd, maxVelocity: maxVelocity, aspect: aspect)
+        return resultsForDuct(length: length, width: width, freeArea: freeArea, massFlowrate: mfr, duct: duct, maxPd: maxPd, maxVelocity: maxVelocity, aspect: aspect)
     }
     
-    func resultsForDuct(length:Float?, width:Float?, massFlowrate:Float, duct:DuctMaterial, maxPd:Float?, maxVelocity:Float?, aspect:Float?) -> (length:Float, width:Float, aspect:Float, pd:Float, v:Float)? {
+    func resultsForDuct(length:Float?, width:Float?, freeArea:Float?, massFlowrate:Float, duct:DuctMaterial, maxPd:Float?, maxVelocity:Float?, aspect:Float?) -> (length:Float, width:Float, aspect:Float, pd:Float, v:Float)? {
         
         // NB: be careful with units
         // length           m
         // width            m
+        // free area        % as a decimal  (0 -> 1)
         // massFlowrate     kg/s
         // maxPd            Pa/m  
         // maxVelocity      m/s
@@ -1877,8 +1878,8 @@ class Calculator: NSObject {
             // Both dimensions have been specified
             // Just grab the results (and ignore the maxPd and maxVel constraints)
             
-            let pressureDrop = pd(massFlowrate: massFlowrate, length: length!, width: width!, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
-            let velocity = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: length!, width: width!)
+            let pressureDrop = pd(massFlowrate: massFlowrate, length: length!, width: width!, freeArea: freeArea, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+            let velocity = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: length!, width: width!, freeArea: freeArea)
             
             var aspt = length!/width!
             if (aspt < 1) {
@@ -1897,8 +1898,8 @@ class Calculator: NSObject {
             }
             
             // Initial calcs
-            var actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
-            var actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+            var actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, freeArea: freeArea, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+            var actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse, freeArea: freeArea)
             
             if (maxPd == nil && maxVelocity == nil) {
                 
@@ -1933,8 +1934,8 @@ class Calculator: NSObject {
                         }
                         
                         // Recalculate
-                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
-                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, freeArea: freeArea, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse, freeArea: freeArea)
                         
                     }
                     
@@ -1963,8 +1964,8 @@ class Calculator: NSObject {
                         }
                         
                         // Recalculate
-                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
-                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, freeArea: freeArea, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse, freeArea: freeArea)
                         
                     }
                     
@@ -1992,8 +1993,8 @@ class Calculator: NSObject {
                         }
                         
                         // Recalculate
-                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
-                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, freeArea: freeArea, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse, freeArea: freeArea)
                         
                     }
                 }
@@ -2020,8 +2021,8 @@ class Calculator: NSObject {
             var lengthToUse = ductDimensionIncrement
             
             // Initial calcs
-            var actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
-            var actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+            var actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, freeArea: freeArea, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+            var actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse, freeArea: freeArea)
             
             if (maxPd == nil && maxVelocity == nil) {
                 
@@ -2040,8 +2041,8 @@ class Calculator: NSObject {
                         lengthToUse = lengthToUse + ductDimensionIncrement
                         
                         // Recalculate
-                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
-                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, freeArea: freeArea, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse, freeArea: freeArea)
                         
                     }
                     
@@ -2055,8 +2056,8 @@ class Calculator: NSObject {
                         lengthToUse = lengthToUse + ductDimensionIncrement
                         
                         // Recalculate
-                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
-                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, freeArea: freeArea, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse, freeArea: freeArea)
                         
                     }
                     
@@ -2069,8 +2070,8 @@ class Calculator: NSObject {
                         lengthToUse = lengthToUse + ductDimensionIncrement
                         
                         // Recalculate
-                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
-                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, freeArea: freeArea, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse, freeArea: freeArea)
                         
                     }
                 }
@@ -2097,8 +2098,8 @@ class Calculator: NSObject {
             let lengthToUse = length!
             
             // Initial calcs
-            var actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
-            var actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+            var actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, freeArea: freeArea, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+            var actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse, freeArea: freeArea)
             
             if (maxPd == nil && maxVelocity == nil) {
                 
@@ -2117,8 +2118,8 @@ class Calculator: NSObject {
                         widthToUse = widthToUse + ductDimensionIncrement
                         
                         // Recalculate
-                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
-                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, freeArea: freeArea, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse, freeArea: freeArea)
                         
                     }
                     
@@ -2132,8 +2133,8 @@ class Calculator: NSObject {
                         widthToUse = widthToUse + ductDimensionIncrement
                         
                         // Recalculate
-                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
-                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, freeArea: freeArea, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse, freeArea: freeArea)
                         
                     }
                     
@@ -2146,8 +2147,8 @@ class Calculator: NSObject {
                         widthToUse = widthToUse + ductDimensionIncrement
                         
                         // Recalculate
-                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
-                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse)
+                        actualPd = pd(massFlowrate: massFlowrate, length: lengthToUse, width: widthToUse, freeArea: freeArea, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = rectangularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, length: lengthToUse, width: widthToUse, freeArea: freeArea)
                         
                     }
                 }
@@ -2173,18 +2174,18 @@ class Calculator: NSObject {
     // Circular
     // Two options for VFR or MFR
     
-    func resultsForDuct(diameter:Float?, volumeFlowrate:Float, duct:DuctMaterial, maxPd:Float?, maxVelocity:Float?) -> (diameter:Float, pd:Float, v:Float)? {
+    func resultsForDuct(diameter:Float?, freeArea:Float?, volumeFlowrate:Float, duct:DuctMaterial, maxPd:Float?, maxVelocity:Float?) -> (diameter:Float, pd:Float, v:Float)? {
         
         // NB: be careful with units
         // volumeFlowrate           m3/s
         // See below for remainder
         
         let mfr:Float = massFlowrate(volumeFlowrate: volumeFlowrate, density: Fluid.Air.density)
-        return resultsForDuct(diameter: diameter, massFlowrate: mfr, duct: duct, maxPd: maxPd, maxVelocity: maxVelocity)
+        return resultsForDuct(diameter: diameter, freeArea: freeArea, massFlowrate: mfr, duct: duct, maxPd: maxPd, maxVelocity: maxVelocity)
         
     }
     
-    func resultsForDuct(diameter:Float?, massFlowrate:Float, duct:DuctMaterial, maxPd:Float?, maxVelocity:Float?) -> (diameter:Float, pd:Float, v:Float)? {
+    func resultsForDuct(diameter:Float?, freeArea:Float?, massFlowrate:Float, duct:DuctMaterial, maxPd:Float?, maxVelocity:Float?) -> (diameter:Float, pd:Float, v:Float)? {
         
         // NB: be careful with units
         // diameter         m
@@ -2233,8 +2234,8 @@ class Calculator: NSObject {
             // Diameter has been specified
             // Just grab the results (and ignore the maxPd and maxVel constraints)
             
-            let pressureDrop = pd(massFlowrate: massFlowrate, dia: diameter!, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
-            let velocity = circularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, dia: diameter!)
+            let pressureDrop = pd(massFlowrate: massFlowrate, dia: diameter!, freeArea: freeArea, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+            let velocity = circularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, dia: diameter!, freeArea: freeArea)
             
             
             return (diameter:diameter!,pd:pressureDrop,v:velocity)
@@ -2245,8 +2246,8 @@ class Calculator: NSObject {
             var diameterToUse = ductDimensionIncrement
             
             // Initial calcs
-            var actualPd = pd(massFlowrate: massFlowrate, dia: diameterToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
-            var actualVel = circularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, dia: diameterToUse)
+            var actualPd = pd(massFlowrate: massFlowrate, dia: diameterToUse, freeArea: freeArea, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+            var actualVel = circularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, dia: diameterToUse, freeArea: freeArea)
             
             if (maxPd == nil && maxVelocity == nil) {
                 
@@ -2265,8 +2266,8 @@ class Calculator: NSObject {
                         diameterToUse = diameterToUse + ductDimensionIncrement
                         
                         // Recalculate
-                        actualPd = pd(massFlowrate: massFlowrate, dia: diameterToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
-                        actualVel = circularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, dia: diameterToUse)
+                        actualPd = pd(massFlowrate: massFlowrate, dia: diameterToUse, freeArea: freeArea, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = circularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, dia: diameterToUse, freeArea: freeArea)
                         
                     }
                     
@@ -2280,8 +2281,8 @@ class Calculator: NSObject {
                         diameterToUse = diameterToUse + ductDimensionIncrement
                         
                         // Recalculate
-                        actualPd = pd(massFlowrate: massFlowrate, dia: diameterToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
-                        actualVel = circularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, dia: diameterToUse)
+                        actualPd = pd(massFlowrate: massFlowrate, dia: diameterToUse, freeArea: freeArea, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = circularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, dia: diameterToUse, freeArea: freeArea)
                         
                     }
                     
@@ -2294,8 +2295,8 @@ class Calculator: NSObject {
                         diameterToUse = diameterToUse + ductDimensionIncrement
                         
                         // Recalculate
-                        actualPd = pd(massFlowrate: massFlowrate, dia: diameterToUse, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
-                        actualVel = circularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, dia: diameterToUse)
+                        actualPd = pd(massFlowrate: massFlowrate, dia: diameterToUse, freeArea: nil, density: Fluid.Air.density, visco: Fluid.Air.visocity, k: duct.kValue, printCalc: false)
+                        actualVel = circularVelocity(massFlowrate: massFlowrate, density: Fluid.Air.density, dia: diameterToUse, freeArea: freeArea)
                         
                     }
                 }
@@ -2392,9 +2393,9 @@ class Calculator: NSObject {
             
             let internalDiameter = material.internalDiameters[index]
             
-            let velocity = circularVelocity(massFlowrate: massFlowrate, density: fluid.density, dia: internalDiameter)
+            let velocity = circularVelocity(massFlowrate: massFlowrate, density: fluid.density, dia: internalDiameter, freeArea: nil)
             
-            let pressureDrop = pd(massFlowrate: massFlowrate, dia: internalDiameter, density: fluid.density, visco: fluid.visocity, k: material.kValue, printCalc: false)
+            let pressureDrop = pd(massFlowrate: massFlowrate, dia: internalDiameter, freeArea: nil, density: fluid.density, visco: fluid.visocity, k: material.kValue, printCalc: false)
             
             return (nomDia:nominalDiameter, pd:pressureDrop, v:velocity)
             
@@ -2419,9 +2420,9 @@ class Calculator: NSObject {
     
     func resultsForPipeSize(internalDiameter:Float, massFlowrate:Float, material:PipeMaterial, fluid:Fluid) -> (intDia:Float, pd:Float, v:Float) {
         
-        let velocity = circularVelocity(massFlowrate: massFlowrate, density: fluid.density, dia: internalDiameter)
+        let velocity = circularVelocity(massFlowrate: massFlowrate, density: fluid.density, dia: internalDiameter, freeArea: nil)
         
-        let pressureDrop = pd(massFlowrate: massFlowrate, dia: internalDiameter, density: fluid.density, visco: fluid.visocity, k: material.kValue, printCalc: false)
+        let pressureDrop = pd(massFlowrate: massFlowrate, dia: internalDiameter, freeArea: nil, density: fluid.density, visco: fluid.visocity, k: material.kValue, printCalc: false)
         
         return (intDia:internalDiameter, pd:pressureDrop, v:velocity)
         
@@ -2442,9 +2443,9 @@ class Calculator: NSObject {
             let internalDiamater = material.internalDiameters[index]
             let nominalDiameter = material.nominalDiameters[index]
             
-            let velocity = circularVelocity(massFlowrate: massFlowrate, density: fluid.density, dia: internalDiamater)
+            let velocity = circularVelocity(massFlowrate: massFlowrate, density: fluid.density, dia: internalDiamater, freeArea: nil)
             
-            let pressureDrop = pd(massFlowrate: massFlowrate, dia: internalDiamater, density: fluid.density, visco: fluid.visocity, k: material.kValue, printCalc: false)
+            let pressureDrop = pd(massFlowrate: massFlowrate, dia: internalDiamater, freeArea: nil, density: fluid.density, visco: fluid.visocity, k: material.kValue, printCalc: false)
             
             let result = (nomDia:nominalDiameter, pd:pressureDrop, v:velocity)
             
@@ -2479,29 +2480,37 @@ class Calculator: NSObject {
         return massFlowrate / density       // m3/s
     }
     
-    private func circularVelocity(massFlowrate:Float, density:Float, dia:Float) -> Float {
+    private func circularVelocity(massFlowrate:Float, density:Float, dia:Float, freeArea:Float?) -> Float {
         let VFR:Float = volumeFlowRate(massFlowrate: massFlowrate, density: density)
-        return circularVelocity(volumeFlowrate: VFR, dia: dia)      // m/s
+        return circularVelocity(volumeFlowrate: VFR, dia: dia, freeArea: freeArea)      // m/s
     }
     
-    private func circularVelocity(volumeFlowrate:Float, dia:Float) -> Float {
-        return (volumeFlowrate * 4) / (dia * dia * pi)  // m/s
+    private func circularVelocity(volumeFlowrate:Float, dia:Float, freeArea:Float?) -> Float {
+        var actualFreeArea = freeArea ?? 1.0    // default is 100% (max is also 1 so check for that too)
+        if actualFreeArea > 1 {
+            actualFreeArea = 1
+        }
+        return (volumeFlowrate * 4 * actualFreeArea) / (dia * dia * pi)  // m/s
     }
     
-    private func rectangularVelocity(massFlowrate:Float, density:Float, length:Float, width:Float) -> Float {
+    private func rectangularVelocity(massFlowrate:Float, density:Float, length:Float, width:Float, freeArea:Float?) -> Float {
         let VFR:Float = volumeFlowRate(massFlowrate: massFlowrate, density: density)
-        return rectangularVelocity(volumeFlowrate: VFR, length: length, width: width)   // m/s
+        return rectangularVelocity(volumeFlowrate: VFR, length: length, width: width, freeArea: freeArea)   // m/s
     }
     
-    private func rectangularVelocity(volumeFlowrate:Float, length:Float, width:Float) -> Float {
-        return volumeFlowrate / (length * width)    // m/s
+    private func rectangularVelocity(volumeFlowrate:Float, length:Float, width:Float, freeArea:Float?) -> Float {
+        var actualFreeArea = freeArea ?? 1.0    // default is 100% (max is also 1 so check for that too)
+        if actualFreeArea > 1 {
+            actualFreeArea = 1
+        }
+        return volumeFlowrate / (length * width * actualFreeArea)    // m/s
     }
     
     private func equivalentDiameter(x:Float, y:Float) -> Float {
         return (2*x*y)/(x+y)    // m - Equivalent diameter
     }
     
-    private func pd(massFlowrate:Float, dia:Float, density:Float, visco:Float, k:Float, printCalc:Bool) -> Float {
+    private func pd(massFlowrate:Float, dia:Float, freeArea:Float?, density:Float, visco:Float, k:Float, printCalc:Bool) -> Float {
         
         // massFlowrate     kg/s
         // dia              m
@@ -2513,13 +2522,13 @@ class Calculator: NSObject {
         
         let q = volumeFlowRate(massFlowrate: massFlowrate, density: density)     // m3/s
         
-        let v:Float  = self.circularVelocity(volumeFlowrate: q, dia: dia)   // m/s
+        let v:Float  = self.circularVelocity(volumeFlowrate: q, dia: dia, freeArea: freeArea)   // m/s
         
         return pd(velocity: v, dia: dia, density: density, visco: visco, k: k, printCalc: printCalc) // Pa/m
         
     }
     
-    private func pd(massFlowrate:Float, length:Float, width:Float, density:Float, visco:Float, k:Float, printCalc:Bool) -> Float {
+    private func pd(massFlowrate:Float, length:Float, width:Float, freeArea:Float?, density:Float, visco:Float, k:Float, printCalc:Bool) -> Float {
         
         // massFlowrate     kg/s
         // length           m
@@ -2532,7 +2541,7 @@ class Calculator: NSObject {
         
         let q = volumeFlowRate(massFlowrate: massFlowrate, density: density)     // m3/s
         
-        let v:Float  = self.rectangularVelocity(volumeFlowrate: q, length: length, width: width)   // m/s
+        let v:Float  = self.rectangularVelocity(volumeFlowrate: q, length: length, width: width, freeArea: freeArea)   // m/s
         
         let dia:Float = self.equivalentDiameter(x: length, y: width)
         
