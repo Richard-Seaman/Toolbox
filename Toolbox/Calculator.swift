@@ -644,23 +644,23 @@ class Calculator: NSObject {
             case .WHB_CH:
                 return [2,2,0,0]
             case .Sink_C:
-                return [5,0,0,0]
+                return [3,0,0,0]
             case .Sink_CH:
-                return [5,5,0,0]
+                return [3,3,0,0]
             case .Sink_CHM:
-                return [5,5,5,0]
+                return [3,3,3,0]
             case .Shower_CH:
                 return [6,6,0,0]
             case .Bath_CH:
                 return [10,10,0,0]
             case .Tap_C:
-                return [5,0,0,0]
+                return [3,0,0,0]
             case .Tap_H:
-                return [0,5,0,0]
+                return [0,3,0,0]
             case .Tap_M:
-                return [0,0,5,0]
+                return [0,0,3,0]
             case .Tap_R:
-                return [0,0,0,5]
+                return [0,0,0,3]
             }
         }
         
