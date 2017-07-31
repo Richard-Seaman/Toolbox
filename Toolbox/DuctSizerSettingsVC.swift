@@ -19,7 +19,7 @@ class DuctSizerSettingsVC: UIViewController {
     var tableViewController = UITableViewController()
     var textFields: [UITextField] = [UITextField(),UITextField(),UITextField(),UITextField()]
     var sectionHeadingsVariables: [String] = ["Air & Duct Properties"]
-    var sectionHeadingsMethod: [String] = ["Overview","Flowrate","Manual Sizing","Automatic Sizing"]
+    var sectionHeadingsMethod: [String] = ["Overview","Flowrate","Manual Sizing","Automatic Sizing","Free Area"]
     
 
     override func viewDidLoad() {
@@ -265,6 +265,20 @@ class DuctSizerSettingsVC: UIViewController {
                 label.numberOfLines = 0
                 
                 label.text = "The autosize calculation determines the minimum duct size that meets the maximum velocity limit.\n\nIn order to automatically size the duct, a maximum velocity must be provided. One of the preset velocities may be used by selecting the corresponding tab at the bottom of the screen. To define the velocity for autosizing, the custom tab must be selected and the velocity must be entered into the text field.\n\nWhen sizing rectangular ducts, an aspect ratio may be defined by using the textfield at the bottom right of the screen. If no aspect ratio is entered, the duct dimensions will be incremented in turn until the required velocity is achieved. The width or height of the duct may also be locked, preventing the dimension from changing during the autosizing procedure."
+                
+            }
+            else if (indexPath.section == 4) {
+                
+                // Automatic Sizing
+                cell = tableView.dequeueReusableCell(withIdentifier: "MethodCell") as UITableViewCell!
+                if (cell == nil) {
+                    cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MethodCell")
+                }
+                
+                let label:UILabel = cell!.viewWithTag(1) as! UILabel
+                label.numberOfLines = 0
+                
+                label.text = "The free area (%) of the duct may be specified using the text field at the top left. If a free area is provided, the velocity will be recalculated accordingly.\n\nNote that if a free area is specified, the pressure drop is no longer shown as it is no longer applicable (it will be dependent on the restrictor applied - grille/louvre/blades etc.)"
                 
             }
             else {

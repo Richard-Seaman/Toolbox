@@ -2490,7 +2490,7 @@ class Calculator: NSObject {
         if actualFreeArea > 1 {
             actualFreeArea = 1
         }
-        return (volumeFlowrate * 4 * actualFreeArea) / (dia * dia * pi)  // m/s
+        return (volumeFlowrate * 4) / (dia * dia * pi * actualFreeArea)  // m/s
     }
     
     private func rectangularVelocity(massFlowrate:Float, density:Float, length:Float, width:Float, freeArea:Float?) -> Float {
