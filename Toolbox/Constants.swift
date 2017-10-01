@@ -9,6 +9,8 @@
 import Foundation
 import UIKit
 
+let developerMode:Bool = true      // Used as a flag for logging extra info
+
 extension String {
     
     // There are a number of text fields used to input floats
@@ -57,6 +59,170 @@ extension UIView {
 var calculator:Calculator!
 
 let APP_ID = 1118758962
+
+
+// MARK: Rate on App Store
+
+let daysBeforeAsking:Int = 0                        // number of days to wait before asking
+let secondsBeforeAsking:Int = 120                   // how long the session must be before asking
+var timeAtStart:Date = Date()                       // initialised from app delegate too
+
+func okayToAskForRating() -> Bool {
+    
+    var okayToAsk = false
+    
+    let now:Date = Date()
+    let userCalendar = Calendar.current
+    var reason:String = ""
+    
+    if let lastAskedDate = loadRecordedFirstUseDate() {
+        
+        // Add the minimum number of days to the last asked date
+        let earliestAskDate:Date = (userCalendar as NSCalendar).date(byAdding: .day,
+                                                                     value: daysBeforeAsking,
+                                                                     to: lastAskedDate,   // Date that it's added to
+            options: [])!
+        
+        // Check if the access has expired
+        if (now == (now as NSDate).laterDate(earliestAskDate)) {
+            
+            // It has passed the earliest ask date, so it's okay to ask again
+            
+            // Check if the session is long enough to ask yet
+            let duration = Int(Date().timeIntervalSince(timeAtStart))
+            if (duration >= secondsBeforeAsking) {
+                okayToAsk = true
+                reason = "Okay to ask, handing over to SKStoreReviewController..."
+            } else {
+                reason = "Session hasn't been active long enough (\(duration)s/\(secondsBeforeAsking)s have passed)"
+            }
+            
+        } else {
+            reason = "Not enough days passed since first use.\nMinimum Days to wait - \(daysBeforeAsking)."
+        }
+        
+    }
+    else {
+        
+        // If there's no saved first use date, it must be the first time it's being used (or the first time it's used since this was added)
+        // save the current date as the first used date (we want to wait the minium number of days above before asking for the first time)
+        saveFirstUsedDate(now)
+        reason = "First time using app"
+        
+    }
+    
+    if developerMode {
+        print("Called: checkIfOkayToAsk\nReturned: \(okayToAsk)\nReason: \(reason)")
+    }
+        
+    
+    return okayToAsk
+    
+}
+
+
+// First Used Date Persistance
+// Save the data
+func saveFirstUsedDate(_ date:Date) {
+    
+    let filePath = dataFilePathForFirstUsedDate()
+    
+    // Deconstruct NSDate so it can be saved to plist (only care about year-month-day)
+    
+    let yearKey:String = "year"
+    let monthKey:String = "month"
+    let dayKey:String = "day"
+    
+    let userCalendar = Calendar.current
+    
+    let requestedDateComponents: NSCalendar.Unit = [.year, .month, .day]
+    
+    // Date components in the user's time zone
+    let firstUseDateComponents = (userCalendar as NSCalendar).components(requestedDateComponents,
+                                                                          from: date)
+    
+    let dict: NSMutableDictionary = ["XInitializerItem": "DoNotEverChangeMe"]
+    //saving values
+    dict.setObject(firstUseDateComponents.year ?? 2100, forKey: yearKey as NSCopying)  // includes a default future date
+    dict.setObject(firstUseDateComponents.month ?? 1, forKey: monthKey as NSCopying)
+    dict.setObject(firstUseDateComponents.day ?? 1, forKey: dayKey as NSCopying)
+    
+    if (dict.write(toFile: filePath, atomically: true)) {
+        print("\nFirst Use Date saved to\n\(filePath)")
+    }
+    else {
+        print("\nFirst Use Date could not be saved to\n\(filePath)")
+    }
+    
+}
+
+// Attempt to load the saved data
+func loadRecordedFirstUseDate() -> Date? {
+    
+    let filePath = dataFilePathForFirstUsedDate()
+    
+    if (FileManager.default.fileExists(atPath: filePath)) {
+        
+        let dict = NSDictionary(contentsOfFile: filePath)
+        
+        // Reconstruct NSDate
+        var firstUsedDate:Date? = nil
+        
+        let userCalendar = Calendar.current
+        
+        let yearKey:String = "year"
+        let monthKey:String = "month"
+        let dayKey:String = "day"
+        
+        var dateComponents = DateComponents()
+        
+        if let actualDict = dict {
+            
+            if let year = actualDict[yearKey] as? Int {
+                
+                if let month = actualDict[monthKey] as? Int {
+                    
+                    if let day = actualDict[dayKey] as? Int {
+                        
+                        dateComponents.year = year
+                        dateComponents.month = month
+                        dateComponents.day = day
+                        
+                        firstUsedDate = userCalendar.date(from: dateComponents)!
+                        // print("\nFirst Used Date loaded from firstUsed.plist\(firstUsedDate?.description)\nMin Days To Wait: \(daysBeforeAsking)")
+                        
+                    }
+                    
+                }
+                
+            }
+            
+        }
+        else {
+            
+            print("\nDictionary could not be extracted from - firstUsed.plist")
+            
+        }
+        
+        return firstUsedDate
+        
+    }
+    else {
+        print("\nLast Asked Date could not be loaded - firstUsed.plist does not exist @\n\(filePath)")
+        return nil
+    }
+    
+}
+
+// Get the path to the file
+func dataFilePathForFirstUsedDate() -> String {
+    let paths = NSSearchPathForDirectoriesInDomains(
+        FileManager.SearchPathDirectory.documentDirectory,
+        FileManager.SearchPathDomainMask.userDomainMask, true)
+    let documentsDirectory = paths[0] as NSString
+    return documentsDirectory.appendingPathComponent("firstUsed.plist") as String
+}
+
 
 
 // MARK: - Daylight Calculator
@@ -138,6 +304,13 @@ func getNavImageView(_ orientationToDisplayImageOn:UIInterfaceOrientation) -> UI
     imageView.contentMode = .scaleAspectFit
     let image = UIImage(named: "navIcon")
     imageView.image = image
+    
+    if #available(iOS 11.0, *) {
+        let widthConstraint = imageView.widthAnchor.constraint(equalToConstant: imageWidth)
+        let heightConstraint = imageView.heightAnchor.constraint(equalToConstant: imageHeight)
+        heightConstraint.isActive = true
+        widthConstraint.isActive = true
+    }
     
     return imageView
     

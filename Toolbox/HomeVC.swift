@@ -8,6 +8,7 @@
 
 import UIKit
 import MessageUI
+import StoreKit
 
 // FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
 // Consider refactoring the code to use the non-optional operators.
@@ -135,6 +136,16 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMa
         // Reload Table incase colour changed
         self.tableView.reloadData()
         
+        // Ask for Rating if okay
+        if okayToAskForRating() {
+            // Check what iOS version is being used to see if StoreKits review available
+            // (if it's an older version, don't bother)
+            if #available(iOS 10.3, *) {
+                // Storekit available
+                SKStoreReviewController.requestReview()
+            }
+        }
+        
     }
     
     
@@ -219,8 +230,8 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMa
                 
             case self.rateUsIndex:
                 // Rate
-                titleLabel.text = "Rate"
-                detailLabel.text = "If you find The Building Services Toolbox useful, I'd really appreciate if you Rate it on the App Store! But If you don't, I'd prefer if you didn't..."
+                titleLabel.text = "Review"
+                detailLabel.text = "If you find The Building Services Toolbox useful, I'd really appreciate if you Review it on the App Store! But If you don't, I'd prefer if you didn't..."
                 imageView.image = UIImage(named: "RateStar")!
             case self.aboutIndex:
                 // About
@@ -325,10 +336,11 @@ class HomeVC: UIViewController, UITableViewDataSource, UITableViewDelegate, MFMa
                 
                 // Rate
                 // Go to app store to rate
+                let storeLink:String = "itms-apps://itunes.apple.com/app/id\(APP_ID)?action=write-review"
                 print("Attempting to open:")
-                print("itms-apps://itunes.apple.com/app/id\(APP_ID)")
+                print(storeLink)
+                UIApplication.shared.openURL(URL(string : storeLink)!)
                 
-                UIApplication.shared.openURL(URL(string : "itms-apps://itunes.apple.com/app/id\(APP_ID)")!)
             case self.aboutIndex:
                 // About
                 self.performSegue(withIdentifier: "toInfo", sender: self)

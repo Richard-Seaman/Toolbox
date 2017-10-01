@@ -17,6 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
+        // Remember to adjust developerMode = false in Constants.swift before releasing
+        
         // Force defaults
         // resetLoadingUnitDefaults()
         // resetDuctSizerPropertiesDefaults()
@@ -60,6 +62,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         gai.trackUncaughtExceptions = true  // report uncaught exceptions
         // TODO: remove before release
         // gai.logger.logLevel = GAILogLevel.verbose  // remove before app release
+        
+        // Load the app start time into memory (needed for Rating prompt)
+        timeAtStart = Date()
+        let timestamp = DateFormatter.localizedString(from: timeAtStart, dateStyle: .medium, timeStyle: .long)
+        print("Logging app start time - \(timestamp)")
         
         return true
     }
