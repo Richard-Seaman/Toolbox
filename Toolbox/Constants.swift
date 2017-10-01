@@ -63,7 +63,7 @@ let APP_ID = 1118758962
 
 // MARK: Rate on App Store
 
-let daysBeforeAsking:Int = 0                        // number of days to wait before asking
+let daysBeforeAsking:Int = 2                        // number of days to wait before asking
 let secondsBeforeAsking:Int = 120                   // how long the session must be before asking
 var timeAtStart:Date = Date()                       // initialised from app delegate too
 
